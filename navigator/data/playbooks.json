@@ -336,36 +336,9 @@
       },
       {
         "question": "How will SNOMED CT releases be coordinated across exchange partners?",
-        "guidance": "When a sender updates to a new SNOMED CT release before receivers do, concept IDs may temporarily be unresolvable on receiver systems. Agree a release coordination policy — including a transition window — with all exchange partners before upgrading. Ensure all stakeholders have access to the version of SNOMED CT declared in exchanged messages, or have access to a public terminology server that can resolve version mismatches."
-      },
-      {
-        "question": "What is the resolution strategy when a received concept cannot be validated due to a version or edition mismatch?",
-        "guidance": "Two failure modes require different resolution strategies. (1) Concept not found: the sender may be using a newer release or a different national edition — in both cases $validate-code returns 'not found'. Check the national terminology server first for a newer version of the national edition; if still unresolved, query a multi-edition server for the closest international ancestor. (2) Concept inactive: the sender used an older release — apply the proposed replacement from SNOMED CT's historical association reference sets. Define and document these strategies for each exchange partner relationship before go-live."
+        "guidance": "When a sender updates to a new SNOMED CT release before receivers do, concept IDs may temporarily be unresolvable on receiver systems. Agree a release coordination policy — including a transition window — with all exchange partners before upgrading."
       }
     ],
-    "errorHandling": {
-      "intro": "When $validate-code fails, the response indicates why. Each failure mode has a distinct cause and resolution — do not treat them as equivalent.",
-      "scenarios": [
-        {
-          "trigger": "Concept not found",
-          "cause": "The sender is using a newer SNOMED CT release or a different national edition. In both cases $validate-code returns 'not found' locally — the detection is the same but the resolution is sequential.",
-          "resolutionSteps": [
-            "Check the relevant national terminology server first — the concept may exist in a newer version of the national edition and resolve to a valid national code.",
-            "If still not found, query a shared multi-edition terminology server to find the concept's closest ancestor in the international edition, which is available to both parties."
-          ],
-          "icon": "search"
-        },
-        {
-          "trigger": "Concept inactive",
-          "cause": "The sender used an older SNOMED CT release. The concept has since been inactivated and a replacement is available in the receiver's version.",
-          "resolutionSteps": [
-            "Look up the inactivated concept in SNOMED CT's historical association reference sets. These identify the proposed replacement concept. Apply that replacement for processing."
-          ],
-          "icon": "clock"
-        }
-      ],
-      "note": "In all cases, preserve both the original received code and the locally resolved code in the record so the substitution is auditable."
-    },
     "steps": [
       {
         "title": "Map each exchange element to a FHIR resource, path, and terminology binding",
@@ -373,23 +346,23 @@
       },
       {
         "title": "Define value sets for each terminology binding using ECL",
-        "description": "Write ECL expressions for each FHIR terminology binding (e.g., <<404684003 for a condition code field). Package these as FHIR ValueSet resources with canonical URLs. Declare the SNOMED CT edition and version URI in the ValueSet compose.include.system (e.g., http://snomed.info/sct/900000000000207008/version/20230901 for the September 2023 international edition)."
+        "description": "Write ECL expressions for each FHIR terminology binding (e.g., <<404684003 for a condition code field). Package these as FHIR ValueSet resources with canonical URLs. Declare the SNOMED CT edition in the ValueSet compose.include.system."
       },
       {
         "title": "Deploy or configure a FHIR Terminology Service",
-        "description": "Ensure a FHIR R4-compliant terminology service (Snowstorm or equivalent) is available to both sender and receiver systems. It must support $expand with ECL, $validate-code, $subsumes, and $translate (for map-based translation to other code systems). For cross-edition or cross-version exchange, access to a public multi-edition terminology server — such as the one operated by SNOMED International — is required to resolve version and edition mismatches."
+        "description": "Ensure a FHIR R4-compliant terminology service (Snowstorm or equivalent) is available to both sender and receiver systems. It must support $expand with ECL, $validate-code, $subsumes, and $translate (for map-based translation to other code systems)."
       },
       {
         "title": "Implement code validation on receipt",
-        "description": "On receiving a FHIR resource, call $validate-code for each SNOMED CT-coded element. If validation succeeds, the concept is active, from the declared edition/version, and within the expected value set — proceed normally. If $validate-code fails, identify the failure mode from the response and apply the corresponding resolution strategy. Do not treat all validation failures as equivalent — each mode requires a different resolution pathway, as detailed in the Validation Error Resolution section above."
+        "description": "On receiving a FHIR resource, call $validate-code for each SNOMED CT-coded element to confirm the concept ID is active, from the declared edition/version, and within the expected value set. Log and escalate validation failures."
       },
       {
         "title": "Handle display text using the receiver's language reference set",
-        "description": "When rendering received SNOMED CT codes, call $lookup against the terminology service with the display language parameter set to the receiver's language reference set. Display the resulting preferred term — do not use the display text from the received resource as authoritative. When a concept has been resolved via a mismatch strategy, display the preferred term for the resolved concept and indicate the original received concept to the user if clinically relevant."
+        "description": "When rendering received SNOMED CT codes, call $lookup against the terminology service with the display language parameter set to the receiver's language reference set. Display the resulting preferred term — do not use the display text from the received resource as authoritative."
       },
       {
         "title": "Test end-to-end with conformance tooling",
-        "description": "Validate exchanges using FHIR validation tooling and, where applicable, IHE or HL7 connectathon test scripts. Confirm that coded data round-trips correctly — codes sent are correctly validated and displayed at the receiver. Specifically test version and edition mismatch scenarios: send concepts from a newer version and from an older version, and verify the resolution strategies produce the expected outcomes."
+        "description": "Validate exchanges using FHIR validation tooling and, where applicable, IHE or HL7 connectathon test scripts. Confirm that coded data round-trips correctly — codes sent are correctly validated and displayed at the receiver."
       }
     ],
     "dependencies": [
@@ -400,12 +373,10 @@
     ],
     "pitfalls": [
       "Sending the FSN as the FHIR display text — receivers will display a technical label to clinicians rather than the appropriate preferred term",
-      "Not declaring the SNOMED CT edition and version URI in exchanged resources — receivers cannot validate codes without knowing which edition and version was used",
+      "Not declaring the SNOMED CT edition in exchanged resources — receivers cannot validate codes without knowing which edition was used",
       "Accepting incoming codes without $validate-code validation — invalid or retired concept IDs silently enter clinical systems",
-      "Treating all validation failures as equivalent — a concept from a newer version, an inactivated concept, and a concept from a different edition each require a different resolution strategy; conflating them leads to incorrect handling",
-      "No resolution strategy for version mismatches — logging and escalating is not sufficient; receivers must be able to resolve concepts from newer or older versions using a public terminology server and SNOMED CT history supplements",
-      "Using extension concepts not available in receiver systems without providing the nearest international ancestor — receivers in a different edition cannot resolve or validate locally created extension concepts",
-      "No release coordination policy across exchange partners — a SNOMED CT upgrade on one side causes validation failures on the other without an agreed resolution pathway"
+      "Using extension concepts not available in receiver systems — receivers cannot resolve or validate locally created concepts",
+      "No release coordination policy across exchange partners — a SNOMED CT upgrade on one side causes validation failures on the other"
     ],
     "resources": [
       {"type": "Tool", "title": "SNOMED CT Browser", "url": "https://browser.ihtsdotools.org/"},

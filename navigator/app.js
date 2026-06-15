@@ -67,9 +67,6 @@ const ICONS = {
   'id-badge':     `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="18" x="5" y="3" rx="2"/><circle cx="12" cy="10" r="2"/><path d="M9 18h6"/></svg>`,
   'check-circle': `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>`,
   'list-check':   `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 3 3 4-4"/><path d="m3 17 3 3 4-4"/><path d="M14 8h7"/><path d="M14 18h7"/></svg>`,
-  clock:          `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-  globe:          `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
-  'arrow-up':     `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="19" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`,
 };
 
 function icon(name, size = 16) {
@@ -266,43 +263,6 @@ function renderPlaybook(id) {
           `).join('')}
         </div>
       </div>
-
-      <!-- Validation error resolution (optional, data-driven) -->
-      ${pb.errorHandling ? `
-      <div class="pb-card pb-error-handling">
-        <div class="pb-card-title">${icon('warning')} Validation error resolution</div>
-        <p class="error-handling-intro">${pb.errorHandling.intro}</p>
-        <div class="error-scenario-grid">
-          ${pb.errorHandling.scenarios.map(s => `
-            <div class="error-scenario-card">
-              <div class="error-scenario-header">
-                ${icon(s.icon || 'warning', 14)}
-                <span class="error-scenario-trigger">${s.trigger}</span>
-              </div>
-              <div class="error-scenario-body">
-                <div class="error-scenario-section">
-                  <div class="error-scenario-label">Cause</div>
-                  <div class="error-scenario-text">${s.cause}</div>
-                </div>
-                <div class="error-scenario-section">
-                  <div class="error-scenario-label">Resolution</div>
-                  ${s.resolutionSteps.length === 1
-                    ? `<div class="error-scenario-text">${s.resolutionSteps[0]}</div>`
-                    : `<ol class="error-resolution-steps">${s.resolutionSteps.map(r => `<li>${r}</li>`).join('')}</ol>`
-                  }
-                </div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-        ${pb.errorHandling.note ? `
-          <div class="error-handling-note">
-            ${icon('check-circle', 14)}
-            <span>${pb.errorHandling.note}</span>
-          </div>
-        ` : ''}
-      </div>
-      ` : ''}
 
       <!-- Implementation steps -->
       <div class="pb-card">
