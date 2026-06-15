@@ -14,40 +14,22 @@ navigator/
     └── playbooks.json  12 detailed playbooks
 ```
 
-## Docker Desktop (recommended)
+## Running locally (Python)
 
-**Start:**
+The app uses `fetch()` to load JSON files, so it must be served over HTTP — opening `index.html` directly from the file system won't work.
+
+**Quickest way — run the included script:**
 ```bash
 cd navigator
-docker compose up --build
+./serve.sh
 ```
 
-Open [http://localhost:8080](http://localhost:8080) — done.
+Open [http://localhost:8080](http://localhost:8080) — done. Edit any file and just refresh the browser.
 
-The `data/` folder is mounted as a live volume, so you can edit `questions.json` or `playbooks.json` and just refresh the browser — **no rebuild needed**.
-
-**Stop:**
-```bash
-docker compose down
-```
-
-**Rebuild after changing HTML/CSS/JS:**
-```bash
-docker compose up --build
-```
-
-The container appears in Docker Desktop's UI as `snomed-navigator` where you can start, stop, and view logs.
-
----
-
-## Local development (no Docker)
-
-The app uses `fetch()` to load JSON files, so it must be served over HTTP — it won't work opened directly from the file system. Use any of these:
-
-**Python (no install needed):**
+**Or run Python directly:**
 ```bash
 cd navigator
-python -m http.server 8080
+python3 -m http.server 8080
 # then open http://localhost:8080
 ```
 
