@@ -78,32 +78,36 @@
   },
 
   "clin-docs": {
-    "title": "Clinical documentation",
+    "title": "Structured clinical documentation",
     "subtitle": "Capturing structured clinical data using SNOMED CT in templates and forms",
     "icon": "notes",
     "color": "teal",
     "audience": ["Architect", "Clinician", "Terminologist"],
-    "overview": "Structured clinical documentation using SNOMED CT replaces free text with computable, queryable data. Each data entry field is bound to a SNOMED CT value set defined using ECL, ensuring clinicians select from clinically appropriate precoordinated concepts. The SNOMED CT Allergy and Adverse Reaction Implementation Guide provides specific patterns for allergy recording. The key challenge is balancing clinical expressiveness with usability — overstructuring creates friction; understructuring produces data that cannot be queried or exchanged.",
+    "overview": "Structured clinical documentation using SNOMED CT supplements — and sometimes replaces — free text with computable, queryable data. Data entry fields are bound to SNOMED CT value sets, giving clinicians access to clinically appropriate SNOMED CT concepts. SNOMED International and national release centres publish domain-specific implementation guides that define patterns for recording specific types of clinical information, such as allergies and adverse reactions. The key challenge is balancing clinical expressiveness with usability — overstructuring creates friction; understructuring produces data that cannot be queried or exchanged.",
     "decisions": [
       {
         "question": "Which clinical data elements need to be SNOMED CT coded, and which can remain as narrative?",
         "guidance": "Not every field should be coded. Focus SNOMED CT binding on data that will be queried, exchanged, or used for decision support. Mandatory structured fields with poor UX lead to workarounds — start with the highest-value fields and expand progressively."
       },
       {
-        "question": "Which SNOMED CT hierarchy or ECL constraint applies to each structured field?",
-        "guidance": "Each field should be bound to a specific, scoped ECL expression — for example, a medication field might use descendants of Medicinal product (<<763158003), a procedure field descendants of Procedure (<<71388002). Broad, unscoped bindings result in irrelevant search results."
+        "question": "How will clinical meaning and context be represented for each structured element?",
+        "guidance": "Consider not just what value to capture, but what it means in context. A finding field may need to distinguish between a confirmed finding, a suspected finding, a family history, or an excluded condition. The Context Representation Implementation Guide defines patterns for capturing such meaning. These decisions affect template design, value set scope, and what downstream queries can reliably answer."
       },
       {
-        "question": "How will allergies and adverse reactions be modelled?",
-        "guidance": "Follow the SNOMED CT Allergy and Adverse Reaction Implementation Guide, which defines specific patterns for causative agent, reaction, severity, and certainty. Do not design a local allergy model if the IG covers your needs — the IG supports FHIR AllergyIntolerance interoperability."
+        "question": "What are the value set binding principles for each structured field?",
+        "guidance": "Value set binding defines the permissible SNOMED CT concepts for a field. Approaches include hierarchy-based constraints, curated reference sets, and combinations. ECL is a powerful tool for hierarchy-based constraints but not the only approach — some fields are better served by curated lists or reference sets. The binding approach should match the clinical purpose and be maintainable over time. Refer to the Context Representation Implementation Guide where contextual meaning needs to be captured alongside the coded value."
       },
       {
-        "question": "What language reference set will be used for preferred term display and search?",
-        "guidance": "Configure the terminology service to return preferred terms from the appropriate national language reference set. Terms displayed in templates must come from the language reference set — not FSNs or arbitrary synonyms."
+        "question": "Are there logic rules or dependencies between data elements that need to be established?",
+        "guidance": "Some documentation fields are clinically interdependent — for example, a severity field may only be relevant if a finding is confirmed, or a causative agent field may constrain which reaction types are appropriate. Identify and model these dependencies explicitly so that templates can guide clinicians and validate data at entry, rather than relying on post-hoc correction."
       },
       {
-        "question": "How will data quality be monitored over time?",
-        "guidance": "Plan QA from the start: track free-text usage rates, concept utilisation within value sets, and completeness. Use ECL queries via the terminology service to detect records using retired or out-of-scope concepts after SNOMED CT releases."
+        "question": "What language reference set and display terms will be used for each clinical context?",
+        "guidance": "Configure the terminology service to return preferred terms from the appropriate national language reference set. Terms displayed in templates must come from the language reference set — not FSNs or arbitrary synonyms. In multilingual deployments, agree language priority order and fallback behaviour explicitly."
+      },
+      {
+        "question": "How will ongoing maintenance, quality assurance, and change management be handled?",
+        "guidance": "Structured documentation must remain maintainable as clinical requirements evolve and SNOMED CT is updated. Establish processes that allow value sets and templates to be updated in response to both clinician requests and terminology releases — without requiring full system redevelopment. Track free-text rates, out-of-scope concept usage, and template completion as quality indicators."
       }
     ],
     "steps": [
@@ -112,45 +116,45 @@
         "description": "Work with clinical leads to identify which fields require structured SNOMED CT coding, what granularity is needed, and how data will be used downstream."
       },
       {
-        "title": "Bind each structured field to an ECL-defined value set",
-        "description": "Write an ECL expression for each field (e.g., <<404684003 for clinical findings, <<71388002 for procedures) and package these as RF2 reference sets or FHIR ValueSet resources for runtime use by the terminology service."
+        "title": "Determine meaning-binding and context representation requirements",
+        "description": "For each structured field, decide whether clinical context needs to be captured alongside the coded value — for example, whether a finding is confirmed, suspected, or excluded. Consult the Context Representation Implementation Guide to identify the appropriate pattern. These decisions must be made before value set binding, as they affect what concepts are appropriate for each field."
       },
       {
-        "title": "Implement data entry UX using preferred terms",
-        "description": "Build autocomplete and pick-list controls that query the terminology service and display preferred terms from the configured language reference set. Never surface FSNs in clinical-facing UI."
+        "title": "Define value set binding for each structured field",
+        "description": "Select the appropriate binding approach for each field — an ECL expression, a curated reference set, or a combination. ECL is well-suited to hierarchy-based constraints; curated reference sets suit fields where clinical judgement over individual concepts is required. Package value sets as RF2 reference sets or FHIR ValueSet resources for runtime use by the terminology service."
       },
       {
-        "title": "Implement allergy and adverse reaction recording",
-        "description": "Follow the SNOMED CT Allergy and Adverse Reaction Implementation Guide. Code causative agents using the Substance or Medicinal product hierarchies, reactions using Clinical finding descendants, and map to FHIR AllergyIntolerance for exchange."
+        "title": "Establish logic and dependencies between data elements",
+        "description": "Identify fields that are clinically interdependent and implement the necessary logic in the template or data entry layer — conditional field display, cross-field validation, or guided value selection. Document these dependencies explicitly so they can be maintained as templates evolve."
       },
       {
-        "title": "Validate coded data at entry",
-        "description": "Use the terminology service $validate-code operation to confirm that selected concepts are active, within the field's ECL constraint, and from the correct SNOMED CT edition. Flag invalid selections in real time."
+        "title": "Implement data entry UX with correct term display and language configuration",
+        "description": "Build autocomplete and pick-list controls that query the terminology service and display preferred terms from the configured language reference set. Never surface FSNs in clinical-facing UI. Verify that synonym coverage supports the terms clinicians naturally use in each specialty context."
       },
       {
-        "title": "Monitor data quality and iterate",
-        "description": "Track free-text rates, out-of-scope concept usage, and template completion rates. Use these metrics to tune value sets, improve UX, and identify where new clinical concepts may need to be requested from SNOMED International."
+        "title": "Establish maintenance, QA, and change management processes",
+        "description": "Define processes for updating value sets and templates in response to clinician requests and SNOMED CT releases. Ensure that changes can be made without full system redevelopment. Track quality indicators — free-text rates, out-of-scope concept usage, template completion — and establish governance for who approves changes and how updates are communicated to clinical teams."
       }
     ],
     "dependencies": [
-      {"icon": "server", "text": "Terminology service supporting ECL-based $expand and $validate-code"},
-      {"icon": "filter", "text": "ECL-defined value sets per documentation field"},
-      {"icon": "search", "text": "Language reference set for preferred term display"},
-      {"icon": "shield-check", "text": "Clinical governance for field binding and allergy model approval"}
+      {"icon": "server", "text": "Terminology service supporting value set expansion and $validate-code"},
+      {"icon": "filter", "text": "Value sets defined per documentation field, using the appropriate binding approach"},
+      {"icon": "search", "text": "Language reference set for preferred term display and synonym search"},
+      {"icon": "shield-check", "text": "Clinical governance for field binding, context representation, and change management"}
     ],
     "pitfalls": [
-      "Binding fields to the top of SNOMED CT hierarchies without ECL scoping — produces overwhelming and irrelevant search results",
-      "Designing a local allergy model instead of following the SNOMED CT Allergy IG — creates interoperability problems",
+      "Replacing free text entirely where supplementing it would be more appropriate — over-structuring creates clinician friction and workarounds",
+      "Not considering context representation — a coded value without context (confirmed vs. suspected, patient vs. family) cannot be reliably queried",
+      "Defaulting to ECL for all value set bindings — some fields are better served by curated reference sets or a combination of approaches",
       "Displaying FSNs to clinicians in documentation templates — FSNs are technical identifiers, not display labels",
-      "Overstructuring — forcing coding at a granularity clinicians cannot sustain leads to abandonment and free-text workarounds",
-      "No data quality monitoring — coded data degrades silently when value sets are not maintained after SNOMED CT releases"
+      "No change management process — structured documentation becomes a maintenance burden when clinician requirements evolve or SNOMED CT releases change relevant content"
     ],
     "resources": [
       {"type": "Tool", "title": "SNOMED CT Browser", "url": "https://browser.ihtsdotools.org/"},
+      {"type": "Guide", "title": "Context representation guide", "url": "https://docs.snomed.org/implementation-guides/context-representation-implementation-guide/"},
       {"type": "Guide", "title": "Allergy implementation guide", "url": "https://docs.snomed.org/implementation-guides/allergy-implementation-guide/"},
       {"type": "Guide", "title": "EHR requirements guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-ehr-requirements-guide/"},
-      {"type": "Spec", "title": "Expression constraint language specification", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"},
-      {"type": "Guide", "title": "Context representation guide", "url": "https://docs.snomed.org/implementation-guides/context-representation-implementation-guide/"}
+      {"type": "Spec", "title": "Expression constraint language specification", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"}
     ]
   },
 
