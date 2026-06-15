@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SNOMED CT Implementation Navigator — find the right playbook for your use case, capability, or role.">
+  <title>SNOMED CT Implementation Navigator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────────────── -->
+<header class="site-header" role="banner">
+  <div class="header-inner">
+    <a href="#/" class="header-logo" aria-label="SNOMED CT Implementation Navigator — home">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"/>
+        <path d="M12 8v4l2 2"/>
+        <path d="M8 3.5A9.06 9.06 0 0 1 12 3a9 9 0 0 1 9 9"/>
+      </svg>
+      <div class="logo-wordmark">
+        <span class="logo-org">SNOMED International</span>
+        <span class="logo-product">Implementation navigator</span>
+      </div>
+    </a>
+
+    <nav class="header-nav" aria-label="Perspectives">
+      <a href="#/browse/useCase">Use cases</a>
+      <a href="#/browse/capability">Capabilities</a>
+      <a href="#/browse/role">Roles</a>
+      <a href="#/playbooks">All playbooks</a>
+    </nav>
+
+    <div class="header-search" role="search">
+      <span class="search-icon" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </span>
+      <input
+        type="search"
+        id="search-input"
+        placeholder="Search questions and playbooks…"
+        aria-label="Search"
+        aria-autocomplete="list"
+        aria-controls="search-results"
+        autocomplete="off"
+      >
+      <div id="search-results" class="search-results" role="listbox" aria-label="Search suggestions"></div>
+    </div>
+  </div>
+</header>
+
+<!-- ── Main ───────────────────────────────────────────────────────────── -->
+<main id="main" role="main">
+
+  <!-- Landing view -->
+  <div id="view-landing" class="view">
+    <div class="landing-hero">
+      <div class="hero-label">SNOMED CT</div>
+      <h1 class="hero-title">Implementation navigator</h1>
+      <p class="hero-subtitle">Find the right playbook — structured guides with decisions, steps, dependencies, pitfalls, and resources.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-number">74</div>
+          <div class="hero-stat-label">Questions</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-number">12</div>
+          <div class="hero-stat-label">Playbooks</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-number">300+</div>
+          <div class="hero-stat-label">Resources</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="landing-body">
+      <div class="container">
+        <p class="section-label">Where are you starting from?</p>
+        <div id="entry-grid" class="entry-grid" role="list"></div>
+
+        <hr class="section-divider">
+        <p class="section-label">Or jump directly to a playbook</p>
+        <div id="playbook-chips" class="chip-row"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Browse view -->
+  <div id="view-browse" class="view">
+    <div class="container">
+      <div class="browse-header">
+        <h2 id="browse-title" class="browse-title"></h2>
+        <p id="browse-subtitle" class="browse-subtitle"></p>
+      </div>
+      <div id="filter-bar" class="filter-bar" role="toolbar" aria-label="Filter by category"></div>
+      <div id="question-list" class="question-list" role="list"></div>
+    </div>
+  </div>
+
+  <!-- Playbook view -->
+  <div id="view-playbook" class="view">
+    <div class="container" style="padding-top: 24px; padding-bottom: 48px;">
+      <button id="playbook-back" class="back-btn" aria-label="Go back">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+        </svg>
+        Back
+      </button>
+      <div id="playbook-content"></div>
+    </div>
+  </div>
+
+  <!-- Question answer view -->
+  <div id="view-question" class="view">
+    <div class="container" style="padding-top:24px;padding-bottom:48px">
+      <button id="question-back" class="back-btn" aria-label="Go back">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        Back to questions
+      </button>
+      <div id="question-content"></div>
+    </div>
+  </div>
+
+  <!-- All playbooks view -->
+  <div id="view-all-playbooks" class="view">
+    <div class="pb-overview-hero">
+      <div class="container">
+        <div class="pb-overview-hero-inner">
+          <div>
+            <div class="hero-label" style="text-align:left;margin-bottom:8px">SNOMED CT implementation playbooks</div>
+            <h1 class="pb-overview-title">What is a playbook?</h1>
+            <p class="pb-overview-intro">A playbook is a practical, structured guide for implementing SNOMED CT in a specific context. Rather than theory, each playbook answers: <em>"What do I need to decide, build, and do — and in what order?"</em></p>
+          </div>
+          <div class="pb-overview-pillars">
+            <div class="pb-overview-pillar">
+              <span class="pb-overview-pillar-icon">🎯</span>
+              <div class="pb-overview-pillar-label">Key decisions</div>
+              <div class="pb-overview-pillar-desc">Critical choices with options and trade-offs</div>
+            </div>
+            <div class="pb-overview-pillar">
+              <span class="pb-overview-pillar-icon">🪜</span>
+              <div class="pb-overview-pillar-label">Implementation steps</div>
+              <div class="pb-overview-pillar-desc">What to do first, next, and why</div>
+            </div>
+            <div class="pb-overview-pillar">
+              <span class="pb-overview-pillar-icon">🔗</span>
+              <div class="pb-overview-pillar-label">Dependencies</div>
+              <div class="pb-overview-pillar-desc">What you need in place before you start</div>
+            </div>
+            <div class="pb-overview-pillar">
+              <span class="pb-overview-pillar-icon">⚠️</span>
+              <div class="pb-overview-pillar-label">Common pitfalls</div>
+              <div class="pb-overview-pillar-desc">What typically goes wrong and how to avoid it</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container" style="padding-top:40px;padding-bottom:56px">
+      <div id="all-playbooks-grid"></div>
+    </div>
+  </div>
+
+  <!-- Search results page -->
+  <div id="view-search" class="view">
+    <div class="container" style="padding-top: 32px; padding-bottom: 48px;">
+      <a href="#/" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+        </svg>
+        Home
+      </a>
+      <div class="search-page-header">
+        <h2 id="search-page-title" class="search-page-title"></h2>
+        <p id="search-page-sub" class="search-page-sub"></p>
+      </div>
+      <div id="search-results-main"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Footer ─────────────────────────────────────────────────────────── -->
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <p>
+      © SNOMED International ·
+      <a href="https://www.snomed.org" target="_blank" rel="noopener">snomed.org</a> ·
+      <a href="https://docs.snomed.org" target="_blank" rel="noopener">docs.snomed.org</a>
+    </p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

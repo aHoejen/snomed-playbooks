@@ -1,0 +1,12 @@
+services:
+  navigator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: snomed-navigator
+    ports:
+      - "8080:80"
+    # Mount the data folder so you can edit JSON files without rebuilding
+    volumes:
+      - ./data:/usr/share/nginx/html/data:ro
+    restart: unless-stopped
