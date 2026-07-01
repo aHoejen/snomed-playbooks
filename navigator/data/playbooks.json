@@ -4,7 +4,7 @@
     "subtitle": "Implementing a structured SNOMED CT-based problem list in clinical systems",
     "icon": "list-details",
     "color": "blue",
-    "audience": ["Clinician", "Software provider", "Terminologist"],
+    "audience": ["Clinician", "Software provider", "Information Manager"],
     "overview": "A SNOMED CT-based problem list enables structured condition recording that supports longitudinal care, clinical decision support, cohort queries, and interoperability. Concepts from the Clinical finding and Disorder hierarchies are used, scoped by an Expression Constraint Language (ECL) expression or curated reference set. This is one of the highest-value and most common SNOMED CT implementation targets.",
     "decisions": [
       {
@@ -82,7 +82,7 @@
     "subtitle": "Capturing structured clinical data using SNOMED CT in templates and forms",
     "icon": "notes",
     "color": "teal",
-    "audience": ["Software provider", "Clinician", "Terminologist"],
+    "audience": ["Software provider", "Clinician", "Information Manager"],
     "overview": "Structured clinical documentation using SNOMED CT supplements — and sometimes replaces — free text with computable, queryable data. Data entry fields are bound to SNOMED CT value sets, giving clinicians access to clinically appropriate SNOMED CT concepts. SNOMED International and national release centres publish domain-specific implementation guides that define patterns for recording specific types of clinical information, such as allergies and adverse reactions. The key challenge is balancing clinical expressiveness with usability — overstructuring creates friction; understructuring produces data that cannot be queried or exchanged.",
     "decisions": [
       {
@@ -163,7 +163,7 @@
     "subtitle": "Using SNOMED CT hierarchies and ECL to power computable clinical rules",
     "icon": "brain",
     "color": "camelot",
-    "audience": ["Software provider", "Clinician", "Terminologist"],
+    "audience": ["Software provider", "Clinician", "Information Manager"],
     "overview": "SNOMED CT enables computable clinical logic through its hierarchical concept model and Expression Constraint Language (ECL). Rules built on SNOMED CT subsumption — using ECL expressions such as <<73211009 for all descendants of Diabetes mellitus — automatically cover all clinically relevant child concepts, including those added in future SNOMED CT releases. This makes CDS rules significantly more durable and clinically complete than rules based on explicit flat code lists.",
     "decisions": [
       {
@@ -239,7 +239,7 @@
     "subtitle": "Using SNOMED CT hierarchies and ECL for cohort definition and reporting",
     "icon": "chart-bar",
     "color": "orange",
-    "audience": ["Software provider", "Terminologist"],
+    "audience": ["Software provider", "Information Manager"],
     "overview": "SNOMED CT's hierarchical concept model, queried using Expression Constraint Language (ECL), enables dramatically more powerful cohort queries than flat code matching. A single ECL expression such as <<73211009 |Diabetes mellitus| returns all subtypes — including specific types added in future SNOMED CT releases — without list maintenance. ECL queries are executed against a SNOMED CT terminology service (via the FHIR $expand operation or Snowstorm's ECL endpoint) and the resulting concept sets are applied against coded clinical data.",
     "decisions": [
       {
@@ -421,7 +421,7 @@
     "subtitle": "Designing, authoring, and maintaining SNOMED CT value sets using ECL and reference sets",
     "icon": "filter",
     "color": "purple",
-    "audience": ["Terminologist", "Software provider"],
+    "audience": ["Information Manager", "Software provider"],
     "overview": "SNOMED CT value sets constrain concept selection for a specific clinical purpose. The recommended approach is to define value sets intensionally using Expression Constraint Language (ECL) — writing an expression that captures the intended concept set from the SNOMED CT hierarchy. ECL-based definitions are self-maintaining (new concepts that satisfy the constraint are automatically included) and can be evaluated at runtime against any SNOMED CT edition by a terminology service. Tools including Simplex and the SNOMED CT Browser support value set authoring and ECL testing.",
     "decisions": [
       {
@@ -497,7 +497,7 @@
     "subtitle": "Deploying and operating a SNOMED CT terminology service for runtime use",
     "icon": "server",
     "color": "blue",
-    "audience": ["Software provider", "Terminologist"],
+    "audience": ["Software provider", "Information Manager"],
     "overview": "A SNOMED CT terminology service is the runtime foundation for all SNOMED CT-enabled applications. It provides concept lookup, preferred term retrieval by language reference set, ECL-based value set expansion, subsumption testing, code validation, and concept map translation. Snowstorm — developed by SNOMED International and released as open source — is the reference server. It implements both a native API and the HL7 FHIR Terminology Service operations ($expand, $lookup, $subsumes, $validate-code, $translate) required for interoperable deployment.",
     "decisions": [
       {
@@ -650,7 +650,7 @@
     "subtitle": "Mapping SNOMED CT to ICD-10 and migrating from legacy code systems using Snap2SNOMED",
     "icon": "arrows-right-left",
     "color": "gray",
-    "audience": ["Terminologist", "Software provider"],
+    "audience": ["Information Manager", "Software provider"],
     "overview": "SNOMED CT mapping enables translation to other code systems (primarily ICD-10 for statutory reporting), and migration of legacy-coded data into SNOMED CT. The official SNOMED CT to ICD-10 extended map — maintained by SNOMED International — provides rule-based, condition-aware mapping for reporting. For custom mapping projects, Snap2SNOMED is the recommended tool, providing a structured workflow for human-curated mapping with audit trail and versioning. Mapping always involves some loss of meaning — the degree of loss depends on the source and target systems and must be explicitly acknowledged.",
     "decisions": [
       {
@@ -726,7 +726,7 @@
     "subtitle": "Establishing governance structures for sustainable, high-quality SNOMED CT implementation",
     "icon": "shield-check",
     "color": "blue",
-    "audience": ["Governance Lead", "Terminologist", "Software provider"],
+    "audience": ["Governance Lead", "Information Manager", "Software provider"],
     "overview": "Governance is what separates a SNOMED CT implementation that improves over time from one that gradually degrades. Good governance defines who has authority over terminology content decisions, how changes are requested and approved, how quality is measured, and how the implementation responds to each SNOMED CT release cycle. Automated QA using ECL-based queries — for example, detecting records using inactivated concepts — is a practical and scalable quality mechanism that should be built into the release management process from the start.",
     "decisions": [
       {
@@ -802,7 +802,7 @@
     "subtitle": "Creating and maintaining SNOMED CT extensions when international content is insufficient",
     "icon": "pencil-plus",
     "color": "green",
-    "audience": ["Terminologist"],
+    "audience": ["Information Manager"],
     "overview": "A SNOMED CT extension allows national release centres or organisations to add concepts, descriptions, and reference sets that are not in the international release. Extension concepts must follow the same design principles as international SNOMED CT content — applying the concept model as defined in the SNOMED CT Machine Readable Concept Model (MRCM), using defining relationships consistent with the international hierarchy, and undergoing description logic classification. Extension authoring should be a last resort: always search the international and national release thoroughly, and submit a content request to SNOMED International before creating local extension concepts.",
     "decisions": [
       {
@@ -880,7 +880,7 @@
     "subtitle": "Supporting SNOMED CT in multiple languages using language reference sets and translation tools",
     "icon": "language",
     "color": "amber",
-    "audience": ["Terminologist", "Software provider", "Clinician"],
+    "audience": ["Information Manager", "Software provider", "Clinician"],
     "overview": "SNOMED CT's concept meanings are language-neutral — meaning is encoded in the concept model and defining relationships, not in text strings. Language reference sets attach preferred terms and acceptable synonyms for each language or dialect to the same underlying concept. This enables clinicians to work in their own language while the coded concept remains universally interoperable. SNOMED International and national release centres publish language reference sets for many languages. The SNOMED International Translation Tool supports structured translation workflows for organisations creating or maintaining translations.",
     "decisions": [
       {
