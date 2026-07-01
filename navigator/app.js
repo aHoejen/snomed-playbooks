@@ -67,6 +67,7 @@ const ICONS = {
   'id-badge':     `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="18" x="5" y="3" rx="2"/><circle cx="12" cy="10" r="2"/><path d="M9 18h6"/></svg>`,
   'check-circle': `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>`,
   'list-check':   `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 3 3 4-4"/><path d="m3 17 3 3 4-4"/><path d="M14 8h7"/><path d="M14 18h7"/></svg>`,
+  stethoscope:    `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>`,
   clock:          `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
   globe:          `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
   'arrow-up':     `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="19" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`,
@@ -195,6 +196,50 @@ function renderBrowse(perspective, activeFilter) {
 
   document.getElementById('browse-subtitle').textContent =
     `${qs.length} questions — select one to open its playbook`;
+
+  // Role introductions
+  const roleIntroEl = document.getElementById('role-intros');
+  if (perspective === 'role') {
+    const roles = [
+      {
+        name: 'Clinician',
+        icon: 'stethoscope',
+        description: 'Clinical professionals involved in defining requirements, reviewing terminology content, and validating that structured data accurately reflects clinical practice. Clinicians determine which data elements need to be captured, what level of granularity is meaningful, and whether the right concepts and terms are available for their specialty.'
+      },
+      {
+        name: 'Software provider',
+        icon: 'code',
+        description: 'Technical teams responsible for designing and building systems that implement SNOMED CT — including EHR platforms, terminology services, FHIR endpoints, and data entry interfaces. Software providers make architectural decisions about how SNOMED CT is stored, queried, and surfaced to end users.'
+      },
+      {
+        name: 'Information Manager',
+        icon: 'filter',
+        description: 'Specialists responsible for the quality, governance, and lifecycle of SNOMED CT content within an organisation or programme. Information managers author and maintain value sets, manage reference sets, oversee concept requests, coordinate release updates, and ensure that terminology content meets clinical and technical requirements.'
+      },
+      {
+        name: 'Governance Lead',
+        icon: 'shield',
+        description: 'Leaders accountable for organisational policy around SNOMED CT adoption — including compliance with national requirements, change control processes, stakeholder alignment, and ongoing quality assurance. Governance leads define who has authority over terminology decisions and how the implementation responds to evolving clinical and regulatory requirements.'
+      }
+    ];
+    roleIntroEl.innerHTML = `
+      <div class="role-intro-grid">
+        ${roles.map(r => `
+          <div class="role-intro-card">
+            <div class="role-intro-icon">${icon(r.icon, 18)}</div>
+            <div class="role-intro-body">
+              <div class="role-intro-name">${r.name}</div>
+              <div class="role-intro-desc">${r.description}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    roleIntroEl.style.display = 'block';
+  } else {
+    roleIntroEl.style.display = 'none';
+    roleIntroEl.innerHTML = '';
+  }
 
   // Filter bar
   const filterBar = document.getElementById('filter-bar');
