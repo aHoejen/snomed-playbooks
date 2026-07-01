@@ -1,76 +1,520 @@
 [
-  {"id":"Q001","text":"How do we implement a SNOMED CT-based problem list in our EHR?","perspective":"useCase","category":"Problem List","playbook":"problem-list"},
-  {"id":"Q002","text":"What should be included in a problem list, and how should it be structured?","perspective":"useCase","category":"Problem List","playbook":"problem-list"},
-  {"id":"Q003","text":"How can clinicians quickly find and record the right diagnosis?","perspective":"useCase","category":"Problem List","playbook":"search-ux"},
-  {"id":"Q004","text":"How do we use SNOMED CT in clinical documentation templates and forms?","perspective":"useCase","category":"Clinical Documentation","playbook":"clin-docs"},
-  {"id":"Q005","text":"How do we ensure consistent and high-quality coding during documentation?","perspective":"useCase","category":"Clinical Documentation","playbook":"governance"},
-  {"id":"Q006","text":"How do we use SNOMED CT to support clinical decision support (CDS)?","perspective":"useCase","category":"Clinical Decision Support","playbook":"cds"},
-  {"id":"Q007","text":"How do we define and manage value sets for CDS rules?","perspective":"useCase","category":"Clinical Decision Support","playbook":"value-sets"},
-  {"id":"Q008","text":"How can SNOMED CT data be used for reporting and analytics?","perspective":"useCase","category":"Analytics & Reporting","playbook":"analytics"},
-  {"id":"Q009","text":"How do we group and aggregate SNOMED CT concepts for reporting?","perspective":"useCase","category":"Analytics & Reporting","playbook":"analytics"},
-  {"id":"Q010","text":"How do we record allergies and adverse reactions using SNOMED CT?","perspective":"useCase","category":"Clinical Documentation","playbook":"clin-docs"},
-  {"id":"Q011","text":"How do we exchange SNOMED CT-coded data between systems (e.g., via FHIR)?","perspective":"useCase","category":"Interoperability","playbook":"interop"},
-  {"id":"Q012","text":"How do I design value sets for my use case?","perspective":"capability","category":"Value Sets","playbook":"value-sets"},
-  {"id":"Q013","text":"How do I create a subset of SNOMED CT concepts?","perspective":"capability","category":"Value Sets","playbook":"value-sets"},
-  {"id":"Q014","text":"How do we implement a terminology service for SNOMED CT?","perspective":"capability","category":"Terminology Service","playbook":"term-service"},
-  {"id":"Q015","text":"How should systems search and retrieve SNOMED CT concepts?","perspective":"capability","category":"Terminology Service","playbook":"term-service"},
-  {"id":"Q016","text":"How do we validate SNOMED CT codes at the point of data entry?","perspective":"capability","category":"Terminology Service","playbook":"term-service"},
-  {"id":"Q017","text":"How do we design an effective search experience for clinicians?","perspective":"capability","category":"Search & UX","playbook":"search-ux"},
-  {"id":"Q018","text":"How do we improve usability and term selection for SNOMED CT?","perspective":"capability","category":"Search & UX","playbook":"search-ux"},
-  {"id":"Q019","text":"How do we map SNOMED CT concepts to ICD-10 for reporting?","perspective":"capability","category":"Mapping","playbook":"mapping"},
-  {"id":"Q020","text":"How do we maintain and update mappings over time?","perspective":"capability","category":"Mapping","playbook":"mapping"},
-  {"id":"Q021","text":"How do we establish governance for SNOMED CT usage?","perspective":"capability","category":"Governance","playbook":"governance"},
-  {"id":"Q022","text":"How are new terms, subsets, and changes approved and managed?","perspective":"capability","category":"Governance","playbook":"governance"},
-  {"id":"Q023","text":"How do we manage SNOMED CT releases and version updates?","perspective":"capability","category":"Terminology Service","playbook":"term-service"},
-  {"id":"Q024","text":"How do we create and maintain SNOMED CT extensions?","perspective":"capability","category":"Terminology Management","playbook":"extensions"},
-  {"id":"Q025","text":"How will SNOMED CT affect my clinical workflow in practice?","perspective":"role","category":"Clinician","playbook":"search-ux"},
-  {"id":"Q026","text":"How can I quickly find the right term during patient care?","perspective":"role","category":"Clinician","playbook":"search-ux"},
-  {"id":"Q027","text":"How do we ensure clinicians consistently use structured coding?","perspective":"role","category":"Clinician","playbook":"governance"},
-  {"id":"Q028","text":"How should we design system architecture to support SNOMED CT?","perspective":"role","category":"Software provider","playbook":"term-service"},
-  {"id":"Q029","text":"How do we integrate SNOMED CT into our existing systems?","perspective":"role","category":"Software provider","playbook":"term-service"},
-  {"id":"Q030","text":"What core services are needed to support SNOMED CT implementation?","perspective":"role","category":"Software provider","playbook":"term-service"},
-  {"id":"Q031","text":"How do we curate and maintain terminology content over time?","perspective":"role","category":"Information Manager","playbook":"governance"},
-  {"id":"Q032","text":"How do we ensure terminology quality and consistency?","perspective":"role","category":"Information Manager","playbook":"governance"},
-  {"id":"Q033","text":"How do we manage value sets and mappings in practice?","perspective":"role","category":"Information Manager","playbook":"value-sets"},
-  {"id":"Q034","text":"How do we organize SNOMED CT governance across the organization?","perspective":"role","category":"Governance Lead","playbook":"governance"},
-  {"id":"Q035","text":"How do we ensure compliance with standards and policies?","perspective":"role","category":"Governance Lead","playbook":"governance"},
-  {"id":"Q036","text":"How do we support multiple languages in SNOMED CT within our system?","perspective":"useCase","category":"Interoperability","playbook":"multilingual"},
-  {"id":"Q037","text":"How do clinicians search and select terms in their local language?","perspective":"useCase","category":"Problem List","playbook":"multilingual"},
-  {"id":"Q038","text":"How do we ensure consistent meaning across languages?","perspective":"useCase","category":"Interoperability","playbook":"multilingual"},
-  {"id":"Q039","text":"How do we handle translations in clinical documentation?","perspective":"useCase","category":"Clinical Documentation","playbook":"multilingual"},
-  {"id":"Q040","text":"How do we use SNOMED CT in a multilingual healthcare environment?","perspective":"useCase","category":"Interoperability","playbook":"multilingual"},
-  {"id":"Q041","text":"How do we manage SNOMED CT translations and language reference sets?","perspective":"capability","category":"Terminology Management","playbook":"multilingual"},
-  {"id":"Q042","text":"How do we implement multilingual search using SNOMED CT?","perspective":"capability","category":"Search & UX","playbook":"multilingual"},
-  {"id":"Q043","text":"How do we maintain and update translations over time?","perspective":"capability","category":"Terminology Management","playbook":"multilingual"},
-  {"id":"Q044","text":"How do we ensure translation quality and consistency?","perspective":"capability","category":"Governance","playbook":"multilingual"},
-  {"id":"Q045","text":"How do we handle synonyms and preferred terms across languages?","perspective":"capability","category":"Search & UX","playbook":"multilingual"},
-  {"id":"Q046","text":"When should we create a SNOMED CT extension instead of using existing concepts?","perspective":"capability","category":"Terminology Management","playbook":"extensions"},
-  {"id":"Q047","text":"How do we design and model new concepts in a SNOMED CT extension?","perspective":"capability","category":"Terminology Management","playbook":"extensions"},
-  {"id":"Q048","text":"How do we manage the lifecycle of extension content?","perspective":"capability","category":"Terminology Management","playbook":"extensions"},
-  {"id":"Q049","text":"How do we align local extensions with the international SNOMED CT release?","perspective":"capability","category":"Terminology Management","playbook":"extensions"},
-  {"id":"Q050","text":"How do we govern and approve new extension content?","perspective":"capability","category":"Governance","playbook":"extensions"},
-  {"id":"Q051","text":"How do we distribute and version SNOMED CT extensions?","perspective":"capability","category":"Terminology Service","playbook":"extensions"},
-  {"id":"Q052","text":"How will SNOMED CT support my language in clinical practice?","perspective":"role","category":"Clinician","playbook":"multilingual"},
-  {"id":"Q053","text":"How do we support multilingual users in system design?","perspective":"role","category":"Software provider","playbook":"multilingual"},
-  {"id":"Q054","text":"How do I manage translations as a terminologist?","perspective":"role","category":"Information Manager","playbook":"multilingual"},
-  {"id":"Q055","text":"How do I create and maintain extension content as a terminologist?","perspective":"role","category":"Information Manager","playbook":"extensions"},
-  {"id":"Q056","text":"How do we ensure governance of translations and extensions?","perspective":"role","category":"Governance Lead","playbook":"extensions"},
-  {"id":"Q057","text":"When should we use postcoordination instead of precoordinated concepts?","perspective":"capability","category":"Terminology Management","playbook":"extensions"},
-  {"id":"Q058","text":"How do we represent and store SNOMED CT expressions?","perspective":"capability","category":"Terminology Service","playbook":"term-service"},
-  {"id":"Q059","text":"How do we validate and process postcoordinated expressions?","perspective":"capability","category":"Terminology Service","playbook":"term-service"},
-  {"id":"Q060","text":"How do SNOMED CT hierarchies and relationships impact implementation?","perspective":"capability","category":"Terminology Management","playbook":"analytics"},
-  {"id":"Q061","text":"How do we use defining relationships for querying and decision support?","perspective":"useCase","category":"Analytics & Reporting","playbook":"analytics"},
-  {"id":"Q062","text":"What modeling principles should we follow when creating new concepts?","perspective":"capability","category":"Terminology Management","playbook":"extensions"},
-  {"id":"Q063","text":"How do we query SNOMED CT-coded data effectively (e.g., using subsumption)?","perspective":"capability","category":"Terminology Service","playbook":"term-service"},
-  {"id":"Q064","text":"How do we design cohort queries using SNOMED CT hierarchies?","perspective":"useCase","category":"Analytics & Reporting","playbook":"analytics"},
-  {"id":"Q065","text":"How do we migrate existing coded or free-text data to SNOMED CT?","perspective":"useCase","category":"Clinical Documentation","playbook":"mapping"},
-  {"id":"Q066","text":"How do we handle legacy codes alongside SNOMED CT during transition?","perspective":"useCase","category":"Interoperability","playbook":"mapping"},
-  {"id":"Q067","text":"Where should we start with SNOMED CT implementation?","perspective":"useCase","category":"Governance","playbook":"governance"},
-  {"id":"Q068","text":"How do we phase SNOMED CT implementation across systems and workflows?","perspective":"useCase","category":"Governance","playbook":"governance"},
-  {"id":"Q069","text":"How do we measure the success of SNOMED CT implementation?","perspective":"capability","category":"Governance","playbook":"governance"},
-  {"id":"Q070","text":"What KPIs should we track for terminology quality and usage?","perspective":"capability","category":"Governance","playbook":"governance"},
-  {"id":"Q071","text":"What are the clinical risks of incorrect SNOMED CT usage?","perspective":"useCase","category":"Clinical Documentation","playbook":"governance"},
-  {"id":"Q072","text":"How do we mitigate risks in terminology-driven workflows?","perspective":"capability","category":"Governance","playbook":"governance"},
-  {"id":"Q073","text":"What are the licensing requirements for using SNOMED CT?","perspective":"capability","category":"Governance","playbook":"governance"},
-  {"id":"Q074","text":"How do we distribute SNOMED CT content across systems securely?","perspective":"capability","category":"Terminology Service","playbook":"term-service"}
+  {
+    "id": "Q001",
+    "text": "Implementing a SNOMED CT-based problem list in an EHR",
+    "perspective": "useCase",
+    "category": "Problem List",
+    "playbook": "problem-list"
+  },
+  {
+    "id": "Q002",
+    "text": "Defining problem list content and structure",
+    "perspective": "useCase",
+    "category": "Problem List",
+    "playbook": "problem-list"
+  },
+  {
+    "id": "Q003",
+    "text": "Enabling clinicians to quickly find and record the right diagnosis",
+    "perspective": "useCase",
+    "category": "Problem List",
+    "playbook": "search-ux"
+  },
+  {
+    "id": "Q004",
+    "text": "Using SNOMED CT in clinical documentation templates and forms",
+    "perspective": "useCase",
+    "category": "Clinical Documentation",
+    "playbook": "clin-docs"
+  },
+  {
+    "id": "Q005",
+    "text": "Ensuring consistent and high-quality coding during documentation",
+    "perspective": "useCase",
+    "category": "Clinical Documentation",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q006",
+    "text": "Using SNOMED CT to support clinical decision support",
+    "perspective": "useCase",
+    "category": "Clinical Decision Support",
+    "playbook": "cds"
+  },
+  {
+    "id": "Q007",
+    "text": "Defining and managing value sets for CDS rules",
+    "perspective": "useCase",
+    "category": "Clinical Decision Support",
+    "playbook": "value-sets"
+  },
+  {
+    "id": "Q008",
+    "text": "Using SNOMED CT data for reporting and analytics",
+    "perspective": "useCase",
+    "category": "Analytics & Reporting",
+    "playbook": "analytics"
+  },
+  {
+    "id": "Q009",
+    "text": "Grouping and aggregating SNOMED CT concepts for reporting",
+    "perspective": "useCase",
+    "category": "Analytics & Reporting",
+    "playbook": "analytics"
+  },
+  {
+    "id": "Q010",
+    "text": "Recording allergies and adverse reactions using SNOMED CT",
+    "perspective": "useCase",
+    "category": "Clinical Documentation",
+    "playbook": "clin-docs"
+  },
+  {
+    "id": "Q011",
+    "text": "Exchanging SNOMED CT-coded data between systems using FHIR",
+    "perspective": "useCase",
+    "category": "Interoperability",
+    "playbook": "interop"
+  },
+  {
+    "id": "Q012",
+    "text": "How do I design value sets for my use case?",
+    "perspective": "capability",
+    "category": "Value Sets",
+    "playbook": "value-sets"
+  },
+  {
+    "id": "Q013",
+    "text": "How do I create a subset of SNOMED CT concepts?",
+    "perspective": "capability",
+    "category": "Value Sets",
+    "playbook": "value-sets"
+  },
+  {
+    "id": "Q014",
+    "text": "How do we implement a terminology service for SNOMED CT?",
+    "perspective": "capability",
+    "category": "Terminology Service",
+    "playbook": "term-service"
+  },
+  {
+    "id": "Q015",
+    "text": "How should systems search and retrieve SNOMED CT concepts?",
+    "perspective": "capability",
+    "category": "Terminology Service",
+    "playbook": "term-service"
+  },
+  {
+    "id": "Q016",
+    "text": "How do we validate SNOMED CT codes at the point of data entry?",
+    "perspective": "capability",
+    "category": "Terminology Service",
+    "playbook": "term-service"
+  },
+  {
+    "id": "Q017",
+    "text": "How do we design an effective search experience for clinicians?",
+    "perspective": "capability",
+    "category": "Search & UX",
+    "playbook": "search-ux"
+  },
+  {
+    "id": "Q018",
+    "text": "How do we improve usability and term selection for SNOMED CT?",
+    "perspective": "capability",
+    "category": "Search & UX",
+    "playbook": "search-ux"
+  },
+  {
+    "id": "Q019",
+    "text": "How do we map SNOMED CT concepts to ICD-10 for reporting?",
+    "perspective": "capability",
+    "category": "Mapping",
+    "playbook": "mapping"
+  },
+  {
+    "id": "Q020",
+    "text": "How do we maintain and update mappings over time?",
+    "perspective": "capability",
+    "category": "Mapping",
+    "playbook": "mapping"
+  },
+  {
+    "id": "Q021",
+    "text": "How do we establish governance for SNOMED CT usage?",
+    "perspective": "capability",
+    "category": "Governance",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q022",
+    "text": "How are new terms, subsets, and changes approved and managed?",
+    "perspective": "capability",
+    "category": "Governance",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q023",
+    "text": "How do we manage SNOMED CT releases and version updates?",
+    "perspective": "capability",
+    "category": "Terminology Service",
+    "playbook": "term-service"
+  },
+  {
+    "id": "Q024",
+    "text": "How do we create and maintain SNOMED CT extensions?",
+    "perspective": "capability",
+    "category": "Terminology Management",
+    "playbook": "extensions"
+  },
+  {
+    "id": "Q025",
+    "text": "How will SNOMED CT affect my clinical workflow in practice?",
+    "perspective": "role",
+    "category": "Clinician",
+    "playbook": "search-ux"
+  },
+  {
+    "id": "Q026",
+    "text": "How can I quickly find the right term during patient care?",
+    "perspective": "role",
+    "category": "Clinician",
+    "playbook": "search-ux"
+  },
+  {
+    "id": "Q027",
+    "text": "How do we ensure clinicians consistently use structured coding?",
+    "perspective": "role",
+    "category": "Clinician",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q028",
+    "text": "How should we design system architecture to support SNOMED CT?",
+    "perspective": "role",
+    "category": "Software provider",
+    "playbook": "term-service"
+  },
+  {
+    "id": "Q029",
+    "text": "How do we integrate SNOMED CT into our existing systems?",
+    "perspective": "role",
+    "category": "Software provider",
+    "playbook": "term-service"
+  },
+  {
+    "id": "Q030",
+    "text": "What core services are needed to support SNOMED CT implementation?",
+    "perspective": "role",
+    "category": "Software provider",
+    "playbook": "term-service"
+  },
+  {
+    "id": "Q031",
+    "text": "How do we curate and maintain terminology content over time?",
+    "perspective": "role",
+    "category": "Information Manager",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q032",
+    "text": "How do we ensure terminology quality and consistency?",
+    "perspective": "role",
+    "category": "Information Manager",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q033",
+    "text": "How do we manage value sets and mappings in practice?",
+    "perspective": "role",
+    "category": "Information Manager",
+    "playbook": "value-sets"
+  },
+  {
+    "id": "Q034",
+    "text": "How do we organize SNOMED CT governance across the organization?",
+    "perspective": "role",
+    "category": "Governance Lead",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q035",
+    "text": "How do we ensure compliance with standards and policies?",
+    "perspective": "role",
+    "category": "Governance Lead",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q036",
+    "text": "Supporting multiple languages in SNOMED CT",
+    "perspective": "useCase",
+    "category": "Interoperability",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q037",
+    "text": "Enabling clinicians to search and select terms in their local language",
+    "perspective": "useCase",
+    "category": "Problem List",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q038",
+    "text": "Ensuring consistent meaning across languages",
+    "perspective": "useCase",
+    "category": "Interoperability",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q039",
+    "text": "Handling translations in clinical documentation",
+    "perspective": "useCase",
+    "category": "Clinical Documentation",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q040",
+    "text": "Using SNOMED CT in a multilingual healthcare environment",
+    "perspective": "useCase",
+    "category": "Interoperability",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q041",
+    "text": "How do we manage SNOMED CT translations and language reference sets?",
+    "perspective": "capability",
+    "category": "Terminology Management",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q042",
+    "text": "How do we implement multilingual search using SNOMED CT?",
+    "perspective": "capability",
+    "category": "Search & UX",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q043",
+    "text": "How do we maintain and update translations over time?",
+    "perspective": "capability",
+    "category": "Terminology Management",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q044",
+    "text": "How do we ensure translation quality and consistency?",
+    "perspective": "capability",
+    "category": "Governance",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q045",
+    "text": "How do we handle synonyms and preferred terms across languages?",
+    "perspective": "capability",
+    "category": "Search & UX",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q046",
+    "text": "When should we create a SNOMED CT extension instead of using existing concepts?",
+    "perspective": "capability",
+    "category": "Terminology Management",
+    "playbook": "extensions"
+  },
+  {
+    "id": "Q047",
+    "text": "How do we design and model new concepts in a SNOMED CT extension?",
+    "perspective": "capability",
+    "category": "Terminology Management",
+    "playbook": "extensions"
+  },
+  {
+    "id": "Q048",
+    "text": "How do we manage the lifecycle of extension content?",
+    "perspective": "capability",
+    "category": "Terminology Management",
+    "playbook": "extensions"
+  },
+  {
+    "id": "Q049",
+    "text": "How do we align local extensions with the international SNOMED CT release?",
+    "perspective": "capability",
+    "category": "Terminology Management",
+    "playbook": "extensions"
+  },
+  {
+    "id": "Q050",
+    "text": "How do we govern and approve new extension content?",
+    "perspective": "capability",
+    "category": "Governance",
+    "playbook": "extensions"
+  },
+  {
+    "id": "Q051",
+    "text": "How do we distribute and version SNOMED CT extensions?",
+    "perspective": "capability",
+    "category": "Terminology Service",
+    "playbook": "extensions"
+  },
+  {
+    "id": "Q052",
+    "text": "How will SNOMED CT support my language in clinical practice?",
+    "perspective": "role",
+    "category": "Clinician",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q053",
+    "text": "How do we support multilingual users in system design?",
+    "perspective": "role",
+    "category": "Software provider",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q054",
+    "text": "How do I manage translations as a terminologist?",
+    "perspective": "role",
+    "category": "Information Manager",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "Q055",
+    "text": "How do I create and maintain extension content as a terminologist?",
+    "perspective": "role",
+    "category": "Information Manager",
+    "playbook": "extensions"
+  },
+  {
+    "id": "Q056",
+    "text": "How do we ensure governance of translations and extensions?",
+    "perspective": "role",
+    "category": "Governance Lead",
+    "playbook": "extensions"
+  },
+  {
+    "id": "Q057",
+    "text": "When should we use postcoordination instead of precoordinated concepts?",
+    "perspective": "capability",
+    "category": "Terminology Management",
+    "playbook": "extensions"
+  },
+  {
+    "id": "Q058",
+    "text": "How do we represent and store SNOMED CT expressions?",
+    "perspective": "capability",
+    "category": "Terminology Service",
+    "playbook": "term-service"
+  },
+  {
+    "id": "Q059",
+    "text": "How do we validate and process postcoordinated expressions?",
+    "perspective": "capability",
+    "category": "Terminology Service",
+    "playbook": "term-service"
+  },
+  {
+    "id": "Q060",
+    "text": "How do SNOMED CT hierarchies and relationships impact implementation?",
+    "perspective": "capability",
+    "category": "Terminology Management",
+    "playbook": "analytics"
+  },
+  {
+    "id": "Q061",
+    "text": "Using defining relationships for querying and decision support",
+    "perspective": "useCase",
+    "category": "Analytics & Reporting",
+    "playbook": "analytics"
+  },
+  {
+    "id": "Q062",
+    "text": "What modeling principles should we follow when creating new concepts?",
+    "perspective": "capability",
+    "category": "Terminology Management",
+    "playbook": "extensions"
+  },
+  {
+    "id": "Q063",
+    "text": "How do we query SNOMED CT-coded data effectively (e.g., using subsumption)?",
+    "perspective": "capability",
+    "category": "Terminology Service",
+    "playbook": "term-service"
+  },
+  {
+    "id": "Q064",
+    "text": "Designing cohort queries using SNOMED CT hierarchies",
+    "perspective": "useCase",
+    "category": "Analytics & Reporting",
+    "playbook": "analytics"
+  },
+  {
+    "id": "Q065",
+    "text": "Migrating existing coded or free-text data to SNOMED CT",
+    "perspective": "useCase",
+    "category": "Clinical Documentation",
+    "playbook": "mapping"
+  },
+  {
+    "id": "Q066",
+    "text": "Managing legacy codes alongside SNOMED CT during transition",
+    "perspective": "useCase",
+    "category": "Interoperability",
+    "playbook": "mapping"
+  },
+  {
+    "id": "Q067",
+    "text": "Defining a SNOMED CT implementation strategy",
+    "perspective": "useCase",
+    "category": "Governance",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q068",
+    "text": "Phasing SNOMED CT implementation across systems and workflows",
+    "perspective": "useCase",
+    "category": "Governance",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q069",
+    "text": "How do we measure the success of SNOMED CT implementation?",
+    "perspective": "capability",
+    "category": "Governance",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q070",
+    "text": "What KPIs should we track for terminology quality and usage?",
+    "perspective": "capability",
+    "category": "Governance",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q071",
+    "text": "Identifying and managing clinical risks of incorrect SNOMED CT usage",
+    "perspective": "useCase",
+    "category": "Clinical Documentation",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q072",
+    "text": "How do we mitigate risks in terminology-driven workflows?",
+    "perspective": "capability",
+    "category": "Governance",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q073",
+    "text": "What are the licensing requirements for using SNOMED CT?",
+    "perspective": "capability",
+    "category": "Governance",
+    "playbook": "governance"
+  },
+  {
+    "id": "Q074",
+    "text": "How do we distribute SNOMED CT content across systems securely?",
+    "perspective": "capability",
+    "category": "Terminology Service",
+    "playbook": "term-service"
+  }
 ]

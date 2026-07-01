@@ -26,7 +26,7 @@ const state = {
 //   gray    = River Bed #434A55
 const PERSPECTIVE = {
   useCase:    { label: 'Use case',   color: 'blue',   icon: 'target',  count: 0 },
-  capability: { label: 'Capability', color: 'teal',   icon: 'puzzle',  count: 0 },
+  capability: { label: 'Implementation questions', color: 'teal',   icon: 'puzzle',  count: 0 },
   role:       { label: 'Role',       color: 'purple', icon: 'users',   count: 0 },
 };
 
@@ -177,7 +177,7 @@ function renderLanding() {
 function entryDesc(p) {
   return {
     useCase:    'I have a specific goal — problem list, decision support, reporting',
-    capability: 'I need to build something — value sets, mappings, services',
+    capability: 'I have a technical question — value sets, mappings, services',
     role:       'Guide me based on my role — clinician, architect, terminologist',
   }[p];
 }
@@ -441,7 +441,7 @@ function renderAllPlaybooks() {
       ids: ['problem-list', 'clin-docs', 'cds', 'analytics', 'interop'],
     },
     {
-      label: 'Capability playbooks',
+      label: 'Implementation playbooks',
       description: 'Start here if you need to design or build a specific component.',
       ids: ['value-sets', 'term-service', 'search-ux', 'mapping', 'governance'],
     },
