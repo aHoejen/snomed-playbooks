@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playbook Editor</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #EEF2F7;
+      --surface:   #FFFFFF;
+      --border:    #CBD5E1;
+      --border-light: #E2E8F0;
+      --text:      #1C2B3A;
+      --text-mid:  #475569;
+      --text-muted:#7A8EA5;
+      --accent:    #1D6FA4;
+      --accent-bg: #EBF4FB;
+      --accent-hover: #155C8A;
+      --amber:     #B45309;
+      --amber-bg:  #FEF3C7;
+      --green:     #15803D;
+      --green-bg:  #DCFCE7;
+      --danger:    #B91C1C;
+      --danger-bg: #FEE2E2;
+      --radius:    6px;
+      --shadow:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+      box-shadow: var(--shadow);
+      z-index: 10;
+    }
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -.2px;
+    }
+    .topbar-title span {
+      color: var(--accent);
+    }
+    .topbar-spacer { flex: 1; }
+
+    .status-badge {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: none;
+    }
+    .status-badge.unsaved {
+      display: inline-flex;
+      background: var(--amber-bg);
+      color: var(--amber);
+    }
+    .status-badge.saved {
+      display: inline-flex;
+      background: var(--green-bg);
+      color: var(--green);
+    }
+
+    .btn {
+      font-size: 13px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: background .12s, opacity .12s;
+      white-space: nowrap;
+    }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-mid);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover:not(:disabled) { background: var(--bg); }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+    .sidebar-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 4px 16px 8px;
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: background .1s;
+    }
+    .sidebar-item:hover { background: var(--bg); }
+    .sidebar-item.active {
+      background: var(--accent-bg);
+      border-left-color: var(--accent);
+    }
+    .sidebar-item.active .sidebar-name { color: var(--accent); font-weight: 600; }
+    .color-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .sidebar-name {
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.3;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--text-muted);
+    }
+    .empty-icon {
+      width: 48px; height: 48px;
+      opacity: .35;
+    }
+    .empty-state h2 { font-size: 16px; color: var(--text-mid); font-weight: 500; }
+    .empty-state p { font-size: 13px; max-width: 260px; text-align: center; line-height: 1.6; }
+
+    /* ── Main form area ── */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px 60px;
+    }
+
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .section-header {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .section-body { padding: 18px; }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-mid);
+      margin-bottom: 5px;
+      letter-spacing: .02em;
+    }
+    input[type=text], textarea, select {
+      width: 100%;
+      font-family: inherit;
+      font-size: 13.5px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 10px;
+      transition: border-color .12s, box-shadow .12s;
+      outline: none;
+    }
+    input[type=text]:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(29,111,164,.12);
+    }
+    textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
+    textarea.tall { min-height: 120px; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .field-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* ── Audience tags ── */
+    .audience-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2px;
+    }
+    .audience-tag {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      color: var(--text-mid);
+      cursor: pointer;
+      transition: all .12s;
+      background: var(--surface);
+      user-select: none;
+    }
+    .audience-tag input { display: none; }
+    .audience-tag.checked {
+      background: var(--accent-bg);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── List items (decisions, steps, pitfalls, etc.) ── */
+    .list-items { display: flex; flex-direction: column; gap: 10px; }
+
+    .list-card {
+      background: var(--bg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+    .list-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .item-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--border-light);
+      border-radius: 4px;
+      padding: 2px 6px;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .item-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 4px;
+    }
+    .icon-btn {
+      width: 26px; height: 26px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: all .1s;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover { background: var(--bg); color: var(--text); }
+    .icon-btn.danger:hover { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+    .icon-btn svg { pointer-events: none; }
+
+    .add-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      background: none;
+      border: 1.5px dashed var(--accent);
+      border-radius: var(--radius);
+      padding: 8px 14px;
+      cursor: pointer;
+      width: 100%;
+      justify-content: center;
+      margin-top: 10px;
+      transition: background .12s;
+    }
+    .add-btn:hover { background: var(--accent-bg); }
+
+    /* Pitfall / simple string items */
+    .simple-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .simple-row textarea { min-height: 52px; flex: 1; }
+
+    /* Resource rows */
+    .resource-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 1fr auto;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    /* Dependency rows */
+    .dep-row {
+      display: grid;
+      grid-template-columns: 140px 1fr auto;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    /* ── Browser note ── */
+    .browser-note {
+      background: var(--amber-bg);
+      border: 1px solid #FDE68A;
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: var(--amber);
+      display: none;
+      margin-bottom: 20px;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">Playbook <span>Editor</span></div>
+  <button class="btn btn-ghost" id="btn-open">Open playbooks.json</button>
+  <div class="topbar-spacer"></div>
+  <span class="status-badge" id="status-badge"></span>
+  <button class="btn btn-primary" id="btn-save" disabled>Save</button>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-label">Playbooks</div>
+    <div style="padding:40px 16px;color:var(--text-muted);font-size:12.5px;line-height:1.6;">
+      Open a file to begin.
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="empty-state" id="empty-state">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+      <h2>No playbook selected</h2>
+      <p>Open playbooks.json and select a playbook from the sidebar to start editing.</p>
+    </div>
+    <div id="form-area" style="display:none"></div>
+  </main>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let fileHandle = null;
+let data = {};
+let currentKey = null;
+let dirty = false;
+
+const COLORS = ['blue','teal','green','amber','red','purple','gray','orange','camelot'];
+const ICONS = ['notes','list-details','brain','chart-bar','arrows-exchange','filter','server','search','arrows-right-left','shield-check','pencil-plus','language'];
+const AUDIENCES = ['Software provider','Clinician','Terminologist','Governance Lead'];
+const DEP_ICONS = ['server','filter','shield-check','database','key','cloud','lock','users','language','code','certificate','file-import','file-description','id-badge','clipboard-list','search','shield'];
+const RES_TYPES = ['Guide','Tool','Spec'];
+const COLOR_MAP = {
+  blue:'#2563EB', teal:'#0D9488', green:'#16A34A', amber:'#D97706',
+  red:'#DC2626', purple:'#7C3AED', gray:'#6B7280', orange:'#EA580C', camelot:'#9333EA'
+};
+
+// ── Icons ──────────────────────────────────────────────────────────────────
+const ic = {
+  up:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>`,
+  down: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>`,
+  del:  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>`,
+  plus: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+};
+
+// ── File I/O ───────────────────────────────────────────────────────────────
+document.getElementById('btn-open').addEventListener('click', async () => {
+  if (!('showOpenFilePicker' in window)) {
+    // Fallback: input[type=file]
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.onchange = async e => {
+      const file = e.target.files[0]; if (!file) return;
+      const text = await file.text();
+      loadData(JSON.parse(text));
+      fileHandle = null;
+      showStatus('fallback');
+    };
+    input.click(); return;
+  }
+  try {
+    [fileHandle] = await window.showOpenFilePicker({
+      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+    });
+    const file = await fileHandle.getFile();
+    loadData(JSON.parse(await file.text()));
+    showStatus('clean');
+  } catch(e) { if (e.name !== 'AbortError') console.error(e); }
+});
+
+document.getElementById('btn-save').addEventListener('click', async () => {
+  if (!fileHandle) {
+    // Download fallback
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'playbooks.json';
+    a.click();
+    showStatus('saved');
+    return;
+  }
+  commitCurrent();
+  const writable = await fileHandle.createWritable();
+  await writable.write(JSON.stringify(data, null, 2));
+  await writable.close();
+  showStatus('saved');
+});
+
+// ── Load data ─────────────────────────────────────────────────────────────
+function loadData(parsed) {
+  data = parsed;
+  currentKey = null;
+  renderSidebar();
+  document.getElementById('btn-save').disabled = false;
+  const keys = Object.keys(data);
+  if (keys.length) selectPlaybook(keys[0]);
+}
+
+function showStatus(state) {
+  const el = document.getElementById('status-badge');
+  if (state === 'unsaved') {
+    el.textContent = '● Unsaved changes'; el.className = 'status-badge unsaved';
+  } else if (state === 'saved') {
+    el.textContent = '✓ Saved'; el.className = 'status-badge saved';
+    setTimeout(() => { el.className = 'status-badge'; }, 2500);
+  } else if (state === 'fallback') {
+    el.textContent = 'Use Save to download'; el.className = 'status-badge unsaved';
+  } else {
+    el.className = 'status-badge';
+  }
+}
+
+function markDirty() {
+  if (!dirty) { dirty = true; showStatus('unsaved'); }
+}
+
+// ── Sidebar ────────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '<div class="sidebar-label">Playbooks</div>';
+  Object.entries(data).forEach(([key, pb]) => {
+    const div = document.createElement('div');
+    div.className = 'sidebar-item' + (key === currentKey ? ' active' : '');
+    div.dataset.key = key;
+    const color = COLOR_MAP[pb.color] || '#6B7280';
+    div.innerHTML = `<span class="color-dot" style="background:${color}"></span><span class="sidebar-name">${pb.title || key}</span>`;
+    div.addEventListener('click', () => selectPlaybook(key));
+    sb.appendChild(div);
+  });
+}
+
+// ── Select playbook ────────────────────────────────────────────────────────
+function selectPlaybook(key) {
+  if (currentKey) commitCurrent();
+  currentKey = key;
+  dirty = false;
+  renderSidebar();
+  renderForm(data[key]);
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('form-area').style.display = 'block';
+}
+
+// ── Commit current form state back to data ─────────────────────────────────
+function commitCurrent() {
+  if (!currentKey) return;
+  const fa = document.getElementById('form-area');
+  const pb = data[currentKey];
+
+  pb.title    = val('f-title');
+  pb.subtitle = val('f-subtitle');
+  pb.icon     = val('f-icon');
+  pb.color    = val('f-color');
+  pb.overview = val('f-overview');
+
+  pb.audience = AUDIENCES.filter(a => {
+    const cb = fa.querySelector(`[data-audience="${a}"]`);
+    return cb && cb.checked;
+  });
+
+  pb.decisions = collectList('decisions-list', card => ({
+    question: card.querySelector('[data-f="question"]').value,
+    guidance: card.querySelector('[data-f="guidance"]').value
+  }));
+
+  pb.steps = collectList('steps-list', card => ({
+    title: card.querySelector('[data-f="title"]').value,
+    description: card.querySelector('[data-f="description"]').value
+  }));
+
+  pb.dependencies = collectList('deps-list', card => ({
+    icon: card.querySelector('[data-f="icon"]').value,
+    text: card.querySelector('[data-f="text"]').value
+  }));
+
+  pb.pitfalls = collectList('pitfalls-list', card => card.querySelector('textarea').value);
+
+  pb.resources = collectList('resources-list', card => ({
+    type:  card.querySelector('[data-f="type"]').value,
+    title: card.querySelector('[data-f="title"]').value,
+    url:   card.querySelector('[data-f="url"]').value
+  }));
+}
+
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
+function collectList(listId, extractor) {
+  const list = document.getElementById(listId);
+  if (!list) return [];
+  return Array.from(list.querySelectorAll(':scope > .list-card')).map(extractor);
+}
+
+// ── Render form ────────────────────────────────────────────────────────────
+function renderForm(pb) {
+  const fa = document.getElementById('form-area');
+  fa.innerHTML = `
+    <!-- Identity -->
+    <div class="section">
+      <div class="section-header"><span class="section-title">Identity</span></div>
+      <div class="section-body">
+        <div class="field-row" style="margin-bottom:14px">
+          <div class="field">
+            <label>Title</label>
+            <input type="text" id="f-title" value="${esc(pb.title||'')}">
+          </div>
+          <div class="field">
+            <label>Subtitle</label>
+            <input type="text" id="f-subtitle" value="${esc(pb.subtitle||'')}">
+          </div>
+        </div>
+        <div class="field-row-3" style="margin-bottom:14px">
+          <div class="field">
+            <label>Icon</label>
+            <select id="f-icon">${ICONS.map(i=>`<option${pb.icon===i?' selected':''}>${i}</option>`).join('')}</select>
+          </div>
+          <div class="field">
+            <label>Color</label>
+            <select id="f-color">${COLORS.map(c=>`<option${pb.color===c?' selected':''}>${c}</option>`).join('')}</select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Audience</label>
+          <div class="audience-tags">
+            ${AUDIENCES.map(a => {
+              const checked = (pb.audience||[]).includes(a);
+              return `<label class="audience-tag${checked?' checked':''}">
+                <input type="checkbox" data-audience="${a}"${checked?' checked':''}>
+                ${a}
+              </label>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overview -->
+    <div class="section">
+      <div class="section-header"><span class="section-title">Overview</span></div>
+      <div class="section-body">
+        <textarea class="tall" id="f-overview">${esc(pb.overview||'')}</textarea>
+      </div>
+    </div>
+
+    <!-- Decisions -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Things to clarify before you start</span>
+        <span style="font-size:11px;color:var(--text-muted)">${(pb.decisions||[]).length} items</span>
+      </div>
+      <div class="section-body">
+        <div class="list-items" id="decisions-list">
+          ${(pb.decisions||[]).map((d,i) => decisionCard(d,i)).join('')}
+        </div>
+        <button class="add-btn" onclick="addDecision()">${ic.plus} Add decision</button>
+      </div>
+    </div>
+
+    <!-- Steps -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Implementation steps</span>
+        <span style="font-size:11px;color:var(--text-muted)">${(pb.steps||[]).length} steps</span>
+      </div>
+      <div class="section-body">
+        <div class="list-items" id="steps-list">
+          ${(pb.steps||[]).map((s,i) => stepCard(s,i)).join('')}
+        </div>
+        <button class="add-btn" onclick="addStep()">${ic.plus} Add step</button>
+      </div>
+    </div>
+
+    <!-- Dependencies -->
+    <div class="section">
+      <div class="section-header"><span class="section-title">Dependencies</span></div>
+      <div class="section-body">
+        <div class="list-items" id="deps-list">
+          ${(pb.dependencies||[]).map((d,i) => depCard(d,i)).join('')}
+        </div>
+        <button class="add-btn" onclick="addDep()">${ic.plus} Add dependency</button>
+      </div>
+    </div>
+
+    <!-- Pitfalls -->
+    <div class="section">
+      <div class="section-header"><span class="section-title">Common pitfalls</span></div>
+      <div class="section-body">
+        <div class="list-items" id="pitfalls-list">
+          ${(pb.pitfalls||[]).map((p,i) => pitfallCard(p,i)).join('')}
+        </div>
+        <button class="add-btn" onclick="addPitfall()">${ic.plus} Add pitfall</button>
+      </div>
+    </div>
+
+    <!-- Resources -->
+    <div class="section">
+      <div class="section-header"><span class="section-title">Resources</span></div>
+      <div class="section-body">
+        <div class="list-items" id="resources-list">
+          ${(pb.resources||[]).map((r,i) => resourceCard(r,i)).join('')}
+        </div>
+        <button class="add-btn" onclick="addResource()">${ic.plus} Add resource</button>
+      </div>
+    </div>
+  `;
+
+  // Wire up change listeners
+  fa.querySelectorAll('input, textarea, select').forEach(el => {
+    el.addEventListener('input', markDirty);
+    el.addEventListener('change', markDirty);
+  });
+
+  // Audience toggle styling
+  fa.querySelectorAll('.audience-tag input').forEach(cb => {
+    cb.addEventListener('change', () => {
+      cb.closest('.audience-tag').classList.toggle('checked', cb.checked);
+    });
+  });
+}
+
+// ── Card templates ─────────────────────────────────────────────────────────
+function cardActions(listId, idx) {
+  return `<div class="item-actions">
+    <button class="icon-btn" title="Move up"    onclick="moveItem('${listId}',${idx},-1)">${ic.up}</button>
+    <button class="icon-btn" title="Move down"  onclick="moveItem('${listId}',${idx}, 1)">${ic.down}</button>
+    <button class="icon-btn danger" title="Delete" onclick="removeItem('${listId}',${idx})">${ic.del}</button>
+  </div>`;
+}
+
+function decisionCard(d, i) {
+  return `<div class="list-card">
+    <div class="list-card-header">
+      <span class="item-num">${i+1}</span>
+      ${cardActions('decisions-list', i)}
+    </div>
+    <div class="field" style="margin-bottom:10px">
+      <label>Question</label>
+      <input type="text" data-f="question" value="${esc(d.question||'')}">
+    </div>
+    <div class="field">
+      <label>Guidance</label>
+      <textarea data-f="guidance">${esc(d.guidance||'')}</textarea>
+    </div>
+  </div>`;
+}
+
+function stepCard(s, i) {
+  return `<div class="list-card">
+    <div class="list-card-header">
+      <span class="item-num">${i+1}</span>
+      ${cardActions('steps-list', i)}
+    </div>
+    <div class="field" style="margin-bottom:10px">
+      <label>Title</label>
+      <input type="text" data-f="title" value="${esc(s.title||'')}">
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea data-f="description">${esc(s.description||'')}</textarea>
+    </div>
+  </div>`;
+}
+
+function depCard(d, i) {
+  return `<div class="list-card">
+    <div class="list-card-header">
+      <span class="item-num">${i+1}</span>
+      ${cardActions('deps-list', i)}
+    </div>
+    <div class="dep-row">
+      <div>
+        <label>Icon</label>
+        <select data-f="icon">${DEP_ICONS.map(ic2=>`<option${d.icon===ic2?' selected':''}>${ic2}</option>`).join('')}</select>
+      </div>
+      <div>
+        <label>Text</label>
+        <input type="text" data-f="text" value="${esc(d.text||'')}">
+      </div>
+    </div>
+  </div>`;
+}
+
+function pitfallCard(p, i) {
+  return `<div class="list-card">
+    <div class="list-card-header">
+      <span class="item-num">${i+1}</span>
+      ${cardActions('pitfalls-list', i)}
+    </div>
+    <textarea>${esc(p||'')}</textarea>
+  </div>`;
+}
+
+function resourceCard(r, i) {
+  return `<div class="list-card">
+    <div class="list-card-header">
+      <span class="item-num">${i+1}</span>
+      ${cardActions('resources-list', i)}
+    </div>
+    <div class="field-row-3">
+      <div>
+        <label>Type</label>
+        <select data-f="type">${RES_TYPES.map(t=>`<option${r.type===t?' selected':''}>${t}</option>`).join('')}</select>
+      </div>
+      <div>
+        <label>Title</label>
+        <input type="text" data-f="title" value="${esc(r.title||'')}">
+      </div>
+      <div>
+        <label>URL</label>
+        <input type="text" data-f="url" value="${esc(r.url||'')}">
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── List mutations ─────────────────────────────────────────────────────────
+function mutateList(listId, fn) {
+  commitCurrent();
+  const pb = data[currentKey];
+  const map = {
+    'decisions-list': 'decisions',
+    'steps-list': 'steps',
+    'deps-list': 'dependencies',
+    'pitfalls-list': 'pitfalls',
+    'resources-list': 'resources'
+  };
+  const key = map[listId];
+  fn(pb[key]);
+  renderForm(pb);
+  markDirty();
+  // Re-wire listeners
+  document.getElementById('form-area').querySelectorAll('input, textarea, select').forEach(el => {
+    el.addEventListener('input', markDirty);
+    el.addEventListener('change', markDirty);
+  });
+  document.getElementById('form-area').querySelectorAll('.audience-tag input').forEach(cb => {
+    cb.addEventListener('change', () => cb.closest('.audience-tag').classList.toggle('checked', cb.checked));
+  });
+}
+
+function moveItem(listId, idx, dir) {
+  mutateList(listId, arr => {
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= arr.length) return;
+    [arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
+  });
+}
+
+function removeItem(listId, idx) {
+  mutateList(listId, arr => arr.splice(idx, 1));
+}
+
+function addDecision()  { mutateList('decisions-list', arr => arr.push({ question: '', guidance: '' })); }
+function addStep()      { mutateList('steps-list',     arr => arr.push({ title: '', description: '' })); }
+function addDep()       { mutateList('deps-list',       arr => arr.push({ icon: 'server', text: '' })); }
+function addPitfall()   { mutateList('pitfalls-list',   arr => arr.push('')); }
+function addResource()  { mutateList('resources-list',  arr => arr.push({ type: 'Guide', title: '', url: '' })); }
+
+// ── Utility ────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/"/g,'&quot;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+
+// Auto-save on close
+window.addEventListener('beforeunload', e => {
+  if (dirty) { e.preventDefault(); e.returnValue = ''; }
+});
+</script>
+</body>
+</html>
