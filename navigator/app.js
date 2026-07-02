@@ -194,8 +194,9 @@ function renderBrowse(perspective, activeFilter) {
   document.getElementById('browse-title').innerHTML =
     `<span class="c-${p.color}" style="color:var(--c-text)">${icon(p.icon, 22)}</span> ${p.label}`;
 
+  const itemLabel = perspective === 'useCase' ? 'SNOMED CT implementation use cases' : 'questions';
   document.getElementById('browse-subtitle').textContent =
-    `${qs.length} questions — select one to open its playbook`;
+    `${qs.length} ${itemLabel} — select one to open its playbook`;
 
   // Role introductions
   const roleIntroEl = document.getElementById('role-intros');
