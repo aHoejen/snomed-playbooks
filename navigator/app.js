@@ -25,7 +25,7 @@ const state = {
 //   camelot = Camelot #8D3057
 //   gray    = River Bed #434A55
 const PERSPECTIVE = {
-  useCase:    { label: 'Use case',   color: 'blue',   icon: 'target',  count: 0 },
+  useCase:    { label: 'Use cases',  color: 'blue',   icon: 'target',  count: 0 },
   capability: { label: 'Implementation questions', color: 'teal',   icon: 'puzzle',  count: 0 },
   role:       { label: 'Role',       color: 'purple', icon: 'users',   count: 0 },
 };
@@ -178,7 +178,7 @@ function entryDesc(p) {
   return {
     useCase:    'I have a specific goal — problem list, decision support, reporting',
     capability: 'I have a technical question — value sets, mappings, services',
-    role:       'Guide me based on my role — clinician, architect, terminologist',
+    role:       'Guide me based on my role — clinician, software provider, information manager',
   }[p];
 }
 
@@ -192,7 +192,7 @@ function renderBrowse(perspective, activeFilter) {
   const cats = [...new Set(qs.map(q => q.category))];
 
   document.getElementById('browse-title').innerHTML =
-    `<span class="c-${p.color}" style="color:var(--c-text)">${icon(p.icon, 22)}</span> ${p.label} questions`;
+    `<span class="c-${p.color}" style="color:var(--c-text)">${icon(p.icon, 22)}</span> ${p.label}`;
 
   document.getElementById('browse-subtitle').textContent =
     `${qs.length} questions — select one to open its playbook`;
