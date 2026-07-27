@@ -267,6 +267,37 @@ function renderBrowse(perspective, activeFilter) {
       </a>
     `;
   }).join('');
+
+  // For role perspective: show relevant playbooks below the questions
+  if (perspective === 'role') {
+    const roleFilter = activeFilter; // the selected role, or null for all
+    const relevantPbs = PLAYBOOK_ORDER
+      .map(id => state.playbooks[id])
+      .filter(pb => pb && (!roleFilter || pb.audience.includes(roleFilter)));
+
+    const pbSection = document.createElement('div');
+    pbSection.className = 'role-playbooks-section';
+    pbSection.innerHTML = `
+      <h3 class="role-playbooks-title">Relevant playbooks</h3>
+      <div class="role-playbooks-grid">
+        ${relevantPbs.map(pb => `
+          <a href="#/playbook/${Object.keys(state.playbooks).find(k => state.playbooks[k] === pb)}" class="role-pb-card">
+            <div class="role-pb-card-accent pb-header-${pb.color}">
+              <span class="c-${pb.color}" style="color:#fff">${icon(pb.icon || 'file', 18)}</span>
+            </div>
+            <div class="role-pb-card-body">
+              <div class="role-pb-card-title">${pb.title}</div>
+              <div class="role-pb-card-sub">${pb.subtitle}</div>
+              <div class="role-pb-card-audience">
+                ${pb.audience.map(a => `<span class="audience-pill c-${pb.color}" style="color:var(--c-text);border-color:var(--c-border);background:var(--c-bg)">${a}</span>`).join('')}
+              </div>
+            </div>
+          </a>
+        `).join('')}
+      </div>
+    `;
+    list.after(pbSection);
+  }
 }
 
 // ── Playbook ──────────────────────────────────────────────────────────────
