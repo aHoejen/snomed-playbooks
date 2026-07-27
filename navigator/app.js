@@ -161,7 +161,6 @@ function renderLanding() {
       </div>
       <div class="entry-card-title">${p.label}</div>
       <div class="entry-card-desc">${entryDesc(key)}</div>
-      <div class="entry-card-count c-${p.color}" style="color:var(--c-text)">${p.count} questions →</div>
     </a>
   `).join('');
 
@@ -196,7 +195,7 @@ function renderBrowse(perspective, activeFilter) {
 
   const itemLabel = perspective === 'useCase' ? 'SNOMED CT implementation use cases' : 'questions';
   document.getElementById('browse-subtitle').textContent =
-    `${qs.length} ${itemLabel} - select one to open its playbook`;
+    `${itemLabel} - select one to open its playbook`;
 
   // Role introductions
   const roleIntroEl = document.getElementById('role-intros');
@@ -469,12 +468,6 @@ function renderAllPlaybooks(activeRole) {
           <div class="pb-full-card-title">${pb.title}</div>
           <div class="pb-full-card-subtitle">${pb.subtitle}</div>
           <div class="pb-full-card-overview">${pb.overview}</div>
-          <div class="pb-full-card-stats">
-            <span class="pb-stat">${icon('git-branch', 13)} ${pb.decisions.length} considerations</span>
-            <span class="pb-stat">${icon('stairs', 13)} ${pb.steps.length} steps</span>
-            <span class="pb-stat">${icon('books', 13)} ${pb.resources.length} resources</span>
-            <span class="pb-stat">${icon('search', 13)} ${qCount} question${qCount !== 1 ? 's' : ''}</span>
-          </div>
           <div class="pb-full-card-footer">
             <div class="pb-full-card-audience">
               ${pb.audience.map(a => `<span class="audience-pill c-${pb.color}" style="color:var(--c-text);border-color:var(--c-border);background:var(--c-bg)">${a}</span>`).join('')}
@@ -551,11 +544,6 @@ function renderQuestion(id) {
                   ${icon(pb.icon || 'file', 16)} ${pb.title}
                 </div>
                 <div class="qa-pb-card-sub">${pb.subtitle}</div>
-                <div class="qa-pb-card-stats">
-                  <span>${icon('git-branch', 12)} ${pb.decisions.length} considerations</span>
-                  <span>${icon('stairs', 12)} ${pb.steps.length} steps</span>
-                  <span>${icon('search', 12)} ${qCount} questions</span>
-                </div>
                 <div class="qa-pb-card-cta c-${pb.color}" style="color:var(--c-text)">
                   Open full playbook ${icon('arrow-right', 13)}
                 </div>
