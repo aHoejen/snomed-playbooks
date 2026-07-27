@@ -417,7 +417,7 @@
     <button class="mode-btn active" id="mode-playbooks">Playbooks</button>
     <button class="mode-btn" id="mode-answers">Questions &amp; Answers</button>
   </div>
-  <button class="btn btn-ghost" id="btn-open">Open playbooks.json</button>
+  <button class="btn btn-ghost" id="btn-open-folder">Open data folder</button>
   <div class="topbar-spacer"></div>
   <span class="status-badge" id="status-badge"></span>
   <button class="btn btn-primary" id="btn-save" disabled>Save</button>
@@ -471,6 +471,47 @@ const ic = {
   del:  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>`,
   plus: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
 };
+
+// ── Folder picker ─────────────────────────────────────────────────────────
+let dirHandle = null;
+
+document.getElementById('btn-open-folder').addEventListener('click', async () => {
+  if (!('showDirectoryPicker' in window)) {
+    alert('Your browser does not support folder access. Please use Chrome or Edge.');
+    return;
+  }
+  try {
+    dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    await loadAllFromDir(dirHandle);
+  } catch(e) { if (e.name !== 'AbortError') console.error(e); }
+});
+
+async function loadAllFromDir(dir) {
+  // Read all three files from the data/ subfolder if present, else root
+  let dataDir = dir;
+  try { dataDir = await dir.getDirectoryHandle('data'); } catch(_) {}
+
+  async function readJson(name) {
+    try {
+      const fh = await dataDir.getFileHandle(name);
+      return { handle: fh, data: JSON.parse(await (await fh.getFile()).text()) };
+    } catch(_) { return null; }
+  }
+
+  const [pb, qs, ans] = await Promise.all([
+    readJson('playbooks.json'),
+    readJson('questions.json'),
+    readJson('answers.json'),
+  ]);
+
+  if (pb) { fileHandle = pb.handle; loadData(pb.data); }
+  if (qs) { questionsData = qs.data; }
+  if (ans) { answersFileHandle = ans.handle; answersData = ans.data; document.getElementById('btn-save').disabled = false; }
+
+  showStatus('clean');
+  // Refresh current mode view
+  switchMode(mode);
+}
 
 // ── File I/O (delegated to mode-aware handlers below) ─────────────────────
 
@@ -875,115 +916,45 @@ function switchMode(newMode) {
   document.getElementById('mode-playbooks').classList.toggle('active', mode === 'playbooks');
   document.getElementById('mode-answers').classList.toggle('active', mode === 'answers');
 
+  const loaded = mode === 'playbooks'
+    ? Object.keys(data).length > 0
+    : questionsData.length > 0;
+
+  document.getElementById('btn-save').disabled = !loaded;
+
   if (mode === 'playbooks') {
-    document.getElementById('btn-open').textContent = 'Open playbooks.json';
-    document.getElementById('btn-save').disabled = !fileHandle && Object.keys(data).length === 0;
     renderSidebar();
     if (currentKey) {
       document.getElementById('empty-state').style.display = 'none';
       document.getElementById('form-area').style.display = 'block';
       renderForm(data[currentKey]);
     } else {
-      document.getElementById('empty-state').style.display = 'flex';
-      document.getElementById('form-area').style.display = 'none';
-      document.getElementById('empty-state').querySelector('p').textContent = 'Open playbooks.json and select a playbook from the sidebar to start editing.';
+      showEmpty('Open the data folder and select a playbook from the sidebar.');
     }
   } else {
-    document.getElementById('btn-open').textContent = questionsData.length ? 'Open answers.json' : 'Open questions.json first';
-    document.getElementById('btn-save').disabled = Object.keys(answersData).length === 0;
     renderAnswersSidebar();
     if (currentAnswerKey) {
       document.getElementById('empty-state').style.display = 'none';
       document.getElementById('form-area').style.display = 'block';
       renderAnswerForm(currentAnswerKey);
     } else {
-      document.getElementById('empty-state').style.display = 'flex';
-      document.getElementById('form-area').style.display = 'none';
-      document.getElementById('empty-state').querySelector('p').textContent =
-        questionsData.length
-          ? 'Open answers.json then select a question to edit its answer.'
-          : 'Open questions.json first, then answers.json.';
+      showEmpty(questionsData.length
+        ? 'Select a question from the sidebar to edit its answer.'
+        : 'Open the data folder to begin.');
     }
   }
 }
 
-// ── Open handler (mode-aware) ──────────────────────────────────────────────
-document.getElementById('btn-open').addEventListener('click', async () => {
-  if (mode === 'playbooks') { openPlaybooks(); return; }
-  // Answers mode: open questions.json first if not loaded, then answers.json
-  if (!questionsData.length) { await openQuestionsJson(); return; }
-  await openAnswersJson();
+function showEmpty(msg) {
+  document.getElementById('empty-state').style.display = 'flex';
+  document.getElementById('form-area').style.display = 'none';
+  document.getElementById('empty-state').querySelector('p').textContent = msg;
+}
+
+// ── Save (mode-aware) ──────────────────────────────────────────────────────
+document.getElementById('btn-save').addEventListener('click', () => {
+  if (mode === 'playbooks') savePb(); else saveAnswers();
 });
-
-async function openQuestionsJson() {
-  if (!('showOpenFilePicker' in window)) {
-    const input = document.createElement('input');
-    input.type = 'file'; input.accept = '.json';
-    input.onchange = async e => {
-      const file = e.target.files[0]; if (!file) return;
-      questionsData = JSON.parse(await file.text());
-      document.getElementById('btn-open').textContent = 'Open answers.json';
-      renderAnswersSidebar();
-    };
-    input.click(); return;
-  }
-  try {
-    const [fh] = await window.showOpenFilePicker({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
-    questionsData = JSON.parse(await (await fh.getFile()).text());
-    document.getElementById('btn-open').textContent = 'Open answers.json';
-    renderAnswersSidebar();
-  } catch(e) { if (e.name !== 'AbortError') console.error(e); }
-}
-
-async function openAnswersJson() {
-  if (!('showOpenFilePicker' in window)) {
-    const input = document.createElement('input');
-    input.type = 'file'; input.accept = '.json';
-    input.onchange = async e => {
-      const file = e.target.files[0]; if (!file) return;
-      answersData = JSON.parse(await file.text());
-      answersFileHandle = null;
-      document.getElementById('btn-save').disabled = false;
-      renderAnswersSidebar();
-      showStatus('fallback');
-    };
-    input.click(); return;
-  }
-  try {
-    [answersFileHandle] = await window.showOpenFilePicker({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
-    answersData = JSON.parse(await (await answersFileHandle.getFile()).text());
-    document.getElementById('btn-save').disabled = false;
-    renderAnswersSidebar();
-    showStatus('clean');
-  } catch(e) { if (e.name !== 'AbortError') console.error(e); }
-}
-
-// Patch original openPlaybooks out of btn-open (now handled above)
-function openPlaybooks() {
-  if (!('showOpenFilePicker' in window)) {
-    const input = document.createElement('input');
-    input.type = 'file'; input.accept = '.json';
-    input.onchange = async e => {
-      const file = e.target.files[0]; if (!file) return;
-      loadData(JSON.parse(await file.text()));
-      fileHandle = null;
-      showStatus('fallback');
-    };
-    input.click(); return;
-  }
-  window.showOpenFilePicker({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] })
-    .then(async ([fh]) => {
-      fileHandle = fh;
-      loadData(JSON.parse(await (await fh.getFile()).text()));
-      showStatus('clean');
-    }).catch(e => { if (e.name !== 'AbortError') console.error(e); });
-}
-
-// Patch save to be mode-aware
-document.getElementById('btn-save').addEventListener('click', async () => {
-  if (mode === 'playbooks') { savePb(); return; }
-  saveAnswers();
-}, { capture: true });
 
 async function savePb() {
   if (!fileHandle) {
