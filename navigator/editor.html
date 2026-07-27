@@ -1012,24 +1012,37 @@ async function saveAnswers() {
 // ── Answers sidebar ────────────────────────────────────────────────────────
 function renderAnswersSidebar() {
   const sb = document.getElementById('sidebar');
-  sb.innerHTML = '<div class="sidebar-label">Questions</div>';
+  sb.innerHTML = '';
   if (!questionsData.length) {
-    sb.innerHTML += '<div style="padding:12px 16px;color:var(--text-muted);font-size:12.5px;line-height:1.6;">Open questions.json to begin.</div>';
+    sb.innerHTML = '<div class="sidebar-label">Questions</div><div style="padding:12px 16px;color:var(--text-muted);font-size:12.5px;line-height:1.6;">Open questions.json to begin.</div>';
     return;
   }
-  questionsData.forEach(q => {
-    const hasAnswer = !!answersData[q.id];
-    const div = document.createElement('div');
-    div.className = 'sidebar-item' + (q.id === currentAnswerKey ? ' active' : '');
-    div.innerHTML = `
-      <span class="color-dot" style="background:${hasAnswer ? '#16A34A' : '#CBD5E1'}"></span>
-      <div class="sidebar-name" style="line-height:1.35">
-        <span style="font-size:10px;font-weight:700;color:var(--text-muted);display:block">${q.id}</span>
-        ${q.text}
-      </div>`;
-    div.addEventListener('click', () => selectAnswer(q.id));
-    sb.appendChild(div);
-  });
+
+  const useCases = questionsData.filter(q => q.id.startsWith('U'));
+  const implQs   = questionsData.filter(q => q.id.startsWith('I'));
+
+  function renderGroup(label, items) {
+    const heading = document.createElement('div');
+    heading.className = 'sidebar-label';
+    heading.textContent = label;
+    sb.appendChild(heading);
+    items.forEach(q => {
+      const hasAnswer = !!answersData[q.id];
+      const div = document.createElement('div');
+      div.className = 'sidebar-item' + (q.id === currentAnswerKey ? ' active' : '');
+      div.innerHTML = `
+        <span class="color-dot" style="background:${hasAnswer ? '#16A34A' : '#CBD5E1'}"></span>
+        <div class="sidebar-name" style="line-height:1.35">
+          <span style="font-size:10px;font-weight:700;color:var(--text-muted);display:block">${q.id}</span>
+          ${q.text}
+        </div>`;
+      div.addEventListener('click', () => selectAnswer(q.id));
+      sb.appendChild(div);
+    });
+  }
+
+  renderGroup('Use cases', useCases);
+  renderGroup('Implementation questions', implQs);
 }
 
 function selectAnswer(id) {
