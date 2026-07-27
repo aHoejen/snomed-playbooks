@@ -425,7 +425,7 @@ function renderPlaybook(id) {
 }
 
 // ── All playbooks overview ────────────────────────────────────────────────
-function renderAllPlaybooks() {
+function renderAllPlaybooks(activeRole) {
   setView('view-all-playbooks');
 
   const bandColour = {
@@ -434,10 +434,30 @@ function renderAllPlaybooks() {
     purple:  '#8072AC', camelot: '#8D3057', gray:    '#434A55',
   };
 
+  const roles = ['Clinician', 'Software provider', 'Information Manager', 'Governance Lead'];
+  const current = activeRole || null;
+
+  // Filter bar
+  const filterBar = document.getElementById('pb-filter-bar');
+  filterBar.innerHTML = [
+    `<button class="filter-btn${!current ? ' active' : ''}" data-role="">All playbooks</button>`,
+    ...roles.map(r =>
+      `<button class="filter-btn${current === r ? ' active' : ''}" data-role="${r}">${r}</button>`
+    )
+  ].join('');
+  filterBar.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => renderAllPlaybooks(btn.dataset.role || null));
+  });
+
+  // Cards
   const grid = document.getElementById('all-playbooks-grid');
-  const cards = PLAYBOOK_ORDER.map(id => {
+  const filtered = PLAYBOOK_ORDER.filter(id => {
     const pb = state.playbooks[id];
-    if (!pb) return '';
+    return pb && (!current || pb.audience.includes(current));
+  });
+
+  const cards = filtered.map(id => {
+    const pb = state.playbooks[id];
     const band = bandColour[pb.color] || '#003865';
     const qCount = state.questions.filter(q => q.playbook === id).length;
     return `
@@ -468,7 +488,7 @@ function renderAllPlaybooks() {
     `;
   }).join('');
 
-  grid.innerHTML = `<div class="pb-group-grid">${cards}</div>`;
+  grid.innerHTML = `<div class="pb-group-grid">${cards || '<p style="color:var(--text-muted);padding:32px 0">No playbooks for this role.</p>'}</div>`;
 }
 
 // ── Question answer page ─────────────────────────────────────────────────
