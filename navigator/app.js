@@ -125,7 +125,6 @@ function route() {
   if (parts[0] === 'question' && parts[1]) return renderQuestion(parts[1]);
   if (parts[0] === 'playbook' && parts[1]) return renderPlaybook(parts[1]);
   if (parts[0] === 'search' && parts[1]) return renderSearchPage(decodeURIComponent(parts[1]));
-  if (parts[0] === 'register') return renderRegister();
   renderLanding();
 }
 
@@ -761,64 +760,6 @@ function renderSearchDropdown(query) {
 
 function closeSearch() {
   document.getElementById('search-results').classList.remove('visible');
-}
-
-// ── Register ─────────────────────────────────────────────────────────────
-function renderRegister() {
-  setView('view-register');
-
-  const { questions, playbooks } = state;
-  const useCases = questions.filter(q => q.id.startsWith('U'));
-  const implQs   = questions.filter(q => q.id.startsWith('I'));
-
-  // Group by playbook
-  function groupByPlaybook(qs) {
-    const map = {};
-    qs.forEach(q => {
-      if (!map[q.playbook]) map[q.playbook] = [];
-      map[q.playbook].push(q);
-    });
-    return map;
-  }
-
-  function sectionHTML(title, qs, prefix) {
-    const grouped = groupByPlaybook(qs);
-    const pbIds = [...new Set(qs.map(q => q.playbook))];
-    return `
-      <section class="reg-section">
-        <h2 class="reg-section-title">${title} <span class="reg-count">${qs.length}</span></h2>
-        ${pbIds.map(pbId => {
-          const pb = playbooks[pbId];
-          const items = grouped[pbId] || [];
-          if (!pb || !items.length) return '';
-          return `
-            <div class="reg-group">
-              <div class="reg-group-header c-${pb.color}">
-                <a href="#/playbook/${pbId}" class="reg-pb-link">${pb.title}</a>
-              </div>
-              <table class="reg-table">
-                <tbody>
-                  ${items.map(q => `
-                    <tr class="reg-row">
-                      <td class="reg-id">${q.id}</td>
-                      <td class="reg-text">
-                        <a href="#/playbook/${q.playbook}" class="reg-q-link">${q.text}</a>
-                      </td>
-                      <td class="reg-audience">${(q.audience || []).join(', ')}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          `;
-        }).join('')}
-      </section>
-    `;
-  }
-
-  document.getElementById('register-content').innerHTML =
-    sectionHTML('Use cases', useCases, 'U') +
-    sectionHTML('Implementation questions', implQs, 'I');
 }
 
 // ── Boot ─────────────────────────────────────────────────────────────────
