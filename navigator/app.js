@@ -1,6 +1,6 @@
 /* ─────────────────────────────────────────────────────────────────────
    SNOMED CT Implementation Navigator
-   Vanilla JS SPA — hash-based routing, search, deep linking
+   Vanilla JS SPA - hash-based routing, search, deep linking
    ───────────────────────────────────────────────────────────────────── */
 
 'use strict';
@@ -100,7 +100,7 @@ async function loadData() {
     console.error('Render error:', renderErr);
     document.getElementById('main').innerHTML =
       `<div class="container" style="padding:80px 0;text-align:center">
-        <p style="color:var(--red-text);font-size:15px;margin-bottom:8px">Rendering error — data loaded but could not be displayed.</p>
+        <p style="color:var(--red-text);font-size:15px;margin-bottom:8px">Rendering error - data loaded but could not be displayed.</p>
         <p style="color:var(--text-muted);font-size:13px">${renderErr.message}</p>
        </div>`;
   }
@@ -176,9 +176,9 @@ function renderLanding() {
 
 function entryDesc(p) {
   return {
-    useCase:    'I have a specific goal — problem list, decision support, reporting',
-    capability: 'I have a technical question — value sets, mappings, services',
-    role:       'Guide me based on my role — clinician, software provider, information manager',
+    useCase:    'I have a specific goal - problem list, decision support, reporting',
+    capability: 'I have a technical question - value sets, mappings, services',
+    role:       'Guide me based on my role - clinician, software provider, information manager',
   }[p];
 }
 
@@ -196,7 +196,7 @@ function renderBrowse(perspective, activeFilter) {
 
   const itemLabel = perspective === 'useCase' ? 'SNOMED CT implementation use cases' : 'questions';
   document.getElementById('browse-subtitle').textContent =
-    `${qs.length} ${itemLabel} — select one to open its playbook`;
+    `${qs.length} ${itemLabel} - select one to open its playbook`;
 
   // Role introductions
   const roleIntroEl = document.getElementById('role-intros');
@@ -210,7 +210,7 @@ function renderBrowse(perspective, activeFilter) {
       {
         name: 'Software provider',
         icon: 'code',
-        description: 'Technical teams responsible for designing and building systems that implement SNOMED CT — including EHR platforms, terminology services, FHIR endpoints, and data entry interfaces. Software providers make architectural decisions about how SNOMED CT is stored, queried, and surfaced to end users.'
+        description: 'Technical teams responsible for designing and building systems that implement SNOMED CT - including EHR platforms, terminology services, FHIR endpoints, and data entry interfaces. Software providers make architectural decisions about how SNOMED CT is stored, queried, and surfaced to end users.'
       },
       {
         name: 'Information Manager',
@@ -220,7 +220,7 @@ function renderBrowse(perspective, activeFilter) {
       {
         name: 'Governance Lead',
         icon: 'shield',
-        description: 'Leaders accountable for organisational policy around SNOMED CT adoption — including compliance with national requirements, change control processes, stakeholder alignment, and ongoing quality assurance. Governance leads define who has authority over terminology decisions and how the implementation responds to evolving clinical and regulatory requirements.'
+        description: 'Leaders accountable for organisational policy around SNOMED CT adoption - including compliance with national requirements, change control processes, stakeholder alignment, and ongoing quality assurance. Governance leads define who has authority over terminology decisions and how the implementation responds to evolving clinical and regulatory requirements.'
       }
     ];
     roleIntroEl.innerHTML = `
@@ -278,7 +278,7 @@ function renderPlaybook(id) {
 
   const related = state.questions.filter(q => q.playbook === id);
 
-  // Determine back link — use history or default to browse
+  // Determine back link - use history or default to browse
   document.getElementById('playbook-back').onclick = () => history.back();
 
   const content = document.getElementById('playbook-content');
@@ -538,7 +538,7 @@ function renderQuestion(id) {
 
     <!-- Go deeper -->
     <div class="qa-playbooks-block">
-      <div class="qa-section-title">${icon('books', 15)} Go deeper — open the full playbook</div>
+      <div class="qa-section-title">${icon('books', 15)} Go deeper - open the full playbook</div>
       <div class="qa-playbook-cards">
         ${relatedPlaybooks.map(pb => {
           const band = bandColour[pb.color] || '#12506B';
@@ -610,7 +610,7 @@ function renderSearchPage(query) {
   if (!questions.length && !playbooks.length) {
     html = `<div class="no-results">
       <div class="no-results-icon">🔍</div>
-      <div class="no-results-text">No results for "<strong>${escHtml(query)}</strong>" — try different keywords</div>
+      <div class="no-results-text">No results for "<strong>${escHtml(query)}</strong>" - try different keywords</div>
     </div>`;
   } else {
     if (playbooks.length) {
@@ -730,7 +730,7 @@ function renderSearchDropdown(query) {
     dropdown.innerHTML = `<div class="search-empty">No results for "<strong>${escHtml(query)}</strong>"</div>`;
   } else {
     dropdown.innerHTML = `
-      <div class="search-results-header">${combined.length} results — press Enter for all</div>
+      <div class="search-results-header">${combined.length} results - press Enter for all</div>
       ${combined.map(item => `
         <a href="${item.href}" class="search-result-item" onclick="closeSearch()">
           <div class="search-result-icon c-${item.color}" style="background:var(--c-bg);color:var(--c-text)">
