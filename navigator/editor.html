@@ -374,6 +374,34 @@
       margin-bottom: 20px;
     }
 
+    /* ── Mode toggle ── */
+    .mode-toggle {
+      display: flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2px;
+      gap: 2px;
+    }
+    .mode-btn {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border: none;
+      border-radius: 4px;
+      background: none;
+      color: var(--text-mid);
+      cursor: pointer;
+      transition: all .12s;
+      white-space: nowrap;
+    }
+    .mode-btn.active {
+      background: var(--surface);
+      color: var(--accent);
+      font-weight: 600;
+      box-shadow: var(--shadow);
+    }
+
     /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -385,6 +413,10 @@
 
 <div class="topbar">
   <div class="topbar-title">Playbook <span>Editor</span></div>
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="mode-playbooks">Playbooks</button>
+    <button class="mode-btn" id="mode-answers">Questions &amp; Answers</button>
+  </div>
   <button class="btn btn-ghost" id="btn-open">Open playbooks.json</button>
   <div class="topbar-spacer"></div>
   <span class="status-badge" id="status-badge"></span>
@@ -440,48 +472,7 @@ const ic = {
   plus: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
 };
 
-// ── File I/O ───────────────────────────────────────────────────────────────
-document.getElementById('btn-open').addEventListener('click', async () => {
-  if (!('showOpenFilePicker' in window)) {
-    // Fallback: input[type=file]
-    const input = document.createElement('input');
-    input.type = 'file'; input.accept = '.json';
-    input.onchange = async e => {
-      const file = e.target.files[0]; if (!file) return;
-      const text = await file.text();
-      loadData(JSON.parse(text));
-      fileHandle = null;
-      showStatus('fallback');
-    };
-    input.click(); return;
-  }
-  try {
-    [fileHandle] = await window.showOpenFilePicker({
-      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
-    });
-    const file = await fileHandle.getFile();
-    loadData(JSON.parse(await file.text()));
-    showStatus('clean');
-  } catch(e) { if (e.name !== 'AbortError') console.error(e); }
-});
-
-document.getElementById('btn-save').addEventListener('click', async () => {
-  if (!fileHandle) {
-    // Download fallback
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'playbooks.json';
-    a.click();
-    showStatus('saved');
-    return;
-  }
-  commitCurrent();
-  const writable = await fileHandle.createWritable();
-  await writable.write(JSON.stringify(data, null, 2));
-  await writable.close();
-  showStatus('saved');
-});
+// ── File I/O (delegated to mode-aware handlers below) ─────────────────────
 
 // ── Load data ─────────────────────────────────────────────────────────────
 function loadData(parsed) {
@@ -867,6 +858,313 @@ function esc(s) {
 window.addEventListener('beforeunload', e => {
   if (dirty) { e.preventDefault(); e.returnValue = ''; }
 });
+
+// ── Mode switching ─────────────────────────────────────────────────────────
+let mode = 'playbooks'; // 'playbooks' | 'answers'
+let answersFileHandle = null;
+let questionsData = [];
+let answersData = {};
+let currentAnswerKey = null;
+let answersDirty = false;
+
+document.getElementById('mode-playbooks').addEventListener('click', () => switchMode('playbooks'));
+document.getElementById('mode-answers').addEventListener('click', () => switchMode('answers'));
+
+function switchMode(newMode) {
+  mode = newMode;
+  document.getElementById('mode-playbooks').classList.toggle('active', mode === 'playbooks');
+  document.getElementById('mode-answers').classList.toggle('active', mode === 'answers');
+
+  if (mode === 'playbooks') {
+    document.getElementById('btn-open').textContent = 'Open playbooks.json';
+    document.getElementById('btn-save').disabled = !fileHandle && Object.keys(data).length === 0;
+    renderSidebar();
+    if (currentKey) {
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('form-area').style.display = 'block';
+      renderForm(data[currentKey]);
+    } else {
+      document.getElementById('empty-state').style.display = 'flex';
+      document.getElementById('form-area').style.display = 'none';
+      document.getElementById('empty-state').querySelector('p').textContent = 'Open playbooks.json and select a playbook from the sidebar to start editing.';
+    }
+  } else {
+    document.getElementById('btn-open').textContent = questionsData.length ? 'Open answers.json' : 'Open questions.json first';
+    document.getElementById('btn-save').disabled = Object.keys(answersData).length === 0;
+    renderAnswersSidebar();
+    if (currentAnswerKey) {
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('form-area').style.display = 'block';
+      renderAnswerForm(currentAnswerKey);
+    } else {
+      document.getElementById('empty-state').style.display = 'flex';
+      document.getElementById('form-area').style.display = 'none';
+      document.getElementById('empty-state').querySelector('p').textContent =
+        questionsData.length
+          ? 'Open answers.json then select a question to edit its answer.'
+          : 'Open questions.json first, then answers.json.';
+    }
+  }
+}
+
+// ── Open handler (mode-aware) ──────────────────────────────────────────────
+document.getElementById('btn-open').addEventListener('click', async () => {
+  if (mode === 'playbooks') { openPlaybooks(); return; }
+  // Answers mode: open questions.json first if not loaded, then answers.json
+  if (!questionsData.length) { await openQuestionsJson(); return; }
+  await openAnswersJson();
+});
+
+async function openQuestionsJson() {
+  if (!('showOpenFilePicker' in window)) {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.onchange = async e => {
+      const file = e.target.files[0]; if (!file) return;
+      questionsData = JSON.parse(await file.text());
+      document.getElementById('btn-open').textContent = 'Open answers.json';
+      renderAnswersSidebar();
+    };
+    input.click(); return;
+  }
+  try {
+    const [fh] = await window.showOpenFilePicker({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
+    questionsData = JSON.parse(await (await fh.getFile()).text());
+    document.getElementById('btn-open').textContent = 'Open answers.json';
+    renderAnswersSidebar();
+  } catch(e) { if (e.name !== 'AbortError') console.error(e); }
+}
+
+async function openAnswersJson() {
+  if (!('showOpenFilePicker' in window)) {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.onchange = async e => {
+      const file = e.target.files[0]; if (!file) return;
+      answersData = JSON.parse(await file.text());
+      answersFileHandle = null;
+      document.getElementById('btn-save').disabled = false;
+      renderAnswersSidebar();
+      showStatus('fallback');
+    };
+    input.click(); return;
+  }
+  try {
+    [answersFileHandle] = await window.showOpenFilePicker({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
+    answersData = JSON.parse(await (await answersFileHandle.getFile()).text());
+    document.getElementById('btn-save').disabled = false;
+    renderAnswersSidebar();
+    showStatus('clean');
+  } catch(e) { if (e.name !== 'AbortError') console.error(e); }
+}
+
+// Patch original openPlaybooks out of btn-open (now handled above)
+function openPlaybooks() {
+  if (!('showOpenFilePicker' in window)) {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.onchange = async e => {
+      const file = e.target.files[0]; if (!file) return;
+      loadData(JSON.parse(await file.text()));
+      fileHandle = null;
+      showStatus('fallback');
+    };
+    input.click(); return;
+  }
+  window.showOpenFilePicker({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] })
+    .then(async ([fh]) => {
+      fileHandle = fh;
+      loadData(JSON.parse(await (await fh.getFile()).text()));
+      showStatus('clean');
+    }).catch(e => { if (e.name !== 'AbortError') console.error(e); });
+}
+
+// Patch save to be mode-aware
+document.getElementById('btn-save').addEventListener('click', async () => {
+  if (mode === 'playbooks') { savePb(); return; }
+  saveAnswers();
+}, { capture: true });
+
+async function savePb() {
+  if (!fileHandle) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'playbooks.json'; a.click();
+    showStatus('saved'); return;
+  }
+  commitCurrent();
+  const w = await fileHandle.createWritable();
+  await w.write(JSON.stringify(data, null, 2)); await w.close();
+  showStatus('saved');
+}
+
+async function saveAnswers() {
+  commitCurrentAnswer();
+  if (!answersFileHandle) {
+    const blob = new Blob([JSON.stringify(answersData, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'answers.json'; a.click();
+    showStatus('saved'); return;
+  }
+  const w = await answersFileHandle.createWritable();
+  await w.write(JSON.stringify(answersData, null, 2)); await w.close();
+  showStatus('saved');
+}
+
+// ── Answers sidebar ────────────────────────────────────────────────────────
+function renderAnswersSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '<div class="sidebar-label">Questions</div>';
+  if (!questionsData.length) {
+    sb.innerHTML += '<div style="padding:12px 16px;color:var(--text-muted);font-size:12.5px;line-height:1.6;">Open questions.json to begin.</div>';
+    return;
+  }
+  questionsData.forEach(q => {
+    const hasAnswer = !!answersData[q.id];
+    const div = document.createElement('div');
+    div.className = 'sidebar-item' + (q.id === currentAnswerKey ? ' active' : '');
+    div.innerHTML = `
+      <span class="color-dot" style="background:${hasAnswer ? '#16A34A' : '#CBD5E1'}"></span>
+      <div class="sidebar-name" style="line-height:1.35">
+        <span style="font-size:10px;font-weight:700;color:var(--text-muted);display:block">${q.id}</span>
+        ${q.text}
+      </div>`;
+    div.addEventListener('click', () => selectAnswer(q.id));
+    sb.appendChild(div);
+  });
+}
+
+function selectAnswer(id) {
+  commitCurrentAnswer();
+  currentAnswerKey = id;
+  answersDirty = false;
+  renderAnswersSidebar();
+  renderAnswerForm(id);
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('form-area').style.display = 'block';
+}
+
+function commitCurrentAnswer() {
+  if (!currentAnswerKey) return;
+  const fa = document.getElementById('form-area');
+  if (!fa || fa.style.display === 'none') return;
+  const answerEl = fa.querySelector('#a-answer');
+  if (!answerEl) return;
+  if (!answersData[currentAnswerKey]) answersData[currentAnswerKey] = {};
+  const ans = answersData[currentAnswerKey];
+  ans.answer = answerEl.value;
+  ans.keyPoints = collectList('kp-list', card => card.querySelector('textarea').value).filter(Boolean);
+  ans.playbooks = Array.from(fa.querySelectorAll('[data-pb]:checked')).map(cb => cb.dataset.pb);
+}
+
+// ── Answer form ────────────────────────────────────────────────────────────
+function renderAnswerForm(id) {
+  const q = questionsData.find(q => q.id === id);
+  const ans = answersData[id] || { answer: '', keyPoints: [], playbooks: [] };
+  const fa = document.getElementById('form-area');
+  const pbIds = Object.keys(data).length ? Object.keys(data) : [];
+
+  fa.innerHTML = `
+    <!-- Question (read-only) -->
+    <div class="section">
+      <div class="section-header"><span class="section-title">Question</span><span style="font-size:11px;color:var(--text-muted)">${id}</span></div>
+      <div class="section-body">
+        <div style="font-size:15px;font-weight:600;color:var(--text);line-height:1.4">${q ? q.text : id}</div>
+        ${q ? `<div style="margin-top:6px;font-size:12px;color:var(--text-muted)">${q.category || ''} · ${q.perspective || ''}</div>` : ''}
+      </div>
+    </div>
+
+    <!-- Answer -->
+    <div class="section">
+      <div class="section-header"><span class="section-title">Answer</span></div>
+      <div class="section-body">
+        <textarea class="tall" id="a-answer" style="min-height:140px">${esc(ans.answer || '')}</textarea>
+      </div>
+    </div>
+
+    <!-- Key points -->
+    <div class="section">
+      <div class="section-header"><span class="section-title">Key points</span></div>
+      <div class="section-body">
+        <div class="list-items" id="kp-list">
+          ${(ans.keyPoints || []).map((kp, i) => `
+            <div class="list-card">
+              <div class="list-card-header">
+                <span class="item-num">${i + 1}</span>
+                <div class="item-actions">
+                  <button class="icon-btn" onclick="moveItem('kp-list',${i},-1)">${ic.up}</button>
+                  <button class="icon-btn" onclick="moveItem('kp-list',${i},1)">${ic.down}</button>
+                  <button class="icon-btn danger" onclick="removeItem('kp-list',${i})">${ic.del}</button>
+                </div>
+              </div>
+              <textarea>${esc(kp)}</textarea>
+            </div>`).join('')}
+        </div>
+        <button class="add-btn" onclick="addKeyPoint()">${ic.plus} Add key point</button>
+      </div>
+    </div>
+
+    <!-- Related playbooks -->
+    <div class="section">
+      <div class="section-header"><span class="section-title">Related playbooks</span></div>
+      <div class="section-body">
+        ${pbIds.length ? `
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            ${pbIds.map(pbId => {
+              const pb = data[pbId];
+              const checked = (ans.playbooks || []).includes(pbId);
+              return `<label class="audience-tag${checked ? ' checked' : ''}">
+                <input type="checkbox" data-pb="${pbId}"${checked ? ' checked' : ''}>
+                ${pb ? pb.title : pbId}
+              </label>`;
+            }).join('')}
+          </div>` : `<p style="font-size:12.5px;color:var(--text-muted)">Open playbooks.json (switch to Playbooks mode) to link playbooks.</p>`}
+      </div>
+    </div>
+  `;
+
+  fa.querySelectorAll('input, textarea, select').forEach(el => {
+    el.addEventListener('input', () => { answersDirty = true; markDirty(); });
+    el.addEventListener('change', () => { answersDirty = true; markDirty(); });
+  });
+  fa.querySelectorAll('.audience-tag input').forEach(cb => {
+    cb.addEventListener('change', () => cb.closest('.audience-tag').classList.toggle('checked', cb.checked));
+  });
+}
+
+function addKeyPoint() {
+  commitCurrentAnswer();
+  if (!answersData[currentAnswerKey]) answersData[currentAnswerKey] = { answer: '', keyPoints: [], playbooks: [] };
+  answersData[currentAnswerKey].keyPoints.push('');
+  renderAnswerForm(currentAnswerKey);
+  markDirty();
+  rewireListeners();
+}
+
+// Override mutateList to also handle kp-list
+const _origMutate = mutateList;
+function mutateList(listId, fn) {
+  if (listId === 'kp-list') {
+    commitCurrentAnswer();
+    const ans = answersData[currentAnswerKey];
+    if (!ans) return;
+    fn(ans.keyPoints);
+    renderAnswerForm(currentAnswerKey);
+    markDirty();
+    rewireListeners();
+    return;
+  }
+  _origMutate(listId, fn);
+}
+
+function rewireListeners() {
+  const fa = document.getElementById('form-area');
+  fa.querySelectorAll('input, textarea, select').forEach(el => {
+    el.addEventListener('input', () => { answersDirty = true; markDirty(); });
+    el.addEventListener('change', () => { answersDirty = true; markDirty(); });
+  });
+  fa.querySelectorAll('.audience-tag input').forEach(cb => {
+    cb.addEventListener('change', () => cb.closest('.audience-tag').classList.toggle('checked', cb.checked));
+  });
+}
 </script>
 </body>
 </html>
