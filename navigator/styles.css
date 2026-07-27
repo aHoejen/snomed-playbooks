@@ -224,7 +224,7 @@ button { font-family: var(--font); cursor: pointer; }
 .search-empty { padding: 24px; text-align: center; color: var(--text-muted); font-size: 14px; }
 
 /* ─── Main ─────────────────────────────────────────────────────────── */
-main { min-height: calc(100vh - 60px - 64px); }
+main { min-height: calc(100vh - 60px - 64px); padding-bottom: 48px; }
 
 /* ─── Landing hero ───────────────────────────────────────────────────── */
 .landing-hero {
