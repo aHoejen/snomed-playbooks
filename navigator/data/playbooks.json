@@ -4,7 +4,11 @@
     "subtitle": "Implementing a structured SNOMED CT-based problem list in clinical systems",
     "icon": "list-details",
     "color": "blue",
-    "audience": ["Clinician", "Software provider", "Information Manager"],
+    "audience": [
+      "Software provider",
+      "Clinician",
+      "Information Manager"
+    ],
     "overview": "A SNOMED CT-based problem list enables structured condition recording that supports longitudinal care, clinical decision support, cohort queries, and interoperability. Concepts from the Clinical finding and Disorder hierarchies are used, scoped by an Expression Constraint Language (ECL) expression or curated reference set. This is one of the highest-value and most common SNOMED CT implementation targets.",
     "decisions": [
       {
@@ -55,10 +59,22 @@
       }
     ],
     "dependencies": [
-      {"icon": "server", "text": "SNOMED CT terminology service (e.g. Snowstorm) with the correct national edition loaded"},
-      {"icon": "filter", "text": "ECL-defined clinical finding value set or reference set"},
-      {"icon": "shield-check", "text": "Clinical and terminology governance framework"},
-      {"icon": "search", "text": "Language reference set configured for preferred term display"}
+      {
+        "icon": "server",
+        "text": "SNOMED CT terminology service (e.g. Snowstorm) with the correct national edition loaded"
+      },
+      {
+        "icon": "filter",
+        "text": "ECL-defined clinical finding value set or reference set"
+      },
+      {
+        "icon": "shield-check",
+        "text": "Clinical and terminology governance framework"
+      },
+      {
+        "icon": "search",
+        "text": "Language reference set configured for preferred term display"
+      }
     ],
     "pitfalls": [
       "Displaying FSNs (fully specified names) instead of preferred terms from a language reference set — FSNs are not for clinical display",
@@ -68,21 +84,48 @@
       "Skipping release management — inactivated concepts silently remain in patient records after SNOMED CT updates"
     ],
     "resources": [
-      {"type": "Tool", "title": "SNOMED CT Browser", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Guide", "title": "EHR requirements guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-ehr-requirements-guide/"},
-      {"type": "Guide", "title": "Search and data entry guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-search-and-data-entry-guide/"},
-      {"type": "Spec", "title": "Expression constraint language specification", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"},
-      {"type": "Guide", "title": "Reference set guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-reference-set-guide/"},
-      {"type": "Guide", "title": "Mapping guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"}
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Guide",
+        "title": "EHR requirements guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-ehr-requirements-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "Search and data entry guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-search-and-data-entry-guide/"
+      },
+      {
+        "type": "Spec",
+        "title": "Expression constraint language specification",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      },
+      {
+        "type": "Guide",
+        "title": "Reference set guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-reference-set-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "Mapping guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
+      }
     ]
   },
-
   "clin-docs": {
     "title": "Structured clinical documentation",
     "subtitle": "Capturing structured clinical data using SNOMED CT in templates and forms",
     "icon": "notes",
     "color": "teal",
-    "audience": ["Software provider", "Clinician", "Information Manager"],
+    "audience": [
+      "Software provider",
+      "Clinician",
+      "Information Manager"
+    ],
     "overview": "Structured clinical documentation using SNOMED CT supplements — and sometimes replaces — free text with computable, queryable data. Data entry fields are bound to SNOMED CT value sets, giving clinicians access to clinically appropriate SNOMED CT concepts. SNOMED International and national release centres publish domain-specific implementation guides that define patterns for recording specific types of clinical information, such as allergies and adverse reactions. The key challenge is balancing clinical expressiveness with usability — overstructuring creates friction; understructuring produces data that cannot be queried or exchanged.",
     "decisions": [
       {
@@ -137,10 +180,22 @@
       }
     ],
     "dependencies": [
-      {"icon": "server", "text": "Terminology service supporting value set expansion and $validate-code"},
-      {"icon": "filter", "text": "Value sets defined per documentation field, using the appropriate binding approach"},
-      {"icon": "search", "text": "Language reference set for preferred term display and synonym search"},
-      {"icon": "shield-check", "text": "Clinical governance for field binding, context representation, and change management"}
+      {
+        "icon": "server",
+        "text": "Terminology service supporting value set expansion and $validate-code"
+      },
+      {
+        "icon": "filter",
+        "text": "Value sets defined per documentation field, using the appropriate binding approach"
+      },
+      {
+        "icon": "search",
+        "text": "Language reference set for preferred term display and synonym search"
+      },
+      {
+        "icon": "shield-check",
+        "text": "Clinical governance for field binding, context representation, and change management"
+      }
     ],
     "pitfalls": [
       "Replacing free text entirely where supplementing it would be more appropriate — over-structuring creates clinician friction and workarounds",
@@ -150,20 +205,48 @@
       "No change management process — structured documentation becomes a maintenance burden when clinician requirements evolve or SNOMED CT releases change relevant content"
     ],
     "resources": [
-      {"type": "Tool", "title": "SNOMED CT Browser", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Guide", "title": "Context representation guide", "url": "https://docs.snomed.org/implementation-guides/context-representation-implementation-guide/"},
-      {"type": "Guide", "title": "Allergy implementation guide", "url": "https://docs.snomed.org/implementation-guides/allergy-implementation-guide/"},
-      {"type": "Guide", "title": "EHR requirements guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-ehr-requirements-guide/"},
-      {"type": "Spec", "title": "Expression constraint language specification", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"}
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Guide",
+        "title": "Context representation guide",
+        "url": "https://docs.snomed.org/implementation-guides/context-representation-implementation-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "Allergy implementation guide",
+        "url": "https://docs.snomed.org/implementation-guides/allergy-implementation-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "Implementation Guide for Cancer Synoptic Reporting",
+        "url": "https://docs.snomed.org/implementation-guides/cancer-synoptic-reporting-implementation-guide"
+      },
+      {
+        "type": "Guide",
+        "title": "EHR requirements guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-ehr-requirements-guide/"
+      },
+      {
+        "type": "Spec",
+        "title": "Expression constraint language specification",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      }
     ]
   },
-
   "cds": {
     "title": "Clinical decision support",
     "subtitle": "Using SNOMED CT hierarchies and ECL to power computable clinical rules",
     "icon": "brain",
     "color": "camelot",
-    "audience": ["Software provider", "Clinician", "Information Manager"],
+    "audience": [
+      "Software provider",
+      "Clinician",
+      "Information Manager"
+    ],
     "overview": "SNOMED CT enables computable clinical logic through its hierarchical concept model and Expression Constraint Language (ECL). Rules built on SNOMED CT subsumption — using ECL expressions such as <<73211009 for all descendants of Diabetes mellitus — automatically cover all clinically relevant child concepts, including those added in future SNOMED CT releases. This makes CDS rules significantly more durable and clinically complete than rules based on explicit flat code lists.",
     "decisions": [
       {
@@ -214,10 +297,22 @@
       }
     ],
     "dependencies": [
-      {"icon": "server", "text": "Terminology service with ECL and $subsumes support"},
-      {"icon": "filter", "text": "ECL-defined value sets for each rule element"},
-      {"icon": "clipboard-list", "text": "Structured, SNOMED CT-coded clinical data of sufficient quality"},
-      {"icon": "shield-check", "text": "Clinical governance process for rule approval and retirement"}
+      {
+        "icon": "server",
+        "text": "Terminology service with ECL and $subsumes support"
+      },
+      {
+        "icon": "filter",
+        "text": "ECL-defined value sets for each rule element"
+      },
+      {
+        "icon": "clipboard-list",
+        "text": "Structured, SNOMED CT-coded clinical data of sufficient quality"
+      },
+      {
+        "icon": "shield-check",
+        "text": "Clinical governance process for rule approval and retirement"
+      }
     ],
     "pitfalls": [
       "Using explicit concept lists instead of ECL subsumption — new child concepts added in SNOMED CT releases silently fall outside the rule",
@@ -227,19 +322,37 @@
       "Skipping value set versioning — it becomes impossible to audit which concept set a historical rule used when fired"
     ],
     "resources": [
-      {"type": "Tool", "title": "SNOMED CT Browser", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Guide", "title": "Clinical decision support guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-clinical-decision-support-guide/"},
-      {"type": "Spec", "title": "Expression constraint language specification", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"},
-      {"type": "Guide", "title": "Terminology services guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"}
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Guide",
+        "title": "Clinical decision support guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-clinical-decision-support-guide/"
+      },
+      {
+        "type": "Spec",
+        "title": "Expression constraint language specification",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      },
+      {
+        "type": "Guide",
+        "title": "Terminology services guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"
+      }
     ]
   },
-
   "analytics": {
     "title": "Analytics and reporting",
     "subtitle": "Using SNOMED CT hierarchies and ECL for cohort definition and reporting",
     "icon": "chart-bar",
     "color": "orange",
-    "audience": ["Software provider", "Information Manager"],
+    "audience": [
+      "Software provider",
+      "Information Manager"
+    ],
     "overview": "SNOMED CT's hierarchical concept model, queried using Expression Constraint Language (ECL), enables dramatically more powerful cohort queries than flat code matching. A single ECL expression such as <<73211009 |Diabetes mellitus| returns all subtypes — including specific types added in future SNOMED CT releases — without list maintenance. ECL queries are executed against a SNOMED CT terminology service (via the FHIR $expand operation or Snowstorm's ECL endpoint) and the resulting concept sets are applied against coded clinical data.",
     "decisions": [
       {
@@ -290,9 +403,18 @@
       }
     ],
     "dependencies": [
-      {"icon": "server", "text": "Terminology service with ECL support and FHIR $expand endpoint"},
-      {"icon": "database", "text": "Clinical data store with SNOMED CT concept IDs persisted at the point of care"},
-      {"icon": "filter", "text": "Validated ECL expressions or reference sets for each cohort definition"}
+      {
+        "icon": "server",
+        "text": "Terminology service with ECL support and FHIR $expand endpoint"
+      },
+      {
+        "icon": "database",
+        "text": "Clinical data store with SNOMED CT concept IDs persisted at the point of care"
+      },
+      {
+        "icon": "filter",
+        "text": "Validated ECL expressions or reference sets for each cohort definition"
+      }
     ],
     "pitfalls": [
       "Querying only exact concept IDs — misses all subtypes and equivalent concepts, producing systematically incomplete cohorts",
@@ -302,20 +424,41 @@
       "Pre-expanding concept sets without a refresh process — after a SNOMED CT release, new subtypes are silently excluded"
     ],
     "resources": [
-      {"type": "Tool", "title": "SNOMED CT Browser — ECL search", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Guide", "title": "Data analytics guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-data-analytics-guide/"},
-      {"type": "Guide", "title": "SQL practical guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-sql-practical-guide/"},
-      {"type": "Spec", "title": "Expression constraint language specification", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"},
-      {"type": "Guide", "title": "Mapping guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"}
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser — ECL search",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Guide",
+        "title": "Data analytics guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-data-analytics-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "SQL practical guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-sql-practical-guide/"
+      },
+      {
+        "type": "Spec",
+        "title": "Expression constraint language specification",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      },
+      {
+        "type": "Guide",
+        "title": "Mapping guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
+      }
     ]
   },
-
   "interop": {
     "title": "Interoperability and data exchange",
     "subtitle": "Exchanging SNOMED CT-coded data between systems using HL7 FHIR",
     "icon": "arrows-exchange",
     "color": "green",
-    "audience": ["Software provider"],
+    "audience": [
+      "Software provider"
+    ],
     "overview": "SNOMED CT combined with HL7 FHIR provides a globally interoperable foundation for clinical data exchange. FHIR resources such as Condition, Observation, Procedure, and AllergyIntolerance carry SNOMED CT codes, and FHIR terminology bindings define which value sets (expressed as ECL constraints) are valid for each coded element. A FHIR Terminology Service — implementing operations including $expand, $validate-code, $subsumes, and $translate — is the runtime component that validates, expands, and translates SNOMED CT content.",
     "decisions": [
       {
@@ -393,10 +536,22 @@
       }
     ],
     "dependencies": [
-      {"icon": "server", "text": "FHIR R4-compliant terminology service ($expand, $validate-code, $subsumes, $translate)"},
-      {"icon": "code", "text": "FHIR R4 server or integration layer at sender and receiver"},
-      {"icon": "language", "text": "Language reference sets configured for each locale involved in exchange"},
-      {"icon": "certificate", "text": "SNOMED CT license for all participating organisations"}
+      {
+        "icon": "server",
+        "text": "FHIR R4-compliant terminology service ($expand, $validate-code, $subsumes, $translate)"
+      },
+      {
+        "icon": "code",
+        "text": "FHIR R4 server or integration layer at sender and receiver"
+      },
+      {
+        "icon": "language",
+        "text": "Language reference sets configured for each locale involved in exchange"
+      },
+      {
+        "icon": "certificate",
+        "text": "SNOMED CT license for all participating organisations"
+      }
     ],
     "pitfalls": [
       "Sending the FSN as the FHIR display text — receivers will display a technical label to clinicians rather than the appropriate preferred term",
@@ -408,20 +563,42 @@
       "No release coordination policy across exchange partners — a SNOMED CT upgrade on one side causes validation failures on the other without an agreed resolution pathway"
     ],
     "resources": [
-      {"type": "Tool", "title": "SNOMED CT Browser", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Guide", "title": "Terminology services guide (FHIR)", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"},
-      {"type": "Guide", "title": "IPS implementation guide", "url": "https://docs.snomed.org/implementation-guides/snomed-ips-terminology-implementation-guide/"},
-      {"type": "Spec", "title": "Expression constraint language specification", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"},
-      {"type": "Spec", "title": "SNOMED CT URI standard", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-uri-standard/"}
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Guide",
+        "title": "Terminology services guide (FHIR)",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "IPS implementation guide",
+        "url": "https://docs.snomed.org/implementation-guides/snomed-ips-terminology-implementation-guide/"
+      },
+      {
+        "type": "Spec",
+        "title": "Expression constraint language specification",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      },
+      {
+        "type": "Spec",
+        "title": "SNOMED CT URI standard",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-uri-standard/"
+      }
     ]
   },
-
   "value-sets": {
     "title": "Value set design and management",
     "subtitle": "Designing, authoring, and maintaining SNOMED CT value sets using ECL and reference sets",
     "icon": "filter",
     "color": "purple",
-    "audience": ["Information Manager", "Software provider"],
+    "audience": [
+      "Information Manager",
+      "Software provider"
+    ],
     "overview": "SNOMED CT value sets constrain concept selection for a specific clinical purpose. The recommended approach is to define value sets intensionally using Expression Constraint Language (ECL) — writing an expression that captures the intended concept set from the SNOMED CT hierarchy. ECL-based definitions are self-maintaining (new concepts that satisfy the constraint are automatically included) and can be evaluated at runtime against any SNOMED CT edition by a terminology service. Tools including Simplex and the SNOMED CT Browser support value set authoring and ECL testing.",
     "decisions": [
       {
@@ -472,9 +649,18 @@
       }
     ],
     "dependencies": [
-      {"icon": "server", "text": "Terminology service with ECL expansion ($expand) support"},
-      {"icon": "users", "text": "Named clinical SMEs for scope definition and validation"},
-      {"icon": "shield-check", "text": "Governance process for approval, versioning, and change notification"}
+      {
+        "icon": "server",
+        "text": "Terminology service with ECL expansion ($expand) support"
+      },
+      {
+        "icon": "users",
+        "text": "Named clinical SMEs for scope definition and validation"
+      },
+      {
+        "icon": "shield-check",
+        "text": "Governance process for approval, versioning, and change notification"
+      }
     ],
     "pitfalls": [
       "Using extensional (explicit list) definitions where ECL would suffice — lists require manual maintenance on every SNOMED CT release",
@@ -484,20 +670,42 @@
       "No governance — value sets with no named clinical owner degrade in quality as the SNOMED CT release evolves"
     ],
     "resources": [
-      {"type": "Tool", "title": "SNOMED CT Browser — ECL search", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Tool", "title": "Simplex — value set authoring", "url": "https://simplex.ihtsdotools.org/"},
-      {"type": "Spec", "title": "Expression constraint language specification", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"},
-      {"type": "Guide", "title": "Reference set guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-reference-set-guide/"},
-      {"type": "Guide", "title": "Simplex user guide", "url": "https://docs.snomed.org/snomed-ct-user-guides/simplex-user-guide/"}
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser — ECL search",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Tool",
+        "title": "Simplex — value set authoring",
+        "url": "https://simplex.ihtsdotools.org/"
+      },
+      {
+        "type": "Spec",
+        "title": "Expression constraint language specification",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      },
+      {
+        "type": "Guide",
+        "title": "Reference set guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-reference-set-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "Simplex user guide",
+        "url": "https://docs.snomed.org/snomed-ct-user-guides/simplex-user-guide/"
+      }
     ]
   },
-
   "term-service": {
     "title": "Terminology service implementation",
     "subtitle": "Deploying and operating a SNOMED CT terminology service for runtime use",
     "icon": "server",
     "color": "blue",
-    "audience": ["Software provider", "Information Manager"],
+    "audience": [
+      "Software provider",
+      "Information Manager"
+    ],
     "overview": "A SNOMED CT terminology service is the runtime foundation for all SNOMED CT-enabled applications. It provides concept lookup, preferred term retrieval by language reference set, ECL-based value set expansion, subsumption testing, code validation, and concept map translation. Snowstorm — developed by SNOMED International and released as open source — is the reference server. It implements both a native API and the HL7 FHIR Terminology Service operations ($expand, $lookup, $subsumes, $validate-code, $translate) required for interoperable deployment.",
     "decisions": [
       {
@@ -548,10 +756,22 @@
       }
     ],
     "dependencies": [
-      {"icon": "database", "text": "Licensed SNOMED CT RF2 release files from SNOMED International or NRC"},
-      {"icon": "key", "text": "SNOMED CT license (via MLDS for SNOMED International members)"},
-      {"icon": "cloud", "text": "Infrastructure: Elasticsearch cluster and sufficient heap/disk for Snowstorm"},
-      {"icon": "lock", "text": "Access control, audit logging, and high-availability configuration"}
+      {
+        "icon": "database",
+        "text": "Licensed SNOMED CT RF2 release files from SNOMED International or NRC"
+      },
+      {
+        "icon": "key",
+        "text": "SNOMED CT license (via MLDS for SNOMED International members)"
+      },
+      {
+        "icon": "cloud",
+        "text": "Infrastructure: Elasticsearch cluster and sufficient heap/disk for Snowstorm"
+      },
+      {
+        "icon": "lock",
+        "text": "Access control, audit logging, and high-availability configuration"
+      }
     ],
     "pitfalls": [
       "Loading only the international release when a national edition exists — local concepts from the national edition are missing from search and validation results",
@@ -561,21 +781,47 @@
       "Allowing clinical applications to bypass the terminology service for concept lookups — local caches diverge from the authoritative SNOMED CT content"
     ],
     "resources": [
-      {"type": "Tool", "title": "Snowstorm terminology server (open source)", "url": "https://github.com/IHTSDO/snowstorm"},
-      {"type": "Tool", "title": "SNOMED CT Browser", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Guide", "title": "Terminology services guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"},
-      {"type": "Spec", "title": "Release file specification (RF2)", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-release-file-specification/"},
-      {"type": "Spec", "title": "Expression constraint language specification", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"},
-      {"type": "Guide", "title": "MLDS — licensing and release access", "url": "https://mlds.ihtsdotools.org/"}
+      {
+        "type": "Tool",
+        "title": "Snowstorm terminology server (open source)",
+        "url": "https://github.com/IHTSDO/snowstorm"
+      },
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Guide",
+        "title": "Terminology services guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"
+      },
+      {
+        "type": "Spec",
+        "title": "Release file specification (RF2)",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-release-file-specification/"
+      },
+      {
+        "type": "Spec",
+        "title": "Expression constraint language specification",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      },
+      {
+        "type": "Guide",
+        "title": "MLDS — licensing and release access",
+        "url": "https://mlds.ihtsdotools.org/"
+      }
     ]
   },
-
   "search-ux": {
     "title": "Search and data entry",
     "subtitle": "Designing clinician-friendly SNOMED CT concept search and data entry experiences",
     "icon": "search",
     "color": "teal",
-    "audience": ["Software provider", "Clinician"],
+    "audience": [
+      "Software provider",
+      "Clinician"
+    ],
     "overview": "Search is the primary interface between clinicians and SNOMED CT. Effective SNOMED CT search requires scoping the concept space using ECL constraints per field, returning preferred terms from the language reference set (never FSNs), and ranking results by clinical frequency and preferred term match. The SNOMED CT Search and Data Entry Guide provides detailed UX design guidance. Clinicians do not need to understand SNOMED CT — they need a search that finds the right concept immediately using the words they naturally use.",
     "decisions": [
       {
@@ -626,9 +872,18 @@
       }
     ],
     "dependencies": [
-      {"icon": "server", "text": "Terminology service with full-text search and ECL constraint filtering (Snowstorm)"},
-      {"icon": "filter", "text": "ECL-defined value sets per data entry field"},
-      {"icon": "language", "text": "Language reference set configured for preferred term display and synonym matching"}
+      {
+        "icon": "server",
+        "text": "Terminology service with full-text search and ECL constraint filtering (Snowstorm)"
+      },
+      {
+        "icon": "filter",
+        "text": "ECL-defined value sets per data entry field"
+      },
+      {
+        "icon": "language",
+        "text": "Language reference set configured for preferred term display and synonym matching"
+      }
     ],
     "pitfalls": [
       "Displaying FSNs (fully specified names) in search results — FSNs are technical identifiers not appropriate for clinician-facing display",
@@ -638,19 +893,37 @@
       "Ignoring synonym configuration — clinicians use different terms than those in the preferred term label, and missing synonyms force workarounds"
     ],
     "resources": [
-      {"type": "Tool", "title": "SNOMED CT Browser — demonstrates preferred term display", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Guide", "title": "Search and data entry guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-search-and-data-entry-guide/"},
-      {"type": "Guide", "title": "EHR requirements guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-ehr-requirements-guide/"},
-      {"type": "Spec", "title": "Expression constraint language specification", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"}
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser — demonstrates preferred term display",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Guide",
+        "title": "Search and data entry guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-search-and-data-entry-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "EHR requirements guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-ehr-requirements-guide/"
+      },
+      {
+        "type": "Spec",
+        "title": "Expression constraint language specification",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      }
     ]
   },
-
   "mapping": {
     "title": "Mapping and legacy data migration",
     "subtitle": "Mapping SNOMED CT to ICD-10 and migrating from legacy code systems using Snap2SNOMED",
     "icon": "arrows-right-left",
     "color": "gray",
-    "audience": ["Information Manager", "Software provider"],
+    "audience": [
+      "Information Manager",
+      "Software provider"
+    ],
     "overview": "SNOMED CT mapping enables translation to other code systems (primarily ICD-10 for statutory reporting), and migration of legacy-coded data into SNOMED CT. The official SNOMED CT to ICD-10 extended map — maintained by SNOMED International — provides rule-based, condition-aware mapping for reporting. For custom mapping projects, Snap2SNOMED is the recommended tool, providing a structured workflow for human-curated mapping with audit trail and versioning. Mapping always involves some loss of meaning — the degree of loss depends on the source and target systems and must be explicitly acknowledged.",
     "decisions": [
       {
@@ -701,9 +974,18 @@
       }
     ],
     "dependencies": [
-      {"icon": "server", "text": "Terminology service with FHIR $translate operation (ConceptMap support)"},
-      {"icon": "file-import", "text": "Official SNOMED CT to ICD-10 extended map (from RF2 release files)"},
-      {"icon": "users", "text": "Clinical coders with expertise in both source and target code systems"}
+      {
+        "icon": "server",
+        "text": "Terminology service with FHIR $translate operation (ConceptMap support)"
+      },
+      {
+        "icon": "file-import",
+        "text": "Official SNOMED CT to ICD-10 extended map (from RF2 release files)"
+      },
+      {
+        "icon": "users",
+        "text": "Clinical coders with expertise in both source and target code systems"
+      }
     ],
     "pitfalls": [
       "Treating the SNOMED CT to ICD-10 map as a simple lookup — the map has rule groups, priorities, and advice fields that must be applied to get the correct ICD-10 code",
@@ -713,20 +995,43 @@
       "Ignoring history supplements when migrating legacy data — historical SNOMED CT concept IDs from older releases may be inactivated and need resolution before mapping"
     ],
     "resources": [
-      {"type": "Tool", "title": "Snap2SNOMED — mapping tool", "url": "https://app.snap2snomed.org/"},
-      {"type": "Tool", "title": "SNOMED CT Browser", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Guide", "title": "Mapping guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"},
-      {"type": "Spec", "title": "ICD-10 map specification", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-to-icd-10-map-specification/"},
-      {"type": "Guide", "title": "Snap2SNOMED user guide", "url": "https://docs.snomed.org/snomed-ct-user-guides/snap2snomed-user-guide/"}
+      {
+        "type": "Tool",
+        "title": "Snap2SNOMED — mapping tool",
+        "url": "https://app.snap2snomed.org/"
+      },
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Guide",
+        "title": "Mapping guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
+      },
+      {
+        "type": "Spec",
+        "title": "ICD-10 map specification",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-to-icd-10-map-specification/"
+      },
+      {
+        "type": "Guide",
+        "title": "Snap2SNOMED user guide",
+        "url": "https://docs.snomed.org/snomed-ct-user-guides/snap2snomed-user-guide/"
+      }
     ]
   },
-
   "governance": {
     "title": "Governance and quality assurance",
     "subtitle": "Establishing governance structures for sustainable, high-quality SNOMED CT implementation",
     "icon": "shield-check",
     "color": "blue",
-    "audience": ["Governance Lead", "Information Manager", "Software provider"],
+    "audience": [
+      "Governance Lead",
+      "Information Manager",
+      "Software provider"
+    ],
     "overview": "Governance is what separates a SNOMED CT implementation that improves over time from one that gradually degrades. Good governance defines who has authority over terminology content decisions, how changes are requested and approved, how quality is measured, and how the implementation responds to each SNOMED CT release cycle. Automated QA using ECL-based queries — for example, detecting records using inactivated concepts — is a practical and scalable quality mechanism that should be built into the release management process from the start.",
     "decisions": [
       {
@@ -777,9 +1082,18 @@
       }
     ],
     "dependencies": [
-      {"icon": "users", "text": "Named governance roles with clear decision-making authority"},
-      {"icon": "server", "text": "Terminology service for ECL-based automated QA queries"},
-      {"icon": "file-description", "text": "Documented policies, value set definitions, and change log"}
+      {
+        "icon": "users",
+        "text": "Named governance roles with clear decision-making authority"
+      },
+      {
+        "icon": "server",
+        "text": "Terminology service for ECL-based automated QA queries"
+      },
+      {
+        "icon": "file-description",
+        "text": "Documented policies, value set definitions, and change log"
+      }
     ],
     "pitfalls": [
       "No named clinical owner for terminology content decisions — produces governance vacuums where changes are made without oversight",
@@ -789,20 +1103,41 @@
       "Treating governance as a one-time setup — SNOMED CT implementations require ongoing governance investment to remain high quality"
     ],
     "resources": [
-      {"type": "Tool", "title": "SNOMED CT Browser", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Tool", "title": "Content Request Service", "url": "https://confluence.ihtsdotools.org/display/SCTGLOBAL/Content+Request+Service"},
-      {"type": "Guide", "title": "Starter guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-starter-guide/"},
-      {"type": "Guide", "title": "NRC guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-nrc-guide/"},
-      {"type": "Guide", "title": "Implementation fact sheets", "url": "https://docs.snomed.org/implementation-guides/implementation-fact-sheets/"}
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Tool",
+        "title": "Content Request Service",
+        "url": "https://confluence.ihtsdotools.org/display/SCTGLOBAL/Content+Request+Service"
+      },
+      {
+        "type": "Guide",
+        "title": "Starter guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-starter-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "NRC guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-nrc-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "Implementation fact sheets",
+        "url": "https://docs.snomed.org/implementation-guides/implementation-fact-sheets/"
+      }
     ]
   },
-
   "extensions": {
     "title": "Extensions and concept authoring",
     "subtitle": "Creating and maintaining SNOMED CT extensions when international content is insufficient",
     "icon": "pencil-plus",
     "color": "green",
-    "audience": ["Information Manager"],
+    "audience": [
+      "Information Manager"
+    ],
     "overview": "A SNOMED CT extension allows national release centres or organisations to add concepts, descriptions, and reference sets that are not in the international release. Extension concepts must follow the same design principles as international SNOMED CT content — applying the concept model as defined in the SNOMED CT Machine Readable Concept Model (MRCM), using defining relationships consistent with the international hierarchy, and undergoing description logic classification. Extension authoring should be a last resort: always search the international and national release thoroughly, and submit a content request to SNOMED International before creating local extension concepts.",
     "decisions": [
       {
@@ -853,10 +1188,22 @@
       }
     ],
     "dependencies": [
-      {"icon": "server", "text": "SNOMED Authoring Platform or equivalent authoring tool"},
-      {"icon": "id-badge", "text": "Registered SNOMED CT namespace (from your NRC or SNOMED International)"},
-      {"icon": "shield-check", "text": "Classification (description logic reasoner) and Drools validation"},
-      {"icon": "key", "text": "SNOMED CT license and NRC relationship for namespace registration"}
+      {
+        "icon": "server",
+        "text": "SNOMED Authoring Platform or equivalent authoring tool"
+      },
+      {
+        "icon": "id-badge",
+        "text": "Registered SNOMED CT namespace (from your NRC or SNOMED International)"
+      },
+      {
+        "icon": "shield-check",
+        "text": "Classification (description logic reasoner) and Drools validation"
+      },
+      {
+        "icon": "key",
+        "text": "SNOMED CT license and NRC relationship for namespace registration"
+      }
     ],
     "pitfalls": [
       "Creating extension concepts without an exhaustive Browser search — many apparent gaps are already covered by existing SNOMED CT content with different term labels",
@@ -866,21 +1213,48 @@
       "Extension concepts promoted to the international release without retirement in the extension — creates duplicate concepts in consuming systems"
     ],
     "resources": [
-      {"type": "Tool", "title": "SNOMED CT Browser — concept search before authoring", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Tool", "title": "SNOMED Authoring Platform", "url": "https://authoring.ihtsdotools.org/"},
-      {"type": "Tool", "title": "Content Request Service", "url": "https://confluence.ihtsdotools.org/display/SCTGLOBAL/Content+Request+Service"},
-      {"type": "Guide", "title": "Extension guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-extension-guide/"},
-      {"type": "Guide", "title": "Editorial guide", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-editorial-guide/"},
-      {"type": "Spec", "title": "Machine readable concept model", "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-machine-readable-concept-model/"}
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser — concept search before authoring",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Tool",
+        "title": "SNOMED Authoring Platform",
+        "url": "https://authoring.ihtsdotools.org/"
+      },
+      {
+        "type": "Tool",
+        "title": "Content Request Service",
+        "url": "https://confluence.ihtsdotools.org/display/SCTGLOBAL/Content+Request+Service"
+      },
+      {
+        "type": "Guide",
+        "title": "Extension guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-extension-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "Editorial guide",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-editorial-guide/"
+      },
+      {
+        "type": "Spec",
+        "title": "Machine readable concept model",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-machine-readable-concept-model/"
+      }
     ]
   },
-
   "multilingual": {
     "title": "Multilingual implementation",
     "subtitle": "Supporting SNOMED CT in multiple languages using language reference sets and translation tools",
     "icon": "language",
     "color": "amber",
-    "audience": ["Information Manager", "Software provider", "Clinician"],
+    "audience": [
+      "Information Manager",
+      "Software provider",
+      "Clinician"
+    ],
     "overview": "SNOMED CT's concept meanings are language-neutral — meaning is encoded in the concept model and defining relationships, not in text strings. Language reference sets attach preferred terms and acceptable synonyms for each language or dialect to the same underlying concept. This enables clinicians to work in their own language while the coded concept remains universally interoperable. SNOMED International and national release centres publish language reference sets for many languages. The SNOMED International Translation Tool supports structured translation workflows for organisations creating or maintaining translations.",
     "decisions": [
       {
@@ -931,9 +1305,18 @@
       }
     ],
     "dependencies": [
-      {"icon": "server", "text": "Terminology service (Snowstorm) with language reference set priority configuration"},
-      {"icon": "language", "text": "National or international language reference sets in RF2 format"},
-      {"icon": "users", "text": "Clinical SMEs fluent in the clinical domain and target language for translation review"}
+      {
+        "icon": "server",
+        "text": "Terminology service (Snowstorm) with language reference set priority configuration"
+      },
+      {
+        "icon": "language",
+        "text": "National or international language reference sets in RF2 format"
+      },
+      {
+        "icon": "users",
+        "text": "Clinical SMEs fluent in the clinical domain and target language for translation review"
+      }
     ],
     "pitfalls": [
       "Displaying FSNs (in English) to non-English-speaking clinicians — always configure preferred terms from the appropriate language reference set",
@@ -943,11 +1326,31 @@
       "No release review process — new concepts added in SNOMED CT releases go without translation and appear in English (or without display text) in clinical systems"
     ],
     "resources": [
-      {"type": "Tool", "title": "SNOMED CT Browser — multilingual term display", "url": "https://browser.ihtsdotools.org/"},
-      {"type": "Tool", "title": "SNOMED International Translation Tool", "url": "https://translate.ihtsdotools.org/"},
-      {"type": "Tool", "title": "MLDS — language reference set access", "url": "https://mlds.ihtsdotools.org/"},
-      {"type": "Guide", "title": "Translation guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-translation-guide/"},
-      {"type": "Guide", "title": "Translation management guide", "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-translation-management-guide/"}
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser — multilingual term display",
+        "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Tool",
+        "title": "SNOMED International Translation Tool",
+        "url": "https://translate.ihtsdotools.org/"
+      },
+      {
+        "type": "Tool",
+        "title": "MLDS — language reference set access",
+        "url": "https://mlds.ihtsdotools.org/"
+      },
+      {
+        "type": "Guide",
+        "title": "Translation guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-translation-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "Translation management guide",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-translation-management-guide/"
+      }
     ]
   }
 }
