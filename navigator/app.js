@@ -434,70 +434,41 @@ function renderAllPlaybooks() {
     purple:  '#8072AC', camelot: '#8D3057', gray:    '#434A55',
   };
 
-  // Group playbooks into themed sections
-  const groups = [
-    {
-      label: 'Use case playbooks',
-      description: 'Start here if you have a specific clinical or operational goal.',
-      ids: ['problem-list', 'clin-docs', 'cds', 'analytics', 'interop'],
-    },
-    {
-      label: 'Implementation playbooks',
-      description: 'Start here if you need to design or build a specific component.',
-      ids: ['value-sets', 'term-service', 'search-ux', 'mapping', 'governance'],
-    },
-    {
-      label: 'Content and language playbooks',
-      description: 'Start here if you are working with extensions, translations, or multilingual environments.',
-      ids: ['extensions', 'multilingual'],
-    },
-  ];
-
   const grid = document.getElementById('all-playbooks-grid');
-  grid.innerHTML = groups.map(group => {
-    const cards = group.ids.map(id => {
-      const pb = state.playbooks[id];
-      if (!pb) return '';
-      const band = bandColour[pb.color] || '#12506B';
-      const qCount = state.questions.filter(q => q.playbook === id).length;
-      return `
-        <a href="#/playbook/${id}" class="pb-full-card">
-          <div class="pb-full-card-accent" style="background:${band}">
-            <span class="c-${pb.color}" style="color:var(--c-text)">${icon(pb.icon || 'file', 20)}</span>
-          </div>
-          <div class="pb-full-card-body">
-            <div class="pb-full-card-title">${pb.title}</div>
-            <div class="pb-full-card-subtitle">${pb.subtitle}</div>
-            <div class="pb-full-card-overview">${pb.overview}</div>
-            <div class="pb-full-card-stats">
-              <span class="pb-stat">${icon('git-branch', 13)} ${pb.decisions.length} considerations</span>
-              <span class="pb-stat">${icon('stairs', 13)} ${pb.steps.length} steps</span>
-              <span class="pb-stat">${icon('books', 13)} ${pb.resources.length} resources</span>
-              <span class="pb-stat">${icon('search', 13)} ${qCount} question${qCount !== 1 ? 's' : ''}</span>
-            </div>
-            <div class="pb-full-card-footer">
-              <div class="pb-full-card-audience">
-                ${pb.audience.map(a => `<span class="audience-pill c-${pb.color}" style="color:var(--c-text);border-color:var(--c-border);background:var(--c-bg)">${a}</span>`).join('')}
-              </div>
-              <span class="pb-full-card-cta c-${pb.color}" style="color:var(--c-text)">
-                Open playbook ${icon('arrow-right', 13)}
-              </span>
-            </div>
-          </div>
-        </a>
-      `;
-    }).join('');
-
+  const cards = PLAYBOOK_ORDER.map(id => {
+    const pb = state.playbooks[id];
+    if (!pb) return '';
+    const band = bandColour[pb.color] || '#003865';
+    const qCount = state.questions.filter(q => q.playbook === id).length;
     return `
-      <div class="pb-group">
-        <div class="pb-group-header">
-          <div class="pb-group-label">${group.label}</div>
-          <div class="pb-group-desc">${group.description}</div>
+      <a href="#/playbook/${id}" class="pb-full-card">
+        <div class="pb-full-card-accent" style="background:${band}">
+          <span class="c-${pb.color}" style="color:var(--c-text)">${icon(pb.icon || 'file', 20)}</span>
         </div>
-        <div class="pb-group-grid">${cards}</div>
-      </div>
+        <div class="pb-full-card-body">
+          <div class="pb-full-card-title">${pb.title}</div>
+          <div class="pb-full-card-subtitle">${pb.subtitle}</div>
+          <div class="pb-full-card-overview">${pb.overview}</div>
+          <div class="pb-full-card-stats">
+            <span class="pb-stat">${icon('git-branch', 13)} ${pb.decisions.length} considerations</span>
+            <span class="pb-stat">${icon('stairs', 13)} ${pb.steps.length} steps</span>
+            <span class="pb-stat">${icon('books', 13)} ${pb.resources.length} resources</span>
+            <span class="pb-stat">${icon('search', 13)} ${qCount} question${qCount !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="pb-full-card-footer">
+            <div class="pb-full-card-audience">
+              ${pb.audience.map(a => `<span class="audience-pill c-${pb.color}" style="color:var(--c-text);border-color:var(--c-border);background:var(--c-bg)">${a}</span>`).join('')}
+            </div>
+            <span class="pb-full-card-cta c-${pb.color}" style="color:var(--c-text)">
+              Open playbook ${icon('arrow-right', 13)}
+            </span>
+          </div>
+        </div>
+      </a>
     `;
   }).join('');
+
+  grid.innerHTML = `<div class="pb-group-grid">${cards}</div>`;
 }
 
 // ── Question answer page ─────────────────────────────────────────────────
