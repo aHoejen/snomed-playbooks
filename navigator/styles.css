@@ -129,9 +129,7 @@ button { font-family: var(--font); cursor: pointer; }
   flex-shrink: 0;
 }
 .header-logo svg { color: var(--cerulean); }
-.logo-wordmark { font-size: 13px; line-height: 1.3; }
-.logo-org { opacity: .65; font-size: 11px; display: block; }
-.logo-product { font-weight: 600; font-size: 14px; display: block; }
+.logo-product { font-weight: 600; font-size: 14px; color: #fff; }
 
 .header-nav { display: flex; gap: 4px; margin: 0 8px; }
 .header-nav a {
