@@ -39,19 +39,19 @@
       },
       {
         "title": "Define the value set",
-        "description": "Define the concept scope for the problem list. Two approaches are available: (1) Manual selection - browse the SNOMED CT hierarchy using the public SNOMED CT Browser and hand-pick the concepts that make up the value set; (2) ECL query - write an Expression Constraint Language expression (e.g., descendants of Clinical finding: <<404684003) and expand it against a terminology server to generate the full concept list. Either way, the output is a static list of concept IDs that the clinical system can use without any live terminology server connection."
+        "description": "Define the concept scope for the problem list. Two approaches are available: \n(1) Manual selection - browse the SNOMED CT hierarchy using the public SNOMED CT Browser and hand-pick the concepts that make up the value set; \n(2) ECL query - write an Expression Constraint Language expression (e.g., descendants of Clinical finding: <<404684003) and expand it against a terminology server to generate the full concept list. \n\nEither way, the output is a static list of concept IDs that the clinical system can use as a basis for the value set."
       },
       {
         "title": "Choose how the value set will be delivered to the clinical system",
-        "description": "Integrating a terminology service directly into the clinical system is best practice - it enables live ECL expansion, concept search, and preferred term retrieval against the current SNOMED CT release. However, this is not always feasible. Where direct integration is not possible, a separate terminology server (a public server such as the one operated by SNOMED International, or a locally deployed Snowstorm instance) can be used offline to extract and export the value set as a flat list of concept IDs. This static list is then loaded into the clinical system and used for search and validation. In this case, the value set must be refreshed manually on each SNOMED CT release."
+        "description": "Integrating a FHIR terminology service directly into the clinical system is best practice - it enables live ECL expansion, concept search, and preferred term retrieval against the current SNOMED CT release. However, this is not always feasible. Where direct integration is not possible, a separate terminology server (a public server such as the one operated by SNOMED International, or a locally deployed Snowstorm instance) can be used to extract the concept list. In either case, a raw list of concept IDs is not yet a usable value set - see the next step."
+      },
+      {
+        "title": "Represent the value set in a form the clinical system can use",
+        "description": "A list of concept IDs alone is not sufficient - the clinical system needs terms and a structured format it can process. Two paths apply depending on your architecture: (1) FHIR terminology server integrated: use the implicit SNOMED CT value set directly via ECL (no separate packaging needed), or define a named FHIR ValueSet resource with an ECL expression in the compose element. The terminology server resolves preferred terms at runtime from the configured language reference set. (2) No integrated terminology server: export the expanded concept list from a separate terminology server, supplemented with the preferred and acceptable terms for your language and context. Package this as a format the clinical system can consume - for example, a FHIR ValueSet with explicit concept entries including display terms, a CSV, or a local reference table. This static representation must be refreshed on each SNOMED CT release."
       },
       {
         "title": "Implement clinician-facing search",
-        "description": "Configure search to display preferred terms from the configured language reference set - never FSNs. Use the terminology service search API (e.g. Snowstorm's /concepts search endpoint) with the ECL constraint applied per field. Rank by clinical frequency and preferred term match."
-      },
-      {
-        "title": "Configure ICD-10 mapping for reporting",
-        "description": "Load the official SNOMED CT to ICD-10 extended map via your terminology service. Apply the map application algorithm (rule groups, priorities, advice fields) to generate ICD-10 codes from SNOMED CT problem list entries for billing and statutory reporting."
+        "description": "Configure search to display preferred terms from the configured language reference set - never FSNs. Where a terminology service is integrated, use its search API (e.g. Snowstorm's /concepts endpoint) with the ECL constraint applied. Where a static value set is used, ensure the exported terms are indexed and searchable within the clinical system. Rank results by clinical frequency and preferred term match."
       },
       {
         "title": "Establish governance and release management",
