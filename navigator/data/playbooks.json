@@ -17,7 +17,7 @@
       },
       {
         "question": "Will concept selection be open or constrained by a value set?",
-        "guidance": "An open constraint (any descendant of Clinical finding) gives maximum flexibility but risks inconsistent coding. A curated value set or ECL-bounded constraint improves data quality and clinician experience. Consider starting with a managed subset and widening over time."
+        "guidance": "An open constraint (any descendant of Clinical finding) gives maximum flexibility but risks inconsistent coding. A curated value set or ECL-bounded constraint improves data quality and clinician experience. Consider starting with a managed subset and widening over time. The value set can be defined using ECL evaluated against a terminology server, or by manually selecting concepts - the method of definition is separate from how the value set is delivered to the clinical system."
       },
       {
         "question": "What level of clinical granularity is required?",
@@ -25,7 +25,7 @@
       },
       {
         "question": "How will preferred terms be displayed to clinicians?",
-        "guidance": "SNOMED CT fully specified names (FSNs) must never be shown to clinicians. Preferred terms from the appropriate language reference set must be configured in your terminology service. If your system is multilingual, agree the language priority order."
+        "guidance": "SNOMED CT fully specified names (FSNs) is not intended for direct data entry and display in the clinical user interface. Preferred terms from the appropriate language reference set must should be the default display term for data entry. If your system is multilingual, agree on the language priority order."
       },
       {
         "question": "How will the problem list feed downstream systems?",
@@ -38,12 +38,12 @@
         "description": "Work with clinical and governance leads to agree what constitutes a 'problem', who approves changes to the scope, and how the list will be maintained over time."
       },
       {
-        "title": "Define the value set using ECL",
-        "description": "Write an Expression Constraint Language expression to bound concept selection - for example, descendants of Clinical finding (<<404684003) or a more specific constraint. Package this as an RF2 simple reference set or a FHIR ValueSet resource for runtime use."
+        "title": "Define the value set",
+        "description": "Define the concept scope for the problem list. Two approaches are available: (1) Manual selection - browse the SNOMED CT hierarchy using the public SNOMED CT Browser and hand-pick the concepts that make up the value set; (2) ECL query - write an Expression Constraint Language expression (e.g., descendants of Clinical finding: <<404684003) and expand it against a terminology server to generate the full concept list. Either way, the output is a static list of concept IDs that the clinical system can use without any live terminology server connection."
       },
       {
-        "title": "Deploy a SNOMED CT terminology service",
-        "description": "Connect to a SNOMED CT-compliant terminology service (such as Snowstorm) that supports ECL-based value set expansion, concept lookup, and preferred term retrieval via language reference sets. Confirm the correct national edition is loaded."
+        "title": "Choose how the value set will be delivered to the clinical system",
+        "description": "Integrating a terminology service directly into the clinical system is best practice - it enables live ECL expansion, concept search, and preferred term retrieval against the current SNOMED CT release. However, this is not always feasible. Where direct integration is not possible, a separate terminology server (a public server such as the one operated by SNOMED International, or a locally deployed Snowstorm instance) can be used offline to extract and export the value set as a flat list of concept IDs. This static list is then loaded into the clinical system and used for search and validation. In this case, the value set must be refreshed manually on each SNOMED CT release."
       },
       {
         "title": "Implement clinician-facing search",
@@ -61,7 +61,7 @@
     "dependencies": [
       {
         "icon": "server",
-        "text": "SNOMED CT terminology service (e.g. Snowstorm) with the correct national edition loaded"
+        "text": "SNOMED CT terminology service - either integrated into the clinical system (best practice) or used separately to extract and export value sets"
       },
       {
         "icon": "filter",
@@ -81,7 +81,8 @@
       "Using an open constraint (all of SNOMED CT) without scoping - this produces irrelevant search results and poor data quality",
       "Failing to configure the correct national edition in the terminology service, causing local concepts to be missing",
       "Not planning for ICD-10 mapping from the start - retrofitting this is expensive once data is in production",
-      "Skipping release management - inactivated concepts silently remain in patient records after SNOMED CT updates"
+      "Skipping release management - inactivated concepts silently remain in patient records after SNOMED CT updates",
+      "Using a static value set extracted from a terminology server without a refresh process - new clinically relevant concepts added in SNOMED CT releases are silently excluded from selection"
     ],
     "resources": [
       {
