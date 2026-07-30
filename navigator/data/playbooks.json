@@ -28,6 +28,10 @@
         "guidance": "SNOMED CT fully specified names (FSNs) is not intended for direct data entry and display in the clinical user interface. Preferred terms from the appropriate language reference set must should be the default display term for data entry. If your system is multilingual, agree on the language priority order."
       },
       {
+        "question": "What is the architecture of the implementation and how is the problem list integrated into the clinical system?",
+        "guidance": "Understand the technical architecture before making value set and terminology service decisions. Key questions: Is the problem list a module within an existing EHR, or a standalone system? Can a FHIR terminology service be integrated directly, or must value sets be loaded statically? Is the system built in-house or a commercial product with constraints on integration? The answers determine which value set delivery approach is feasible and how much of the SNOMED CT infrastructure the implementation team controls."
+      },
+      {
         "question": "How will the problem list feed downstream systems?",
         "guidance": "Identify which systems consume problem list data - CDS engines, analytics platforms, ICD-10 reporting, FHIR document exchange. Each has different requirements that will constrain your SNOMED CT implementation choices."
       }
