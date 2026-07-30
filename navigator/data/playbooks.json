@@ -84,7 +84,6 @@
       "Displaying FSNs (fully specified names) instead of preferred terms from a language reference set - FSNs are not for clinical display",
       "Using an open constraint (all of SNOMED CT) without scoping - this produces irrelevant search results and poor data quality",
       "Failing to configure the correct national edition in the terminology service, causing local concepts to be missing",
-      "Not planning for ICD-10 mapping from the start - retrofitting this is expensive once data is in production",
       "Skipping release management - inactivated concepts silently remain in patient records after SNOMED CT updates",
       "Using a static value set extracted from a terminology server without a refresh process - new clinically relevant concepts added in SNOMED CT releases are silently excluded from selection"
     ],
