@@ -1,82 +1,5 @@
 [
   {
-    "id": "U001",
-    "text": "Implementing a SNOMED CT-based problem list in an EHR",
-    "perspective": "useCase",
-    "category": "Problem List",
-    "playbook": "problem-list"
-  },
-  {
-    "id": "U002",
-    "text": "Defining problem list content and structure",
-    "perspective": "useCase",
-    "category": "Problem List",
-    "playbook": "problem-list"
-  },
-  {
-    "id": "U003",
-    "text": "Enabling clinicians to quickly find and record the right diagnosis",
-    "perspective": "useCase",
-    "category": "Problem List",
-    "playbook": "search-ux"
-  },
-  {
-    "id": "U004",
-    "text": "Using SNOMED CT in clinical documentation templates and forms",
-    "perspective": "useCase",
-    "category": "Clinical Documentation",
-    "playbook": "clin-docs"
-  },
-  {
-    "id": "U005",
-    "text": "Ensuring consistent and high-quality coding during documentation",
-    "perspective": "useCase",
-    "category": "Clinical Documentation",
-    "playbook": "governance"
-  },
-  {
-    "id": "U006",
-    "text": "Using SNOMED CT to support clinical decision support",
-    "perspective": "useCase",
-    "category": "Clinical Decision Support",
-    "playbook": "cds"
-  },
-  {
-    "id": "U007",
-    "text": "Defining and managing value sets for CDS rules",
-    "perspective": "useCase",
-    "category": "Clinical Decision Support",
-    "playbook": "value-sets"
-  },
-  {
-    "id": "U008",
-    "text": "Using SNOMED CT data for reporting and analytics",
-    "perspective": "useCase",
-    "category": "Analytics & Reporting",
-    "playbook": "analytics"
-  },
-  {
-    "id": "U009",
-    "text": "Grouping and aggregating SNOMED CT concepts for reporting",
-    "perspective": "useCase",
-    "category": "Analytics & Reporting",
-    "playbook": "analytics"
-  },
-  {
-    "id": "U010",
-    "text": "Recording allergies and adverse reactions using SNOMED CT",
-    "perspective": "useCase",
-    "category": "Clinical Documentation",
-    "playbook": "clin-docs"
-  },
-  {
-    "id": "U011",
-    "text": "Exchanging SNOMED CT-coded data between systems using FHIR",
-    "perspective": "useCase",
-    "category": "Interoperability",
-    "playbook": "interop"
-  },
-  {
     "id": "I001",
     "text": "How do I design value sets for my use case?",
     "perspective": "capability",
@@ -245,41 +168,6 @@
     "playbook": "governance"
   },
   {
-    "id": "U012",
-    "text": "Supporting multiple languages in SNOMED CT",
-    "perspective": "useCase",
-    "category": "Interoperability",
-    "playbook": "multilingual"
-  },
-  {
-    "id": "U013",
-    "text": "Enabling clinicians to search and select terms in their local language",
-    "perspective": "useCase",
-    "category": "Problem List",
-    "playbook": "multilingual"
-  },
-  {
-    "id": "U014",
-    "text": "Ensuring consistent meaning across languages",
-    "perspective": "useCase",
-    "category": "Interoperability",
-    "playbook": "multilingual"
-  },
-  {
-    "id": "U015",
-    "text": "Handling translations in clinical documentation",
-    "perspective": "useCase",
-    "category": "Clinical Documentation",
-    "playbook": "multilingual"
-  },
-  {
-    "id": "U016",
-    "text": "Using SNOMED CT in a multilingual healthcare environment",
-    "perspective": "useCase",
-    "category": "Interoperability",
-    "playbook": "multilingual"
-  },
-  {
     "id": "I025",
     "text": "How do we manage SNOMED CT translations and language reference sets?",
     "perspective": "capability",
@@ -420,13 +308,6 @@
     "playbook": "analytics"
   },
   {
-    "id": "U017",
-    "text": "Using defining relationships for querying and decision support",
-    "perspective": "useCase",
-    "category": "Analytics & Reporting",
-    "playbook": "analytics"
-  },
-  {
     "id": "I045",
     "text": "What modeling principles should we follow when creating new concepts?",
     "perspective": "capability",
@@ -441,41 +322,6 @@
     "playbook": "term-service"
   },
   {
-    "id": "U018",
-    "text": "Designing cohort queries using SNOMED CT hierarchies",
-    "perspective": "useCase",
-    "category": "Analytics & Reporting",
-    "playbook": "analytics"
-  },
-  {
-    "id": "U019",
-    "text": "Migrating existing coded or free-text data to SNOMED CT",
-    "perspective": "useCase",
-    "category": "Clinical Documentation",
-    "playbook": "mapping"
-  },
-  {
-    "id": "U020",
-    "text": "Managing legacy codes alongside SNOMED CT during transition",
-    "perspective": "useCase",
-    "category": "Interoperability",
-    "playbook": "mapping"
-  },
-  {
-    "id": "U021",
-    "text": "Defining a SNOMED CT implementation strategy",
-    "perspective": "useCase",
-    "category": "Governance",
-    "playbook": "governance"
-  },
-  {
-    "id": "U022",
-    "text": "Phasing SNOMED CT implementation across systems and workflows",
-    "perspective": "useCase",
-    "category": "Governance",
-    "playbook": "governance"
-  },
-  {
     "id": "I047",
     "text": "How do we measure the success of SNOMED CT implementation?",
     "perspective": "capability",
@@ -487,13 +333,6 @@
     "text": "What KPIs should we track for terminology quality and usage?",
     "perspective": "capability",
     "category": "Governance",
-    "playbook": "governance"
-  },
-  {
-    "id": "U023",
-    "text": "Identifying and managing clinical risks of incorrect SNOMED CT usage",
-    "perspective": "useCase",
-    "category": "Clinical Documentation",
     "playbook": "governance"
   },
   {
@@ -516,5 +355,166 @@
     "perspective": "capability",
     "category": "Terminology Service",
     "playbook": "term-service"
+  },
+  {
+    "id": "I052",
+    "text": "How do I implement a SNOMED CT-based problem list in an EHR?",
+    "perspective": "capability",
+    "category": "Problem List",
+    "playbook": "problem-list"
+  },
+  {
+    "id": "I053",
+    "text": "How do I define the content and structure of a problem list?",
+    "perspective": "capability",
+    "category": "Problem List",
+    "playbook": "problem-list"
+  },
+  {
+    "id": "I054",
+    "text": "How do I enable clinicians to quickly find and record the right diagnosis?",
+    "perspective": "capability",
+    "category": "Problem List",
+    "playbook": "search-ux"
+  },
+  {
+    "id": "I055",
+    "text": "How do I use SNOMED CT in clinical documentation templates and forms?",
+    "perspective": "capability",
+    "category": "Clinical Documentation",
+    "playbook": "clin-docs"
+  },
+  {
+    "id": "I056",
+    "text": "How do I ensure consistent and high-quality coding during clinical documentation?",
+    "perspective": "capability",
+    "category": "Clinical Documentation",
+    "playbook": "governance"
+  },
+  {
+    "id": "I057",
+    "text": "How do I use SNOMED CT to support clinical decision support?",
+    "perspective": "capability",
+    "category": "Clinical Decision Support",
+    "playbook": "cds"
+  },
+  {
+    "id": "I058",
+    "text": "How do I define and manage value sets for CDS rules?",
+    "perspective": "capability",
+    "category": "Clinical Decision Support",
+    "playbook": "value-sets"
+  },
+  {
+    "id": "I059",
+    "text": "How do I use SNOMED CT data for reporting and analytics?",
+    "perspective": "capability",
+    "category": "Analytics & Reporting",
+    "playbook": "analytics"
+  },
+  {
+    "id": "I060",
+    "text": "How do I group and aggregate SNOMED CT concepts for reporting?",
+    "perspective": "capability",
+    "category": "Analytics & Reporting",
+    "playbook": "analytics"
+  },
+  {
+    "id": "I061",
+    "text": "How do I record allergies and adverse reactions using SNOMED CT?",
+    "perspective": "capability",
+    "category": "Clinical Documentation",
+    "playbook": "clin-docs"
+  },
+  {
+    "id": "I062",
+    "text": "How do I exchange SNOMED CT-coded data between systems using FHIR?",
+    "perspective": "capability",
+    "category": "Interoperability",
+    "playbook": "interop"
+  },
+  {
+    "id": "I063",
+    "text": "How do I support multiple languages in SNOMED CT?",
+    "perspective": "capability",
+    "category": "Interoperability",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "I064",
+    "text": "How do I enable clinicians to search and select terms in their local language?",
+    "perspective": "capability",
+    "category": "Problem List",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "I065",
+    "text": "How do I ensure consistent meaning across languages?",
+    "perspective": "capability",
+    "category": "Interoperability",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "I066",
+    "text": "How do I handle translations in clinical documentation?",
+    "perspective": "capability",
+    "category": "Clinical Documentation",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "I067",
+    "text": "How do I use SNOMED CT in a multilingual healthcare environment?",
+    "perspective": "capability",
+    "category": "Interoperability",
+    "playbook": "multilingual"
+  },
+  {
+    "id": "I068",
+    "text": "How do I use defining relationships for querying and decision support?",
+    "perspective": "capability",
+    "category": "Analytics & Reporting",
+    "playbook": "analytics"
+  },
+  {
+    "id": "I069",
+    "text": "How do I design cohort queries using SNOMED CT hierarchies?",
+    "perspective": "capability",
+    "category": "Analytics & Reporting",
+    "playbook": "analytics"
+  },
+  {
+    "id": "I070",
+    "text": "How do I migrate existing coded or free-text data to SNOMED CT?",
+    "perspective": "capability",
+    "category": "Clinical Documentation",
+    "playbook": "mapping"
+  },
+  {
+    "id": "I071",
+    "text": "How do I manage legacy codes alongside SNOMED CT during transition?",
+    "perspective": "capability",
+    "category": "Interoperability",
+    "playbook": "mapping"
+  },
+  {
+    "id": "I072",
+    "text": "How do I define a SNOMED CT implementation strategy?",
+    "perspective": "capability",
+    "category": "Governance",
+    "playbook": "governance"
+  },
+  {
+    "id": "I073",
+    "text": "How do I phase SNOMED CT implementation across systems and workflows?",
+    "perspective": "capability",
+    "category": "Governance",
+    "playbook": "governance"
+  },
+  {
+    "id": "I074",
+    "text": "How do I identify and manage clinical risks of incorrect SNOMED CT usage?",
+    "perspective": "capability",
+    "category": "Clinical Documentation",
+    "playbook": "governance"
   }
 ]

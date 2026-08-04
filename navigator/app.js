@@ -25,7 +25,6 @@ const state = {
 //   camelot = Camelot #8D3057
 //   gray    = River Bed #434A55
 const PERSPECTIVE = {
-  useCase:    { label: 'Use cases',  color: 'blue',   icon: 'target',  count: 0 },
   capability: { label: 'Implementation questions', color: 'teal',   icon: 'puzzle',  count: 0 },
   role:       { label: 'Role',       color: 'purple', icon: 'users',   count: 0 },
 };
@@ -175,8 +174,7 @@ function renderLanding() {
 
 function entryDesc(p) {
   return {
-    useCase:    'I have a specific goal - problem list, decision support, reporting',
-    capability: 'I have a technical question - value sets, mappings, services',
+    capability: 'Browse questions about implementing SNOMED CT - from problem lists and CDS to value sets, mappings, and services',
     role:       'Guide me based on my role - clinician, software provider, information manager',
   }[p];
 }
@@ -193,9 +191,8 @@ function renderBrowse(perspective, activeFilter) {
   document.getElementById('browse-title').innerHTML =
     `<span class="c-${p.color}" style="color:var(--c-text)">${icon(p.icon, 22)}</span> ${p.label}`;
 
-  const itemLabel = perspective === 'useCase' ? 'SNOMED CT implementation use cases' : 'questions';
   document.getElementById('browse-subtitle').textContent =
-    `${itemLabel} - select one to open its playbook`;
+    `questions - select one to open its playbook`;
 
   // Role introductions
   const roleIntroEl = document.getElementById('role-intros');
