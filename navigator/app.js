@@ -172,12 +172,25 @@ function renderLanding() {
     </a>
   `).join('');
 
-  // Playbook chips
-  const chips = document.getElementById('playbook-chips');
-  chips.innerHTML = PLAYBOOK_ORDER.map(id => {
+  // Playbook cards
+  const pbCards = document.getElementById('playbook-cards');
+  const bandColour = {
+    blue:'#00A9E0', teal:'#25ACB8', green:'#6DBBA1', amber:'#F8A73D',
+    orange:'#DE8345', red:'#CE0037', purple:'#8072AC', camelot:'#8D3057', gray:'#434A55',
+  };
+  pbCards.innerHTML = PLAYBOOK_ORDER.map(id => {
     const pb = state.playbooks[id];
     if (!pb) return '';
-    return `<a href="#/playbook/${id}" class="chip c-${pb.color}" style="color:var(--c-text);background:var(--c-bg);border-color:var(--c-border)">${pb.title}</a>`;
+    const band = bandColour[pb.color] || '#003865';
+    return `
+      <a href="#/playbook/${id}" class="landing-pb-card">
+        <div class="landing-pb-card-band" style="background:${band}"></div>
+        <div class="landing-pb-card-body">
+          <div class="landing-pb-card-title">${pb.title}</div>
+          <div class="landing-pb-card-sub">${pb.subtitle}</div>
+        </div>
+      </a>
+    `;
   }).join('');
 }
 
