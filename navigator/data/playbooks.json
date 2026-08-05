@@ -17,11 +17,11 @@
       },
       {
         "question": "Will concept selection be open or constrained by a value set?",
-        "guidance": "An open constraint (any descendant of Clinical finding) gives maximum flexibility but risks inconsistent coding. A curated value set or ECL-bounded constraint improves data quality and clinician experience. Consider starting with a managed subset and widening over time. The value set can be defined using ECL evaluated against a terminology server, or by manually selecting concepts - the method of definition is separate from how the value set is delivered to the clinical system."
+        "guidance": "An open constraint (any descendant of Clinical finding) gives maximum flexibility, but searching across hundreds of thousands of concepts demands an efficient search mechanism - relevance ranking, frequency-based ordering, or context-aware suggestions become essential as the constraint gets broader. A manually curated subset is quick to define and easy for clinicians to accept, but it lacks the granularity of a hierarchical (ECL-bounded) constraint and needs more maintenance as SNOMED CT content evolves. A managed subset is often an easy starting point for this reason, widening over time - or giving way to an ECL-bounded constraint - as free-text fallback and out-of-scope requests signal the need. See the Value Sets playbook for how to define and govern it."
       },
       {
         "question": "What level of clinical granularity is required?",
-        "guidance": "Body-system level may be sufficient for some workflows; specific diagnosis codes are needed for CDS, analytics, and reporting. Agree the required depth with clinicians and informaticists before building search and validation logic."
+        "guidance": "The right granularity is rarely a single choice across a workflow: CDS rules and patient-level analytics need the most specific concept the clinician can confidently assert, while population-level reporting can aggregate upward using subsumption (<<) rather than forcing coarser data entry. Capture at the most specific level available and aggregate for reporting, rather than constraining entry to a coarser grain up front. Agree the required depth with clinicians and informaticists before building search and validation logic."
       },
       {
         "question": "How will preferred terms be displayed to clinicians?",
