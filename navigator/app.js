@@ -254,7 +254,7 @@ function renderBrowse(perspective, activeFilter, activeRole) {
   roleIntroEl.innerHTML = '';
 
   // ── Implementation questions view ────────────────────────────────────────
-  document.getElementById('browse-subtitle').textContent = 'Filter by role or topic, or search — each question links to a playbook.';
+  document.getElementById('browse-subtitle').textContent = 'Filter by role or topic, or search. Each question links to a playbook.';
 
   const ROLES = ['Clinician', 'Software provider', 'Information Manager', 'Governance Lead'];
 
