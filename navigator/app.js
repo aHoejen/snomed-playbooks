@@ -27,7 +27,8 @@ const state = {
 //   gray    = River Bed #434A55
 const PERSPECTIVE = {
   capability: { label: 'Implementation questions', color: 'teal',   icon: 'puzzle',  count: 0 },
-  role:       { label: 'Role',       color: 'purple', icon: 'users',   count: 0 },
+  playbooks:  { label: 'All playbooks',            color: 'blue',   icon: 'books',   count: 0 },
+  role:       { label: 'Roles',                    color: 'purple', icon: 'users',   count: 0 },
 };
 
 const PLAYBOOK_ORDER = [
@@ -162,8 +163,9 @@ function renderLanding() {
 
   // Entry cards
   const grid = document.getElementById('entry-grid');
+  const entryHref = key => key === 'playbooks' ? '#/playbooks' : `#/browse/${key}`;
   grid.innerHTML = Object.entries(PERSPECTIVE).map(([key, p]) => `
-    <a href="#/browse/${key}" class="entry-card">
+    <a href="${entryHref(key)}" class="entry-card">
       <div class="entry-card-icon c-${p.color}" style="background:var(--c-bg)">
         <span style="color:var(--c-text)">${icon(p.icon, 22)}</span>
       </div>
@@ -172,31 +174,12 @@ function renderLanding() {
     </a>
   `).join('');
 
-  // Playbook cards
-  const pbCards = document.getElementById('playbook-cards');
-  const bandColour = {
-    blue:'#00A9E0', teal:'#25ACB8', green:'#6DBBA1', amber:'#F8A73D',
-    orange:'#DE8345', red:'#CE0037', purple:'#8072AC', camelot:'#8D3057', gray:'#434A55',
-  };
-  pbCards.innerHTML = PLAYBOOK_ORDER.map(id => {
-    const pb = state.playbooks[id];
-    if (!pb) return '';
-    const band = bandColour[pb.color] || '#003865';
-    return `
-      <a href="#/playbook/${id}" class="landing-pb-card">
-        <div class="landing-pb-card-band" style="background:${band}"></div>
-        <div class="landing-pb-card-body">
-          <div class="landing-pb-card-title">${pb.title}</div>
-          <div class="landing-pb-card-sub">${pb.subtitle}</div>
-        </div>
-      </a>
-    `;
-  }).join('');
 }
 
 function entryDesc(p) {
   return {
     capability: 'Browse questions about implementing SNOMED CT - from problem lists and CDS to value sets, mappings, and services',
+    playbooks:  'Structured guides covering key decisions, implementation steps, dependencies, and common pitfalls',
     role:       'Guide me based on my role - clinician, software provider, information manager',
   }[p];
 }
