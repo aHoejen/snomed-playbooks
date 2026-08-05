@@ -121,9 +121,9 @@ function route() {
   if (!parts.length || parts[0] === '') return renderLanding();
   if (parts[0] === 'playbooks') return renderAllPlaybooks();
   if (parts[0] === 'browse' && parts[1]) {
-    const raw = parts[2] ? decodeURIComponent(parts[2]) : null;
-    const roleFilter = raw && raw.startsWith('role:') ? raw.slice(5) : null;
-    const catFilter  = raw && !raw.startsWith('role:') ? raw : null;
+    const segments = parts.slice(2).map(s => decodeURIComponent(s));
+    const roleFilter = (segments.find(s => s.startsWith('role:')) || '').slice(5) || null;
+    const catFilter  = segments.find(s => !s.startsWith('role:')) || null;
     return renderBrowse(parts[1], catFilter, roleFilter);
   }
   if (parts[0] === 'question' && parts[1]) return renderQuestion(parts[1]);
@@ -258,30 +258,43 @@ function renderBrowse(perspective, activeFilter, activeRole) {
 
   const ROLES = ['Clinician', 'Software provider', 'Information Manager', 'Governance Lead'];
 
-  // Apply role pre-filter
-  const roleFiltered = activeRole
-    ? allQs.filter(q => {
-        const pb = state.playbooks[q.playbook];
-        return pb && pb.audience.includes(activeRole);
-      })
-    : allQs;
+  // Build URL with both filters, toggling the one clicked
+  function browseHref(role, cat) {
+    const parts = [`#/browse/${perspective}`];
+    if (role) parts.push(`role:${encodeURIComponent(role)}`);
+    if (cat)  parts.push(encodeURIComponent(cat));
+    return parts.join('/');
+  }
 
-  const cats = [...new Set(roleFiltered.map(q => q.category))];
+  // Apply both filters independently (AND logic)
+  const filtered = allQs.filter(q =>
+    (!activeRole   || (q.audience && q.audience.includes(activeRole))) &&
+    (!activeFilter || q.category === activeFilter)
+  );
 
-  // Role filter row
+  const allCats = [...new Set(allQs.map(q => q.category))];
+
+  // Role filter row — counts reflect current cat filter
   const roleRow = ROLES.map(r => {
     const isActive = activeRole === r;
-    const href = isActive ? `#/browse/${perspective}` : `#/browse/${perspective}/role:${encodeURIComponent(r)}`;
-    return `<button class="filter-btn filter-btn-role ${isActive ? 'active' : ''}" onclick="navigate('${href}')">${r}</button>`;
+    const count = allQs.filter(q =>
+      q.audience && q.audience.includes(r) &&
+      (!activeFilter || q.category === activeFilter)
+    ).length;
+    const href = isActive ? browseHref(null, activeFilter) : browseHref(r, activeFilter);
+    return `<button class="filter-btn filter-btn-role ${isActive ? 'active' : ''}" onclick="navigate('${href}')">${r} (${count})</button>`;
   }).join('');
 
-  // Category filter row
+  // Topic filter row — counts reflect current role filter
   const catRow = [
-    `<button class="filter-btn ${!activeFilter ? 'active' : ''}" onclick="navigate('#/browse/${perspective}${activeRole ? '/role:' + encodeURIComponent(activeRole) : ''}')">All (${roleFiltered.length})</button>`,
-    ...cats.map(cat => {
-      const count = roleFiltered.filter(q => q.category === cat).length;
+    `<button class="filter-btn ${!activeFilter ? 'active' : ''}" onclick="navigate('${browseHref(activeRole, null)}')">All (${allQs.filter(q => !activeRole || (q.audience && q.audience.includes(activeRole))).length})</button>`,
+    ...allCats.map(cat => {
+      const count = allQs.filter(q =>
+        q.category === cat &&
+        (!activeRole || (q.audience && q.audience.includes(activeRole)))
+      ).length;
       const isActive = activeFilter === cat;
-      const href = `#/browse/${perspective}/${encodeURIComponent(cat)}`;
+      const href = isActive ? browseHref(activeRole, null) : browseHref(activeRole, cat);
       return `<button class="filter-btn ${isActive ? 'active' : ''}" onclick="navigate('${href}')">${cat} (${count})</button>`;
     })
   ].join('');
@@ -290,9 +303,6 @@ function renderBrowse(perspective, activeFilter, activeRole) {
     <div class="filter-row filter-row-roles">${roleRow}</div>
     <div class="filter-row">${catRow}</div>
   `;
-
-  // Apply category filter on top of role filter
-  const filtered = activeFilter ? roleFiltered.filter(q => q.category === activeFilter) : roleFiltered;
 
   list.innerHTML = filtered.map(q => {
     const pb = state.playbooks[q.playbook];
