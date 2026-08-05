@@ -275,19 +275,23 @@ function renderBrowse(perspective, activeFilter, activeRole) {
   const allCats = [...new Set(allQs.map(q => q.category))];
 
   // Role filter row — counts reflect current cat filter
-  const roleRow = ROLES.map(r => {
-    const isActive = activeRole === r;
-    const count = allQs.filter(q =>
-      q.audience && q.audience.includes(r) &&
-      (!activeFilter || q.category === activeFilter)
-    ).length;
-    const href = isActive ? browseHref(null, activeFilter) : browseHref(r, activeFilter);
-    return `<button class="filter-btn filter-btn-role ${isActive ? 'active' : ''}" onclick="navigate('${href}')">${r} (${count})</button>`;
-  }).join('');
+  const allRolesCount = allQs.filter(q => !activeFilter || q.category === activeFilter).length;
+  const roleRow = [
+    `<button class="filter-btn filter-btn-role ${!activeRole ? 'active' : ''}" onclick="navigate('${browseHref(null, activeFilter)}')">All roles (${allRolesCount})</button>`,
+    ...ROLES.map(r => {
+      const isActive = activeRole === r;
+      const count = allQs.filter(q =>
+        q.audience && q.audience.includes(r) &&
+        (!activeFilter || q.category === activeFilter)
+      ).length;
+      const href = isActive ? browseHref(null, activeFilter) : browseHref(r, activeFilter);
+      return `<button class="filter-btn filter-btn-role ${isActive ? 'active' : ''}" onclick="navigate('${href}')">${r} (${count})</button>`;
+    })
+  ].join('');
 
   // Topic filter row — counts reflect current role filter
   const catRow = [
-    `<button class="filter-btn ${!activeFilter ? 'active' : ''}" onclick="navigate('${browseHref(activeRole, null)}')">All (${allQs.filter(q => !activeRole || (q.audience && q.audience.includes(activeRole))).length})</button>`,
+    `<button class="filter-btn ${!activeFilter ? 'active' : ''}" onclick="navigate('${browseHref(activeRole, null)}')">All topics (${allQs.filter(q => !activeRole || (q.audience && q.audience.includes(activeRole))).length})</button>`,
     ...allCats.map(cat => {
       const count = allQs.filter(q =>
         q.category === cat &&
