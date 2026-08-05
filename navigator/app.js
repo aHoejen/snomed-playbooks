@@ -27,7 +27,7 @@ const state = {
 //   gray    = River Bed #434A55
 const PERSPECTIVE = {
   capability: { label: 'Implementation questions', color: 'teal',   icon: 'puzzle',  count: 0 },
-  playbooks:  { label: 'All playbooks',            color: 'blue',   icon: 'books',   count: 0 },
+  playbooks:  { label: 'Playbooks',                color: 'blue',   icon: 'books',   count: 0 },
   role:       { label: 'Roles',                    color: 'purple', icon: 'users',   count: 0 },
 };
 
