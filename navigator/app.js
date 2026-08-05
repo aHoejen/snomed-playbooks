@@ -254,7 +254,7 @@ function renderBrowse(perspective, activeFilter, activeRole) {
   roleIntroEl.innerHTML = '';
 
   // ── Implementation questions view ────────────────────────────────────────
-  document.getElementById('browse-subtitle').textContent = 'questions - select one to open its playbook';
+  document.getElementById('browse-subtitle').textContent = 'Filter by role or topic, or search — each question links to a playbook.';
 
   const ROLES = ['Clinician', 'Software provider', 'Information Manager', 'Governance Lead'];
 
@@ -306,20 +306,30 @@ function renderBrowse(perspective, activeFilter, activeRole) {
   filterBar.innerHTML = `
     <div class="filter-row filter-row-roles">${roleRow}</div>
     <div class="filter-row">${catRow}</div>
+    <div class="filter-row filter-row-search">
+      <input id="q-search" type="search" class="q-search-input" placeholder="Search questions…" autocomplete="off" oninput="renderQuestionList()" value="">
+    </div>
   `;
 
-  list.innerHTML = filtered.map(q => {
-    const pb = state.playbooks[q.playbook];
-    const color = pb ? pb.color : 'blue';
-    return `
-      <a href="${state.answers[q.id] ? `#/question/${q.id}` : `#/playbook/${q.playbook}`}" class="question-item">
-        <span class="question-id">${q.id}</span>
-        <span class="question-text">${q.text}</span>
-        ${pb ? `<span class="question-pb-tag c-${color}" style="color:var(--c-text);background:var(--c-bg);border-color:var(--c-border)">${pb.title}</span>` : ''}
-        <span class="question-arrow">${icon('arrow-right', 14)}</span>
-      </a>
-    `;
-  }).join('');
+  function renderQuestionList() {
+    const term = (document.getElementById('q-search').value || '').toLowerCase().trim();
+    const visible = term ? filtered.filter(q => q.text.toLowerCase().includes(term)) : filtered;
+    list.innerHTML = visible.length ? visible.map(q => {
+      const pb = state.playbooks[q.playbook];
+      const color = pb ? pb.color : 'blue';
+      const text = term ? q.text.replace(new RegExp(`(${term})`, 'gi'), '<mark>$1</mark>') : q.text;
+      return `
+        <a href="${state.answers[q.id] ? `#/question/${q.id}` : `#/playbook/${q.playbook}`}" class="question-item">
+          <span class="question-id">${q.id}</span>
+          <span class="question-text">${text}</span>
+          ${pb ? `<span class="question-pb-tag c-${color}" style="color:var(--c-text);background:var(--c-bg);border-color:var(--c-border)">${pb.title}</span>` : ''}
+          <span class="question-arrow">${icon('arrow-right', 14)}</span>
+        </a>
+      `;
+    }).join('') : `<p style="color:var(--text-secondary);padding:16px 0">No questions match your search.</p>`;
+  }
+
+  renderQuestionList();
 }
 
 // ── Playbook ──────────────────────────────────────────────────────────────
