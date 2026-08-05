@@ -387,7 +387,7 @@ main { min-height: calc(100vh - 60px - 64px); padding-bottom: 48px; }
 .browse-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
 .browse-subtitle { font-size: 14px; color: var(--text-secondary); }
 
-.filter-bar { display: flex; flex-direction: column; gap: 0; margin-bottom: 32px; border: 1px solid #c8d8e8; border-radius: var(--radius); background: #f0f5fa; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.filter-bar { display: flex; flex-direction: column; gap: 0; margin-bottom: 32px; border: 1px solid #c8d8e8; border-radius: var(--radius); background: #f0f5fa; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: sticky; top: 8px; z-index: 10; }
 .filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px 14px; }
 .filter-row + .filter-row { border-top: 1px solid #c8d8e8; }
 .filter-row-label {
@@ -403,16 +403,16 @@ main { min-height: calc(100vh - 60px - 64px); padding-bottom: 48px; }
 .filter-btn {
   padding: 4px 12px;
   border-radius: var(--radius-xl);
-  border: 1.5px solid var(--border);
-  background: transparent;
+  border: 1.5px solid #b0c8d8;
+  background: white;
   font-size: 12.5px;
   cursor: pointer;
   transition: var(--transition);
   color: var(--text-secondary);
 }
-.filter-btn:hover { border-color: var(--cerulean); color: var(--text-primary); background: var(--bg-surface); }
-.filter-btn.active { border-color: var(--cerulean); background: #e8f6fc; color: var(--brand-dark); font-weight: 600; }
-.filter-btn-role.active { border-color: #8072AC; background: #f0eef8; color: #5a4f8a; }
+.filter-btn:hover { border-color: var(--cerulean); color: var(--text-primary); background: white; }
+.filter-btn.active { border-color: var(--cerulean); background: #00A9E0; color: white; font-weight: 600; }
+.filter-btn-role.active { border-color: #8072AC; background: #8072AC; color: white; font-weight: 600; }
 .filter-row-search { justify-content: flex-end; padding: 8px 14px; border-top: 1px solid #c8d8e8; background: #e8f0f8; }
 .q-search-input {
   width: 260px;
