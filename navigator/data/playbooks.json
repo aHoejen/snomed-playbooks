@@ -117,6 +117,16 @@
         "type": "Guide",
         "title": "Mapping guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
+      },
+      {
+        "type": "Demo",
+        "title": "Allergies demonstrator",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/allergies"
+      },
+      {
+        "type": "Demo",
+        "title": "Terminology Bindings Sandbox",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/sandbox"
       }
     ]
   },
@@ -238,6 +248,31 @@
         "type": "Spec",
         "title": "Expression constraint language specification",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED EHR Lab",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
+      },
+      {
+        "type": "Demo",
+        "title": "Allergies demonstrator",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/allergies"
+      },
+      {
+        "type": "Demo",
+        "title": "Cancer Synoptic Reporting",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/cancer-reporting"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED & FHIR Questionnaires Manager",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/questionnaires"
+      },
+      {
+        "type": "Demo",
+        "title": "Context Representation Transformations",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/context"
       }
     ]
   },
@@ -345,6 +380,16 @@
         "type": "Guide",
         "title": "Terminology services guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED EHR Lab",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED and LLMs (AI Demo)",
+        "url": "https://ihtsdo.github.io/openai-demo/"
       }
     ]
   },
@@ -452,6 +497,21 @@
         "type": "Guide",
         "title": "Mapping guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
+      },
+      {
+        "type": "Demo",
+        "title": "Descriptive Analytics",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/descriptive-analytics"
+      },
+      {
+        "type": "Demo",
+        "title": "Analytics with Snolytical",
+        "url": "https://training-snolytical.ihtsdotools.org/"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED EHR Lab",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
       }
     ]
   },
@@ -591,6 +651,31 @@
         "type": "Spec",
         "title": "SNOMED CT URI standard",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-uri-standard/"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED EHR Lab",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
+      },
+      {
+        "type": "Demo",
+        "title": "IPS Terminology Demonstrator",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ips-terminology"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED Integrations Hub",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/snomed-integrations"
+      },
+      {
+        "type": "Demo",
+        "title": "FHIR Resource Internationalizer",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/fhir-internationalizer"
+      },
+      {
+        "type": "Demo",
+        "title": "Context Representation Transformations",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/context"
       }
     ]
   },
@@ -698,6 +783,21 @@
         "type": "Guide",
         "title": "Simplex user guide",
         "url": "https://docs.snomed.org/snomed-ct-user-guides/simplex-user-guide/"
+      },
+      {
+        "type": "Demo",
+        "title": "ValueSet Utility",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/valueset-translator"
+      },
+      {
+        "type": "Demo",
+        "title": "Terminology Bindings Sandbox",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/sandbox"
+      },
+      {
+        "type": "Demo",
+        "title": "IPS Terminology Demonstrator",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ips-terminology"
       }
     ]
   },
@@ -814,6 +914,16 @@
         "type": "Guide",
         "title": "MLDS - licensing and release access",
         "url": "https://mlds.ihtsdotools.org/"
+      },
+      {
+        "type": "Demo",
+        "title": "Post-coordination Demonstrator",
+        "url": "https://ihtsdo.github.io/iid-postcoordination"
+      },
+      {
+        "type": "Demo",
+        "title": "Extensions Search Utility",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/extensions-search"
       }
     ]
   },
@@ -860,7 +970,7 @@
       },
       {
         "title": "Implement autocomplete search with ECL constraint applied",
-        "description": "Integrate the terminology service search API into the data entry UI. Apply the field's ECL constraint as a search filter. Return preferred terms as the primary display label, with synonyms as supporting context. Implement minimum character threshold (typically 2–3 characters) before search fires."
+        "description": "Integrate the terminology service search API into the data entry UI. Apply the field's ECL constraint as a search filter. Return preferred terms as the primary display label, with synonyms as supporting context. Implement minimum character threshold (typically 2\u20133 characters) before search fires."
       },
       {
         "title": "Configure result ranking and quick-pick lists",
@@ -916,6 +1026,21 @@
         "type": "Spec",
         "title": "Expression constraint language specification",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      },
+      {
+        "type": "Demo",
+        "title": "Encounters UI Demo",
+        "url": "https://ihtsdo.github.io/snomed-ui-examples"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED EHR Lab",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
+      },
+      {
+        "type": "Demo",
+        "title": "Terminology Bindings Sandbox",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/sandbox"
       }
     ]
   },
@@ -995,7 +1120,7 @@
       "Treating the SNOMED CT to ICD-10 map as a simple lookup - the map has rule groups, priorities, and advice fields that must be applied to get the correct ICD-10 code",
       "Creating a custom map when the official map already meets the need - custom maps require active maintenance on every SNOMED CT release",
       "Not validating map output with clinical coders - technical correctness does not guarantee clinical coding correctness",
-      "Attempting bidirectional mapping - SNOMED CT is more granular than ICD-10, so SNOMED CT → ICD-10 loses information that cannot be recovered in the reverse direction",
+      "Attempting bidirectional mapping - SNOMED CT is more granular than ICD-10, so SNOMED CT \u2192 ICD-10 loses information that cannot be recovered in the reverse direction",
       "Ignoring history supplements when migrating legacy data - historical SNOMED CT concept IDs from older releases may be inactivated and need resolution before mapping"
     ],
     "resources": [
@@ -1023,6 +1148,21 @@
         "type": "Guide",
         "title": "Snap2SNOMED user guide",
         "url": "https://docs.snomed.org/snomed-ct-user-guides/snap2snomed-user-guide/"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED Maps Demonstrator",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/icd-mappings"
+      },
+      {
+        "type": "Demo",
+        "title": "LOINC & SNOMED CT demonstrator",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/loinc"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED Integrations Hub",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/snomed-integrations"
       }
     ]
   },
@@ -1131,6 +1271,21 @@
         "type": "Guide",
         "title": "Implementation fact sheets",
         "url": "https://docs.snomed.org/implementation-guides/implementation-fact-sheets/"
+      },
+      {
+        "type": "Demo",
+        "title": "Implementation Maturity Framework",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/maturity"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED Implementation Roadmap Generator",
+        "url": "https://ihtsdo.github.io/roadmap-generator"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED CT as an Evolving Terminology",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/reports"
       }
     ]
   },
@@ -1246,6 +1401,16 @@
         "type": "Spec",
         "title": "Machine readable concept model",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-machine-readable-concept-model/"
+      },
+      {
+        "type": "Demo",
+        "title": "Extensions Search Utility",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/extensions-search"
+      },
+      {
+        "type": "Demo",
+        "title": "Module Dependency Reference Set Viewer",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/mdrs-viewer"
       }
     ]
   },
@@ -1354,6 +1519,16 @@
         "type": "Guide",
         "title": "Translation management guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-translation-management-guide/"
+      },
+      {
+        "type": "Demo",
+        "title": "FHIR Resource Internationalizer",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/fhir-internationalizer"
+      },
+      {
+        "type": "Demo",
+        "title": "Extensions Search Utility",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/extensions-search"
       }
     ]
   }

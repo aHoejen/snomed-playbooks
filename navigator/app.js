@@ -459,8 +459,8 @@ function renderPlaybook(id) {
         <div class="pb-card-title">${icon('books')} Resources</div>
         <div class="resource-grid">
           ${pb.resources.map(r => {
-            const typeClass = r.type === 'Tool' ? 'resource-type-tool' : r.type === 'Spec' ? 'resource-type-spec' : 'resource-type-guide';
-            const resIcon = r.type === 'Tool' ? icon('plug', 16) : icon('file', 16);
+            const typeClass = r.type === 'Tool' ? 'resource-type-tool' : r.type === 'Spec' ? 'resource-type-spec' : r.type === 'Demo' ? 'resource-type-demo' : 'resource-type-guide';
+            const resIcon = r.type === 'Tool' ? icon('plug', 16) : r.type === 'Demo' ? icon('arrow-right', 16) : icon('file', 16);
             return `
             <a href="${r.url}" target="_blank" rel="noopener" class="resource-item">
               ${resIcon}

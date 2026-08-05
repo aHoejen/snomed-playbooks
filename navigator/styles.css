@@ -715,6 +715,7 @@ div:has(> .role-iq-link) { display: flex; flex-direction: column; align-items: f
 .resource-type-tool { background: var(--blue-bg); color: var(--blue-text); }
 .resource-type-guide { background: var(--bg-page); color: var(--text-muted); }
 .resource-type-spec { background: var(--purple-bg); color: var(--purple-text); }
+.resource-type-demo { background: #e6f7f0; color: #1a7a52; }
 .resource-title { font-size: 13px; font-weight: 600; line-height: 1.3; }
 
 /* Related questions */
