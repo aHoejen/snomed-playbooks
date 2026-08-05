@@ -17,7 +17,7 @@
       },
       {
         "question": "Will concept selection be open or constrained by a value set?",
-        "guidance": "An open constraint (any descendant of Clinical finding) gives maximum flexibility, but searching across hundreds of thousands of concepts demands an efficient search mechanism - relevance ranking, frequency-based ordering, or context-aware suggestions become essential as the constraint gets broader. A manually curated subset is quick to define and easy for clinicians to accept, but it lacks the granularity of a hierarchical (ECL-bounded) constraint and needs more maintenance as SNOMED CT content evolves. A managed subset is often an easy starting point for this reason, widening over time - or giving way to an ECL-bounded constraint - as free-text fallback and out-of-scope requests signal the need. See the Value Sets playbook for how to define and govern it."
+        "guidance": "An open and high-level constraint (any descendant of Clinical finding) gives maximum flexibility and granularity, but searching across thousands of concepts demands an efficient search mechanism. Relevance ranking, frequency-based ordering, or context-aware suggestions become essential as the constraint gets broader. A manually curated subset is quick to define and easy for clinicians to accept, but it lacks the granularity of a hierarchical (ECL-bounded) constraint and needs more maintenance as SNOMED CT content evolves. A managed subset is often an easy starting point for this reason, widening over time - or giving way to an ECL-bounded constraint. See the Value Sets playbook for how to define and govern it."
       },
       {
         "question": "What level of clinical granularity is required?",
