@@ -1,0 +1,218 @@
+[
+  {
+    "key": "ehrLab",
+    "name": "SNOMED EHR Lab",
+    "type": "Clinical Demo",
+    "featured": true,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab",
+    "description": "Full EHR simulation with AI-assisted entry, CDS, analytics, interoperability tools, and FHIR Smart Health Links."
+  },
+  {
+    "key": "allergies",
+    "name": "Allergies",
+    "type": "Clinical Demo",
+    "featured": true,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/allergies",
+    "description": "Record allergy and intolerance details using SNOMED CT and FHIR resources."
+  },
+  {
+    "key": "loincSnomed",
+    "name": "LOINC & SNOMED CT",
+    "type": "Clinical Demo",
+    "featured": true,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/loinc",
+    "description": "Laboratory orders and results using LOINC ontology integrated with SNOMED CT."
+  },
+  {
+    "key": "cancerReporting",
+    "name": "Cancer Synoptic Reporting",
+    "type": "Clinical Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/cancer-reporting",
+    "description": "FHIR questionnaires for cancer synoptic reporting, in collaboration with ICCR."
+  },
+  {
+    "key": "ncptRefset",
+    "name": "NCPT Refset",
+    "type": "Clinical Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ncpt",
+    "description": "A clinical demonstration of the NCPT (Nutrition Care Process Terminology) reference set."
+  },
+  {
+    "key": "encountersUiDemo",
+    "name": "Encounters UI Demo",
+    "type": "Clinical Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/snomed-ui-examples",
+    "description": "Classic simulation of clinical data entry using SNOMED FHIR terminology services."
+  },
+  {
+    "key": "snomedMaps",
+    "name": "SNOMED Maps Demonstrator",
+    "type": "Learning Demo",
+    "featured": true,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/icd-mappings",
+    "description": "Maps SNOMED CT concepts to ICD-10 and ICD-11, including complex mapping rules."
+  },
+  {
+    "key": "bindingsSandbox",
+    "name": "Terminology Bindings Sandbox",
+    "type": "Learning Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/sandbox",
+    "description": "Interactive sandbox for learning and testing SNOMED CT terminology bindings."
+  },
+  {
+    "key": "postcoordination",
+    "name": "Post-coordination Demonstrator",
+    "type": "Learning Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/iid-postcoordination",
+    "description": "SNOMED CT post-coordination demo using the prototype SNOWSTORM X terminology server."
+  },
+  {
+    "key": "ipsTerminology",
+    "name": "IPS Terminology Demonstrator",
+    "type": "Learning Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ips-terminology",
+    "description": "Explores International Patient Summary (IPS) terminology and the IPS SNOMED CT refset."
+  },
+  {
+    "key": "contextTransformations",
+    "name": "Context Representation Transformations",
+    "type": "Learning Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/context",
+    "description": "Transform clinical context representations between SNOMED CT and FHIR resources."
+  },
+  {
+    "key": "snomedLlms",
+    "name": "SNOMED and LLMs (AI Demo)",
+    "type": "Learning Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/openai-demo/",
+    "description": "Demonstrates SNOMED CT paired with Large Language Models (LLMs) via the OpenAI ChatGPT API."
+  },
+  {
+    "key": "evolvingTerminology",
+    "name": "SNOMED CT as an Evolving Terminology",
+    "type": "Learning Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/reports",
+    "description": "Release change reports and educational material for SNOMED CT implementers."
+  },
+  {
+    "key": "integrationsHub",
+    "name": "SNOMED Integrations Hub",
+    "type": "Learning Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/snomed-integrations",
+    "description": "Explore SNOMED CT integrations with ICD, LOINC, and other classifications and code systems."
+  },
+  {
+    "key": "mdrsViewer",
+    "name": "Module Dependency Reference Set Viewer",
+    "type": "Learning Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/mdrs-viewer",
+    "description": "Graphical viewer for dependencies between SNOMED CT module versions."
+  },
+  {
+    "key": "drugStrengthRounding",
+    "name": "Drug Strength Rounding Rules",
+    "type": "Learning Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/drug-strength-rounding",
+    "description": "Demonstrates drug strength rounding rules for significant figures in pharmaceutical calculations."
+  },
+  {
+    "key": "medicinalProductClasses",
+    "name": "Medicinal Product Classes",
+    "type": "Learning Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/medicinal-product-classes",
+    "description": "Terminology bindings demonstrator for medicinal product, clinical drug, and packaged drug classes."
+  },
+  {
+    "key": "maturityFramework",
+    "name": "Implementation Maturity Framework",
+    "type": "Tool",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/maturity",
+    "description": "Online assessment tool and dashboard for SNOMED CT implementation maturity."
+  },
+  {
+    "key": "questionnairesManager",
+    "name": "SNOMED & FHIR Questionnaires Manager",
+    "type": "Tool",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/questionnaires",
+    "description": "Manage a FHIR Questionnaires repository with SNOMED CT coded bindings."
+  },
+  {
+    "key": "questionnairesUtilities",
+    "name": "SNOMED & FHIR Questionnaires Utilities",
+    "type": "Tool",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/questionnaires?utility=true",
+    "description": "Utilities for editing and validating FHIR Questionnaires with SNOMED CT bindings."
+  },
+  {
+    "key": "roadmapGenerator",
+    "name": "SNOMED Implementation Roadmap Generator",
+    "type": "Tool",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/roadmap-generator",
+    "description": "Create SNOMED CT adoption roadmaps for countries, regions, or organizations."
+  },
+  {
+    "key": "valueSetUtility",
+    "name": "ValueSet Utility",
+    "type": "Tool",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/valueset-translator",
+    "description": "Convert SNOMED CT value sets from Excel or CSV into FHIR ValueSet packages."
+  },
+  {
+    "key": "extensionsSearch",
+    "name": "Extensions Search Utility",
+    "type": "Tool",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/extensions-search",
+    "description": "Run ECL searches across SNOMED CT extensions and compare results by edition."
+  },
+  {
+    "key": "fhirInternationalizer",
+    "name": "FHIR Resource Internationalizer",
+    "type": "Tool",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/fhir-internationalizer",
+    "description": "Adapt FHIR resources to a target SNOMED CT edition, replacing codings and inactive concepts."
+  },
+  {
+    "key": "descriptiveAnalytics",
+    "name": "Descriptive Analytics",
+    "type": "Analytics Demo",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/descriptive-analytics",
+    "description": "Treemap and hierarchical analytics for exploring SNOMED CT content and structure."
+  },
+  {
+    "key": "snolytical",
+    "name": "Analytics with Snolytical",
+    "type": "Analytics Demo",
+    "featured": false,
+    "url": "https://training-snolytical.ihtsdotools.org/",
+    "description": "Build health analytics reports from SNOMED CT coded data using Snolytical."
+  },
+  {
+    "key": "snoguess",
+    "name": "Snoguess",
+    "type": "Game",
+    "featured": false,
+    "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/snoguess",
+    "description": "Guess SNOMED CT terms and compete for the highest score."
+  }
+]

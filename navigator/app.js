@@ -10,6 +10,7 @@ const state = {
   questions: [],
   playbooks: {},
   answers: {},
+  demonstrators: [],
   loaded: false,
 };
 
@@ -79,14 +80,16 @@ function icon(name, size = 16) {
 
 // ── Data loading ─────────────────────────────────────────────────────────
 async function loadData() {
-  const [qRes, pbRes, aRes] = await Promise.all([
+  const [qRes, pbRes, aRes, dRes] = await Promise.all([
     fetch('data/questions.json'),
     fetch('data/playbooks.json'),
     fetch('data/answers.json'),
+    fetch('data/demonstrators.json'),
   ]);
-  state.questions = await qRes.json();
-  state.playbooks = await pbRes.json();
-  state.answers  = await aRes.json();
+  state.questions     = await qRes.json();
+  state.playbooks     = await pbRes.json();
+  state.answers       = await aRes.json();
+  state.demonstrators = await dRes.json();
 
   // Compute perspective counts
   state.questions.forEach(q => {
@@ -129,6 +132,7 @@ function route() {
   if (parts[0] === 'question' && parts[1]) return renderQuestion(parts[1]);
   if (parts[0] === 'playbook' && parts[1]) return renderPlaybook(parts[1]);
   if (parts[0] === 'search' && parts[1]) return renderSearchPage(decodeURIComponent(parts[1]));
+  if (parts[0] === 'demonstrators') return renderDemonstrators();
   renderLanding();
 }
 
@@ -628,6 +632,56 @@ function renderQuestion(id) {
       `;
     })()}
   `;
+}
+
+// ── Demonstrators ────────────────────────────────────────────────────────
+function renderDemonstrators() {
+  setView('view-demonstrators');
+
+  const TYPE_ORDER = ['Clinical Demo', 'Learning Demo', 'Tool', 'Analytics Demo', 'Game'];
+  const TYPE_COLOR = {
+    'Clinical Demo':   'teal',
+    'Learning Demo':   'blue',
+    'Tool':            'purple',
+    'Analytics Demo':  'amber',
+    'Game':            'green',
+  };
+
+  const featured = state.demonstrators.filter(d => d.featured);
+  const byType   = {};
+  TYPE_ORDER.forEach(t => { byType[t] = state.demonstrators.filter(d => d.type === t); });
+
+  function demoCard(d, large) {
+    const color = TYPE_COLOR[d.type] || 'blue';
+    return `
+      <a href="${d.url}" target="_blank" rel="noopener" class="demo-card${large ? ' demo-card-large' : ''}">
+        <div class="demo-card-type c-${color}" style="color:var(--c-text);background:var(--c-bg);border-color:var(--c-border)">${d.type}</div>
+        <div class="demo-card-name">${d.name}</div>
+        <div class="demo-card-desc">${d.description}</div>
+        <div class="demo-card-cta">Open ${icon('arrow-right', 13)}</div>
+      </a>
+    `;
+  }
+
+  let html = '';
+
+  if (featured.length) {
+    html += `<div class="demo-section">
+      <div class="demo-section-title">Featured</div>
+      <div class="demo-grid demo-grid-featured">${featured.map(d => demoCard(d, true)).join('')}</div>
+    </div>`;
+  }
+
+  TYPE_ORDER.forEach(type => {
+    const demos = byType[type];
+    if (!demos || !demos.length) return;
+    html += `<div class="demo-section">
+      <div class="demo-section-title">${type}s</div>
+      <div class="demo-grid">${demos.map(d => demoCard(d, false)).join('')}</div>
+    </div>`;
+  });
+
+  document.getElementById('demonstrators-content').innerHTML = html;
 }
 
 // ── Search page ──────────────────────────────────────────────────────────
