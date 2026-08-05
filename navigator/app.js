@@ -120,7 +120,12 @@ function route() {
 
   if (!parts.length || parts[0] === '') return renderLanding();
   if (parts[0] === 'playbooks') return renderAllPlaybooks();
-  if (parts[0] === 'browse' && parts[1]) return renderBrowse(parts[1], parts[2] ? decodeURIComponent(parts[2]) : null);
+  if (parts[0] === 'browse' && parts[1]) {
+    const raw = parts[2] ? decodeURIComponent(parts[2]) : null;
+    const roleFilter = raw && raw.startsWith('role:') ? raw.slice(5) : null;
+    const catFilter  = raw && !raw.startsWith('role:') ? raw : null;
+    return renderBrowse(parts[1], catFilter, roleFilter);
+  }
   if (parts[0] === 'question' && parts[1]) return renderQuestion(parts[1]);
   if (parts[0] === 'playbook' && parts[1]) return renderPlaybook(parts[1]);
   if (parts[0] === 'search' && parts[1]) return renderSearchPage(decodeURIComponent(parts[1]));
@@ -180,23 +185,23 @@ function entryDesc(p) {
 }
 
 // ── Browse ────────────────────────────────────────────────────────────────
-function renderBrowse(perspective, activeFilter) {
+function renderBrowse(perspective, activeFilter, activeRole) {
   setView('view-browse');
   const p = PERSPECTIVE[perspective];
   if (!p) return renderLanding();
 
-  const qs = state.questions.filter(q => q.perspective === perspective);
-  const cats = [...new Set(qs.map(q => q.category))];
+  const allQs = state.questions.filter(q => q.perspective === perspective);
 
   document.getElementById('browse-title').innerHTML =
     `<span class="c-${p.color}" style="color:var(--c-text)">${icon(p.icon, 22)}</span> ${p.label}`;
 
-  document.getElementById('browse-subtitle').textContent =
-    `questions - select one to open its playbook`;
-
-  // Role introductions
   const roleIntroEl = document.getElementById('role-intros');
+  const filterBar   = document.getElementById('filter-bar');
+  const list        = document.getElementById('question-list');
+
+  // ── Roles view: descriptions only + link to questions ───────────────────
   if (perspective === 'role') {
+    document.getElementById('browse-subtitle').textContent = 'Roles involved in SNOMED CT implementation';
     const roles = [
       {
         name: 'Clinician',
@@ -231,27 +236,64 @@ function renderBrowse(perspective, activeFilter) {
           </div>
         `).join('')}
       </div>
+      <div style="margin-top:32px">
+        ${roles.map(r => `
+          <a href="#/browse/capability/role:${encodeURIComponent(r.name)}" class="role-iq-link">
+            ${icon('puzzle', 16)} View implementation questions for ${r.name}
+          </a>
+        `).join('')}
+      </div>
     `;
     roleIntroEl.style.display = 'block';
-  } else {
-    roleIntroEl.style.display = 'none';
-    roleIntroEl.innerHTML = '';
+    filterBar.innerHTML = '';
+    list.innerHTML = '';
+    return;
   }
 
-  // Filter bar
-  const filterBar = document.getElementById('filter-bar');
-  filterBar.innerHTML = [
-    `<button class="filter-btn ${!activeFilter ? 'active' : ''}" onclick="navigate('#/browse/${perspective}')">All (${qs.length})</button>`,
+  roleIntroEl.style.display = 'none';
+  roleIntroEl.innerHTML = '';
+
+  // ── Implementation questions view ────────────────────────────────────────
+  document.getElementById('browse-subtitle').textContent = 'questions - select one to open its playbook';
+
+  const ROLES = ['Clinician', 'Software provider', 'Information Manager', 'Governance Lead'];
+
+  // Apply role pre-filter
+  const roleFiltered = activeRole
+    ? allQs.filter(q => {
+        const pb = state.playbooks[q.playbook];
+        return pb && pb.audience.includes(activeRole);
+      })
+    : allQs;
+
+  const cats = [...new Set(roleFiltered.map(q => q.category))];
+
+  // Role filter row
+  const roleRow = ROLES.map(r => {
+    const isActive = activeRole === r;
+    const href = isActive ? `#/browse/${perspective}` : `#/browse/${perspective}/role:${encodeURIComponent(r)}`;
+    return `<button class="filter-btn filter-btn-role ${isActive ? 'active' : ''}" onclick="navigate('${href}')">${r}</button>`;
+  }).join('');
+
+  // Category filter row
+  const catRow = [
+    `<button class="filter-btn ${!activeFilter ? 'active' : ''}" onclick="navigate('#/browse/${perspective}${activeRole ? '/role:' + encodeURIComponent(activeRole) : ''}')">All (${roleFiltered.length})</button>`,
     ...cats.map(cat => {
-      const count = qs.filter(q => q.category === cat).length;
+      const count = roleFiltered.filter(q => q.category === cat).length;
       const isActive = activeFilter === cat;
-      return `<button class="filter-btn ${isActive ? 'active' : ''}" onclick="navigate('#/browse/${perspective}/${encodeURIComponent(cat)}')">${cat} (${count})</button>`;
+      const href = `#/browse/${perspective}/${encodeURIComponent(cat)}`;
+      return `<button class="filter-btn ${isActive ? 'active' : ''}" onclick="navigate('${href}')">${cat} (${count})</button>`;
     })
   ].join('');
 
-  // Questions
-  const filtered = activeFilter ? qs.filter(q => q.category === activeFilter) : qs;
-  const list = document.getElementById('question-list');
+  filterBar.innerHTML = `
+    <div class="filter-row filter-row-roles">${roleRow}</div>
+    <div class="filter-row">${catRow}</div>
+  `;
+
+  // Apply category filter on top of role filter
+  const filtered = activeFilter ? roleFiltered.filter(q => q.category === activeFilter) : roleFiltered;
+
   list.innerHTML = filtered.map(q => {
     const pb = state.playbooks[q.playbook];
     const color = pb ? pb.color : 'blue';
@@ -264,37 +306,6 @@ function renderBrowse(perspective, activeFilter) {
       </a>
     `;
   }).join('');
-
-  // For role perspective: show relevant playbooks below the questions
-  if (perspective === 'role') {
-    const roleFilter = activeFilter; // the selected role, or null for all
-    const relevantPbs = PLAYBOOK_ORDER
-      .map(id => state.playbooks[id])
-      .filter(pb => pb && (!roleFilter || pb.audience.includes(roleFilter)));
-
-    const pbSection = document.createElement('div');
-    pbSection.className = 'role-playbooks-section';
-    pbSection.innerHTML = `
-      <h3 class="role-playbooks-title">Relevant playbooks</h3>
-      <div class="role-playbooks-grid">
-        ${relevantPbs.map(pb => `
-          <a href="#/playbook/${Object.keys(state.playbooks).find(k => state.playbooks[k] === pb)}" class="role-pb-card">
-            <div class="role-pb-card-accent pb-header-${pb.color}">
-              <span class="c-${pb.color}" style="color:#fff">${icon(pb.icon || 'file', 18)}</span>
-            </div>
-            <div class="role-pb-card-body">
-              <div class="role-pb-card-title">${pb.title}</div>
-              <div class="role-pb-card-sub">${pb.subtitle}</div>
-              <div class="role-pb-card-audience">
-                ${pb.audience.map(a => `<span class="audience-pill c-${pb.color}" style="color:var(--c-text);border-color:var(--c-border);background:var(--c-bg)">${a}</span>`).join('')}
-              </div>
-            </div>
-          </a>
-        `).join('')}
-      </div>
-    `;
-    list.after(pbSection);
-  }
 }
 
 // ── Playbook ──────────────────────────────────────────────────────────────
