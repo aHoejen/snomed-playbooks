@@ -496,27 +496,11 @@ function renderAllPlaybooks(activeRole) {
     purple:  '#8072AC', camelot: '#8D3057', gray:    '#434A55',
   };
 
-  const roles = ['Clinician', 'Software provider', 'Information Manager', 'Governance Lead'];
-  const current = activeRole || null;
-
-  // Filter bar
-  const filterBar = document.getElementById('pb-filter-bar');
-  filterBar.innerHTML = [
-    `<button class="filter-btn${!current ? ' active' : ''}" data-role="">All playbooks</button>`,
-    ...roles.map(r =>
-      `<button class="filter-btn${current === r ? ' active' : ''}" data-role="${r}">${r}</button>`
-    )
-  ].join('');
-  filterBar.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => renderAllPlaybooks(btn.dataset.role || null));
-  });
+  document.getElementById('pb-filter-bar').innerHTML = '';
 
   // Cards
   const grid = document.getElementById('all-playbooks-grid');
-  const filtered = PLAYBOOK_ORDER.filter(id => {
-    const pb = state.playbooks[id];
-    return pb && (!current || pb.audience.includes(current));
-  });
+  const filtered = PLAYBOOK_ORDER.filter(id => state.playbooks[id]);
 
   const cards = filtered.map(id => {
     const pb = state.playbooks[id];
