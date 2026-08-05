@@ -304,8 +304,8 @@ function renderBrowse(perspective, activeFilter, activeRole) {
   ].join('');
 
   filterBar.innerHTML = `
-    <div class="filter-row filter-row-roles">${roleRow}</div>
-    <div class="filter-row">${catRow}</div>
+    <div class="filter-row filter-row-roles"><span class="filter-row-label">Role</span>${roleRow}</div>
+    <div class="filter-row"><span class="filter-row-label">Topic</span>${catRow}</div>
     <div class="filter-row filter-row-search">
       <input id="q-search" type="search" class="q-search-input" placeholder="Search questions…" autocomplete="off" oninput="renderQuestionList()" value="">
     </div>
