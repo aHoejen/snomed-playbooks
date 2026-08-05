@@ -362,6 +362,19 @@ function renderPlaybook(id) {
 
     <div class="playbook-sections">
 
+      <!-- Related questions -->
+      ${related.length ? `
+        <div class="related-card">
+          <div class="pb-card-title" style="margin-bottom:10px">${icon('search', 14)} Questions answered by this playbook</div>
+          ${related.map(q => `
+            <div class="related-item">
+              <span class="related-id">${q.id}</span>
+              <span>${q.text}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
       <!-- Key considerations -->
       <div class="pb-card">
         <div class="pb-card-title">${icon('git-branch')} Things to clarify before you start</div>
@@ -473,18 +486,6 @@ function renderPlaybook(id) {
         </div>
       </div>
 
-      <!-- Related questions -->
-      ${related.length ? `
-        <div class="related-card">
-          <div class="pb-card-title" style="margin-bottom:10px">${icon('search', 14)} Questions answered by this playbook</div>
-          ${related.map(q => `
-            <div class="related-item">
-              <span class="related-id">${q.id}</span>
-              <span>${q.text}</span>
-            </div>
-          `).join('')}
-        </div>
-      ` : ''}
 
     </div>
   `;
