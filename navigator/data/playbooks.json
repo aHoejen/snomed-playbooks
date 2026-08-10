@@ -39,27 +39,27 @@
     "steps": [
       {
         "title": "Define clinical scope and governance policy",
-        "description": "Work with clinical and governance leads to agree what constitutes a 'problem', who approves changes to the problem list scope, and how the list will be maintained over time."
+        "description": "Work with clinical and governance leads to agree what constitutes a 'problem', who approves changes to the scope, and how the list will be maintained over time."
       },
       {
-        "title": "Define the problem list concept scope",
-        "description": "Decide which SNOMED CT concepts are valid entries on the problem list. Two approaches are available: (1) Manual selection \u2014 browse the SNOMED CT hierarchy and hand-pick the concepts; (2) ECL query \u2014 write an Expression Constraint Language expression (e.g. descendants of Clinical finding: <<404684003) and expand it against a terminology server to generate the full concept list. Either way, the output is a static list of concept IDs that defines the scope of the problem list. This scoped concept set is itself a value set \u2014 the mechanism for bounding what clinicians can record."
+        "title": "Define the value set",
+        "description": "Define the concept scope for the problem list. Two approaches are available: \n(1) Manual selection - browse the SNOMED CT hierarchy using the public SNOMED CT Browser and hand-pick the concepts that make up the value set; \n(2) ECL query - write an Expression Constraint Language expression (e.g., descendants of Clinical finding: <<404684003) and expand it against a terminology server to generate the full concept list. \n\nEither way, the output is a static list of concept IDs that the clinical system can use as a basis for the value set."
       },
       {
-        "title": "Choose how the problem list value set will be delivered",
-        "description": "Integrating a FHIR terminology service directly into the clinical system is best practice \u2014 it enables live ECL expansion, concept search, and preferred term retrieval against the current SNOMED CT release. Where direct integration is not feasible, a separate terminology server (a public server or a locally deployed Snowstorm instance) can be used to extract the concept list. In either case, a raw list of concept IDs is not yet a usable problem list value set \u2014 see the next step."
+        "title": "Choose how the value set will be delivered to the clinical system",
+        "description": "Integrating a FHIR terminology service directly into the clinical system is best practice - it enables live ECL expansion, concept search, and preferred term retrieval against the current SNOMED CT release. However, this is not always feasible. Where direct integration is not possible, a separate terminology server (a public server such as the one operated by SNOMED International, or a locally deployed Snowstorm instance) can be used to extract the concept list. In either case, a raw list of concept IDs is not yet a usable value set - see the next step."
       },
       {
-        "title": "Represent the problem list value set in a form the clinical system can use",
-        "description": "A list of concept IDs alone is not sufficient \u2014 the clinical system needs terms and a structured format it can process. Two paths apply depending on your architecture: (1) FHIR terminology server integrated: define a named FHIR ValueSet resource with an ECL expression in the compose element. The terminology server resolves preferred terms at runtime. (2) No integrated terminology server: export the expanded problem list concept list from a separate terminology server, including preferred and acceptable terms for your language. Package this as a FHIR ValueSet with explicit concept entries, a CSV, or a local reference table. This static representation of the problem list must be refreshed on each SNOMED CT release."
+        "title": "Represent the value set in a form the clinical system can use",
+        "description": "A list of concept IDs alone is not sufficient - the clinical system needs terms and a structured format it can process. Two paths apply depending on your architecture: (1) FHIR terminology server integrated: use the implicit SNOMED CT value set directly via ECL (no separate packaging needed), or define a named FHIR ValueSet resource with an ECL expression in the compose element. The terminology server resolves preferred terms at runtime from the configured language reference set. (2) No integrated terminology server: export the expanded concept list from a separate terminology server, supplemented with the preferred and acceptable terms for your language and context. Package this as a format the clinical system can consume - for example, a FHIR ValueSet with explicit concept entries including display terms, a CSV, or a local reference table. This static representation must be refreshed on each SNOMED CT release."
       },
       {
-        "title": "Implement clinician-facing problem list search",
-        "description": "Configure search to display preferred terms from the configured language reference set \u2014 never FSNs. Where a terminology service is integrated, use its search API (e.g. Snowstorm's /concepts endpoint) with the problem list ECL constraint applied. Where a static problem list value set is used, ensure the exported terms are indexed and searchable within the clinical system. Rank results by clinical frequency and preferred term match."
+        "title": "Implement clinician-facing search",
+        "description": "Configure search to display preferred terms from the configured language reference set - never FSNs. Note that Snowstorm's /concepts endpoint returns both the FSN and PT for each match, so the client is responsible for selecting which term to display. Where a terminology service is integrated, use its search API with the ECL constraint applied - Snowstorm matches on prefixes of the description terms in any order (not fuzzy matching) and by default ranks results by the length of the matched term, so the shortest, most general match surfaces first rather than the most clinically relevant one. Clinical-frequency ranking and preferred-term-over-synonym boosting are not native to Snowstorm and must be layered on top, as described in the Search and data entry playbook. Where a static value set is used, ensure the exported terms are indexed and searchable within the clinical system, with the same layered ranking applied."
       },
       {
         "title": "Establish governance and release management",
-        "description": "Define who reviews the problem list value set on each SNOMED CT release (twice yearly), how inactivated concepts are handled in existing patient records, and how clinicians can request new concepts or additions to the problem list scope."
+        "description": "Define who reviews the value set on each SNOMED CT release (twice yearly), how inactivated concepts are handled in existing patient data, and how clinicians can request new concepts or additions to the value set."
       }
     ],
     "dependencies": [
@@ -117,16 +117,6 @@
         "type": "Guide",
         "title": "Mapping guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
-      },
-      {
-        "type": "Demo",
-        "title": "Allergies demonstrator",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/allergies"
-      },
-      {
-        "type": "Demo",
-        "title": "Terminology Bindings Sandbox",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/sandbox"
       }
     ]
   },
@@ -248,31 +238,6 @@
         "type": "Spec",
         "title": "Expression constraint language specification",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED EHR Lab",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
-      },
-      {
-        "type": "Demo",
-        "title": "Allergies demonstrator",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/allergies"
-      },
-      {
-        "type": "Demo",
-        "title": "Cancer Synoptic Reporting",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/cancer-reporting"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED & FHIR Questionnaires Manager",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/questionnaires"
-      },
-      {
-        "type": "Demo",
-        "title": "Context Representation Transformations",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/context"
       }
     ]
   },
@@ -380,16 +345,6 @@
         "type": "Guide",
         "title": "Terminology services guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED EHR Lab",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED and LLMs (AI Demo)",
-        "url": "https://ihtsdo.github.io/openai-demo/"
       }
     ]
   },
@@ -497,21 +452,6 @@
         "type": "Guide",
         "title": "Mapping guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
-      },
-      {
-        "type": "Demo",
-        "title": "Descriptive Analytics",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/descriptive-analytics"
-      },
-      {
-        "type": "Demo",
-        "title": "Analytics with Snolytical",
-        "url": "https://training-snolytical.ihtsdotools.org/"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED EHR Lab",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
       }
     ]
   },
@@ -651,31 +591,6 @@
         "type": "Spec",
         "title": "SNOMED CT URI standard",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-uri-standard/"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED EHR Lab",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
-      },
-      {
-        "type": "Demo",
-        "title": "IPS Terminology Demonstrator",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ips-terminology"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED Integrations Hub",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/snomed-integrations"
-      },
-      {
-        "type": "Demo",
-        "title": "FHIR Resource Internationalizer",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/fhir-internationalizer"
-      },
-      {
-        "type": "Demo",
-        "title": "Context Representation Transformations",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/context"
       }
     ]
   },
@@ -783,21 +698,6 @@
         "type": "Guide",
         "title": "Simplex user guide",
         "url": "https://docs.snomed.org/snomed-ct-user-guides/simplex-user-guide/"
-      },
-      {
-        "type": "Demo",
-        "title": "ValueSet Utility",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/valueset-translator"
-      },
-      {
-        "type": "Demo",
-        "title": "Terminology Bindings Sandbox",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/sandbox"
-      },
-      {
-        "type": "Demo",
-        "title": "IPS Terminology Demonstrator",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ips-terminology"
       }
     ]
   },
@@ -914,16 +814,6 @@
         "type": "Guide",
         "title": "MLDS - licensing and release access",
         "url": "https://mlds.ihtsdotools.org/"
-      },
-      {
-        "type": "Demo",
-        "title": "Post-coordination Demonstrator",
-        "url": "https://ihtsdo.github.io/iid-postcoordination"
-      },
-      {
-        "type": "Demo",
-        "title": "Extensions Search Utility",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/extensions-search"
       }
     ]
   },
@@ -970,7 +860,7 @@
       },
       {
         "title": "Implement autocomplete search with ECL constraint applied",
-        "description": "Integrate the terminology service search API into the data entry UI. Apply the field's ECL constraint as a search filter. Return preferred terms as the primary display label, with synonyms as supporting context. Implement minimum character threshold (typically 2\u20133 characters) before search fires."
+        "description": "Integrate the terminology service search API into the data entry UI. Apply the field's ECL constraint as a search filter. Return preferred terms as the primary display label, with synonyms as supporting context. Implement minimum character threshold (typically 2–3 characters) before search fires."
       },
       {
         "title": "Configure result ranking and quick-pick lists",
@@ -1026,21 +916,6 @@
         "type": "Spec",
         "title": "Expression constraint language specification",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
-      },
-      {
-        "type": "Demo",
-        "title": "Encounters UI Demo",
-        "url": "https://ihtsdo.github.io/snomed-ui-examples"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED EHR Lab",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
-      },
-      {
-        "type": "Demo",
-        "title": "Terminology Bindings Sandbox",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/sandbox"
       }
     ]
   },
@@ -1120,7 +995,7 @@
       "Treating the SNOMED CT to ICD-10 map as a simple lookup - the map has rule groups, priorities, and advice fields that must be applied to get the correct ICD-10 code",
       "Creating a custom map when the official map already meets the need - custom maps require active maintenance on every SNOMED CT release",
       "Not validating map output with clinical coders - technical correctness does not guarantee clinical coding correctness",
-      "Attempting bidirectional mapping - SNOMED CT is more granular than ICD-10, so SNOMED CT \u2192 ICD-10 loses information that cannot be recovered in the reverse direction",
+      "Attempting bidirectional mapping - SNOMED CT is more granular than ICD-10, so SNOMED CT → ICD-10 loses information that cannot be recovered in the reverse direction",
       "Ignoring history supplements when migrating legacy data - historical SNOMED CT concept IDs from older releases may be inactivated and need resolution before mapping"
     ],
     "resources": [
@@ -1148,21 +1023,6 @@
         "type": "Guide",
         "title": "Snap2SNOMED user guide",
         "url": "https://docs.snomed.org/snomed-ct-user-guides/snap2snomed-user-guide/"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED Maps Demonstrator",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/icd-mappings"
-      },
-      {
-        "type": "Demo",
-        "title": "LOINC & SNOMED CT demonstrator",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/loinc"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED Integrations Hub",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/snomed-integrations"
       }
     ]
   },
@@ -1271,21 +1131,6 @@
         "type": "Guide",
         "title": "Implementation fact sheets",
         "url": "https://docs.snomed.org/implementation-guides/implementation-fact-sheets/"
-      },
-      {
-        "type": "Demo",
-        "title": "Implementation Maturity Framework",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/maturity"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED Implementation Roadmap Generator",
-        "url": "https://ihtsdo.github.io/roadmap-generator"
-      },
-      {
-        "type": "Demo",
-        "title": "SNOMED CT as an Evolving Terminology",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/reports"
       }
     ]
   },
@@ -1401,16 +1246,6 @@
         "type": "Spec",
         "title": "Machine readable concept model",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-machine-readable-concept-model/"
-      },
-      {
-        "type": "Demo",
-        "title": "Extensions Search Utility",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/extensions-search"
-      },
-      {
-        "type": "Demo",
-        "title": "Module Dependency Reference Set Viewer",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/mdrs-viewer"
       }
     ]
   },
@@ -1519,16 +1354,6 @@
         "type": "Guide",
         "title": "Translation management guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-translation-management-guide/"
-      },
-      {
-        "type": "Demo",
-        "title": "FHIR Resource Internationalizer",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/fhir-internationalizer"
-      },
-      {
-        "type": "Demo",
-        "title": "Extensions Search Utility",
-        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/extensions-search"
       }
     ]
   }
