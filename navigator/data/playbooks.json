@@ -9,7 +9,7 @@
       "Clinician",
       "Information Manager"
     ],
-    "overview": "A SNOMED CT-based problem list enables structured condition recording that supports longitudinal care, clinical decision support, cohort queries, and interoperability. Concepts from the Clinical finding and Disorder hierarchies are used, scoped by an Expression Constraint Language (ECL) expression or curated reference set. This is one of the highest-value and most common SNOMED CT implementation targets.",
+    "overview": "A SNOMED CT-based problem list enables structured condition recording that supports longitudinal care, clinical decision support, cohort queries, and interoperability. Concepts from the Clinical finding and Disorder hierarchies are used, typically scoped by a value set with a simple is-a constraint. See the <a href=\"#/playbook/value-sets\">Value Sets playbook</a> for how to define and govern it. This is one of the highest-value and most common SNOMED CT implementation targets.",
     "decisions": [
       {
         "question": "What constitutes a 'problem' in your clinical context?",
