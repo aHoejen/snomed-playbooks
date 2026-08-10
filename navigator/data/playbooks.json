@@ -13,7 +13,7 @@
     "decisions": [
       {
         "question": "What constitutes a 'problem' in your clinical context?",
-        "guidance": "Clarify whether the list covers active conditions only, includes resolved history, or captures the full range of health concerns. This is a clinical governance decision - scope agreed early is hard to reverse once data is being captured."
+        "guidance": "There is no single definition of a 'problem' - it varies by specialty, care setting, and organisation. Clarify whether the list covers active conditions only, includes resolved history, or captures the full range of health concerns. Treat this as a critical starting point, not a detail to settle later: it determines which SNOMED CT hierarchies and value set bindings the rest of the implementation is built on. This is a clinical governance decision - scope agreed early is hard to reverse once data is being captured."
       },
       {
         "question": "Will concept selection be open or constrained by a value set?",
