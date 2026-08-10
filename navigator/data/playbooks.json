@@ -55,7 +55,7 @@
       },
       {
         "title": "Implement clinician-facing search",
-        "description": "Configure search to display preferred terms from the configured language reference set - never FSNs. Note that Snowstorm's /concepts endpoint returns both the FSN and PT for each match, so the client is responsible for selecting which term to display. Where a terminology service is integrated, use its search API with the ECL constraint applied - Snowstorm matches on prefixes of the description terms in any order (not fuzzy matching) and by default ranks results by the length of the matched term, so the shortest, most general match surfaces first rather than the most clinically relevant one. Clinical-frequency ranking and preferred-term-over-synonym boosting are not native to Snowstorm and must be layered on top, as described in the Search and data entry playbook. Where a static value set is used, ensure the exported terms are indexed and searchable within the clinical system, with the same layered ranking applied."
+        "description": "Configure search to display preferred terms from the configured language reference set - never FSNs. Where a terminology service is integrated, use its search API with the ECL constraint applied - but verify how that specific server matches and ranks terms, since this varies by implementation and default behaviour rarely surfaces the most clinically relevant match first. For example, <a href=\"https://github.com/IHTSDO/snowstorm\" target=\"_blank\" rel=\"noopener\">Snowstorm</a> (the open-source terminology server developed by SNOMED International) matches on prefixes of description terms in any order rather than fuzzy matching, and by default ranks results by the length of the matched term - so the shortest, most general match surfaces first; its /concepts endpoint also returns both the FSN and PT for each match, leaving the client responsible for choosing which to display. Clinical-frequency ranking and preferred-term-over-synonym boosting are not native to most terminology servers and typically need to be layered on top, as described in the Search and data entry playbook. Where a static value set is used, ensure the exported terms are indexed and searchable within the clinical system, with the same layered ranking applied."
       },
       {
         "title": "Establish governance and release management",
@@ -92,6 +92,11 @@
         "type": "Tool",
         "title": "SNOMED CT Browser",
         "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Tool",
+        "title": "Snowstorm terminology server (open source)",
+        "url": "https://github.com/IHTSDO/snowstorm"
       },
       {
         "type": "Guide",
