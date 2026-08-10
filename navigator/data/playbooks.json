@@ -43,15 +43,15 @@
       },
       {
         "title": "Define the value set",
-        "description": "Define the concept scope for the problem list. Two approaches are available: \n(1) Manual selection - browse the SNOMED CT hierarchy using the public SNOMED CT Browser and hand-pick the concepts that make up the value set; \n(2) ECL query - write an Expression Constraint Language expression (e.g., descendants of Clinical finding: <<404684003) and expand it against a terminology server to generate the full concept list. \n\nEither way, the output is a static list of concept IDs that the clinical system can use as a basis for the value set."
+        "description": "Define the concept scope for the problem list. Manual selection (browsing the SNOMED CT hierarchy and hand-picking concepts) works for small, stable subsets, but an ECL expression (e.g. descendants of Clinical finding: <<404684003) is the recommended approach - it stays accurate as SNOMED CT content evolves. Using ECL doesn't mean the constraint has to be evaluated live on every search: it can (1) be expanded once into a static concept list that is then loaded into the clinical system, (2) be evaluated live at runtime against a terminology service on every search or validation, or (3) be embedded as the compose expression of a formal value set definition (e.g. a FHIR ValueSet resource) that a terminology server resolves when needed. Which pattern fits depends on your architecture - see the next step."
       },
       {
         "title": "Choose how the value set will be delivered to the clinical system",
-        "description": "Integrating a FHIR terminology service directly into the clinical system is best practice - it enables live ECL expansion, concept search, and preferred term retrieval against the current SNOMED CT release. However, this is not always feasible. Where direct integration is not possible, a separate terminology server (a public server such as the one operated by SNOMED International, or a locally deployed Snowstorm instance) can be used to extract the concept list. In either case, a raw list of concept IDs is not yet a usable value set - see the next step."
+        "description": "Integrating a FHIR terminology service directly into the clinical system is best practice - it supports all three ECL delivery patterns (static extraction, runtime evaluation, or a stored ValueSet definition) and keeps concept and term data aligned with the current SNOMED CT release. However, this is not always feasible. Where direct integration is not possible, a separate terminology server (a public server such as the one operated by SNOMED International, or a locally deployed Snowstorm instance) can still be used to run the ECL once and extract a static concept list. In either case, a raw list of concept IDs is not yet a usable value set - see the next step."
       },
       {
         "title": "Represent the value set in a form the clinical system can use",
-        "description": "A list of concept IDs alone is not sufficient - the clinical system needs terms and a structured format it can process. Two paths apply depending on your architecture: (1) FHIR terminology server integrated: use the implicit SNOMED CT value set directly via ECL (no separate packaging needed), or define a named FHIR ValueSet resource with an ECL expression in the compose element. The terminology server resolves preferred terms at runtime from the configured language reference set. (2) No integrated terminology server: export the expanded concept list from a separate terminology server, supplemented with the preferred and acceptable terms for your language and context. Package this as a format the clinical system can consume - for example, a FHIR ValueSet with explicit concept entries including display terms, a CSV, or a local reference table. This static representation must be refreshed on each SNOMED CT release."
+        "description": "A list of concept IDs alone is not sufficient - the clinical system needs terms and a structured format it can process. Two paths apply depending on your architecture: (1) FHIR terminology server integrated: use the implicit SNOMED CT value set directly via ECL (no separate packaging needed), or define a named FHIR ValueSet resource with an ECL expression in the compose element - a reusable, versionable definition that the terminology server resolves when needed, not necessarily on every request. The terminology server resolves preferred terms at runtime from the configured language reference set. (2) No integrated terminology server: export the expanded concept list from a separate terminology server, supplemented with the preferred and acceptable terms for your language and context. Package this as a format the clinical system can consume - for example, a FHIR ValueSet with explicit concept entries including display terms, a CSV, or a local reference table. This static representation must be refreshed on each SNOMED CT release."
       },
       {
         "title": "Implement clinician-facing search",
@@ -59,7 +59,7 @@
       },
       {
         "title": "Establish governance and release management",
-        "description": "Define who reviews the value set on each SNOMED CT release (twice yearly), how inactivated concepts are handled in existing patient data, and how clinicians can request new concepts or additions to the value set."
+        "description": "Define who reviews the value set on each SNOMED CT release, how inactivated concepts are handled in existing patient data, and how clinicians can request new concepts or additions to the value set."
       }
     ],
     "dependencies": [
@@ -649,7 +649,7 @@
       },
       {
         "title": "Establish a maintenance schedule",
-        "description": "Review the value set on each SNOMED CT release (twice yearly). Check whether new concepts satisfy the ECL constraint and whether inactivated concepts have been handled. Communicate changes to all consuming systems."
+        "description": "Review the value set on each relevant SNOMED CT release - the International Edition is released monthly, and national extensions typically follow their own release cycle. Check whether new concepts satisfy the ECL constraint and whether inactivated concepts have been handled. Communicate changes to all consuming systems."
       }
     ],
     "dependencies": [
@@ -726,7 +726,7 @@
       },
       {
         "question": "How will SNOMED CT release upgrades be tested and deployed?",
-        "guidance": "SNOMED CT releases occur twice yearly. Upgrades must be tested against all consuming applications before production deployment - value sets may change, concepts may be inactivated, and preferred terms may be updated. Define the testing protocol, rollback procedure, and notification process for consuming systems."
+        "guidance": "The International Edition is released monthly, and national extensions typically follow their own release cycle - track both. Upgrades must be tested against all consuming applications before production deployment - value sets may change, concepts may be inactivated, and preferred terms may be updated. Define the testing protocol, rollback procedure, and notification process for consuming systems."
       },
       {
         "question": "What access control, audit logging, and availability requirements apply?",
@@ -1052,7 +1052,7 @@
       },
       {
         "question": "How will each SNOMED CT release be assessed, tested, and deployed?",
-        "guidance": "SNOMED CT is released twice yearly. Each release may include concept inactivations, redefinitions, new preferred terms, and map updates. Define a release assessment process: review release notes, run regression QA queries, test consuming applications in a non-production environment, and deploy to production with a documented rollback plan."
+        "guidance": "The International Edition is released monthly, and national extensions typically follow their own release cycle, so plan for both. Each release may include concept inactivations, redefinitions, new preferred terms, and map updates. Define a release assessment process: review release notes, run regression QA queries, test consuming applications in a non-production environment, and deploy to production with a documented rollback plan."
       },
       {
         "question": "What quality metrics will indicate the health of the SNOMED CT implementation?",
