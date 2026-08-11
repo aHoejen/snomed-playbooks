@@ -919,7 +919,7 @@ div:has(> .role-iq-link) { display: flex; flex-direction: column; align-items: f
   line-height: 1.7;
   opacity: .85;
 }
-.pb-overview-intro em { color: var(--cerulean); font-style: normal; font-weight: 500; }
+.pb-overview-intro em { color: #fff; font-style: italic; font-weight: 400; opacity: 1; }
 .pb-overview-pillars {
   display: grid;
   grid-template-columns: 1fr 1fr;

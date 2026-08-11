@@ -9,7 +9,7 @@
       "Clinician",
       "Information Manager"
     ],
-    "overview": "A SNOMED CT-based problem list enables structured condition recording that supports longitudinal care, clinical decision support, cohort queries, and interoperability. Concepts from the Clinical finding and Disorder hierarchies are used, typically scoped by a value set with a simple is-a constraint. See the <a href=\"#/playbook/value-sets\">Value Sets playbook</a> for how to define and govern it. This is one of the highest-value and most common SNOMED CT implementation targets.",
+    "overview": "A SNOMED CT-based problem list enables structured condition recording that supports longitudinal care, clinical decision support, cohort queries, and interoperability. Concepts from the Clinical finding and Disorder hierarchies are used, scoped by an Expression Constraint Language (ECL) expression or a curated reference set. This is one of the highest-value and most common SNOMED CT implementation targets.",
     "decisions": [
       {
         "question": "What constitutes a 'problem' in your clinical context?",
@@ -865,7 +865,7 @@
       },
       {
         "title": "Implement autocomplete search with ECL constraint applied",
-        "description": "Integrate the terminology service search API into the data entry UI. Apply the field's ECL constraint as a search filter. Return preferred terms as the primary display label, with synonyms as supporting context. Implement minimum character threshold (typically 2–3 characters) before search fires."
+        "description": "Integrate the terminology service search API into the data entry UI. Apply the field's ECL constraint as a search filter. Return preferred terms as the primary display label, with synonyms as supporting context. Implement minimum character threshold (typically 2\u20133 characters) before search fires."
       },
       {
         "title": "Configure result ranking and quick-pick lists",
@@ -1000,7 +1000,7 @@
       "Treating the SNOMED CT to ICD-10 map as a simple lookup - the map has rule groups, priorities, and advice fields that must be applied to get the correct ICD-10 code",
       "Creating a custom map when the official map already meets the need - custom maps require active maintenance on every SNOMED CT release",
       "Not validating map output with clinical coders - technical correctness does not guarantee clinical coding correctness",
-      "Attempting bidirectional mapping - SNOMED CT is more granular than ICD-10, so SNOMED CT → ICD-10 loses information that cannot be recovered in the reverse direction",
+      "Attempting bidirectional mapping - SNOMED CT is more granular than ICD-10, so SNOMED CT \u2192 ICD-10 loses information that cannot be recovered in the reverse direction",
       "Ignoring history supplements when migrating legacy data - historical SNOMED CT concept IDs from older releases may be inactivated and need resolution before mapping"
     ],
     "resources": [
