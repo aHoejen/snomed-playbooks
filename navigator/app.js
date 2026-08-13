@@ -434,7 +434,12 @@ function renderPlaybook(id) {
               <div class="step-num c-${pb.color}" style="background:var(--c-bg);color:var(--c-text)">${i + 1}</div>
               <div class="step-body">
                 <div class="step-title">${s.title}</div>
-                <div class="step-desc">${s.description}</div>
+                ${s.description ? `<div class="step-desc">${s.description}</div>` : ''}
+                ${s.options ? `<div class="step-options">${s.options.map(o => `
+                  <div class="step-option-card">
+                    <div class="step-option-label">${o.label}</div>
+                    <ul class="step-option-points">${o.points.map(p => `<li>${p}</li>`).join('')}</ul>
+                  </div>`).join('')}</div>` : ''}
               </div>
             </div>
           `).join('')}

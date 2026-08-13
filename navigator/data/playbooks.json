@@ -654,7 +654,25 @@
       },
       {
         "title": "Represent the value set in a form the clinical system can use",
-        "description": "A list of concept IDs alone is not sufficient: the clinical system needs terms and a structured format it can process. Two paths apply depending on your architecture: (1) FHIR terminology server integrated: define a named FHIR ValueSet resource with an ECL expression in the compose element; the terminology server resolves preferred terms at runtime. (2) No integrated terminology server: export the expanded concept list from a terminology server, including preferred and acceptable terms for your language. Package as a FHIR ValueSet with explicit concept entries, a CSV, or an RF2 reference set. Static representations must be refreshed on each SNOMED CT release."
+        "description": "A list of concept IDs alone is not sufficient: the clinical system needs terms and a structured format it can process. The right approach depends on your architecture.",
+        "options": [
+          {
+            "label": "FHIR terminology server integrated",
+            "points": [
+              "Define a named FHIR ValueSet resource with an ECL expression in the compose element",
+              "The terminology server resolves preferred terms at runtime from the configured language reference set",
+              "No static export needed - the value set stays current with each SNOMED CT release"
+            ]
+          },
+          {
+            "label": "No integrated terminology server",
+            "points": [
+              "Export the expanded concept list from a terminology server, including preferred and acceptable terms for your language",
+              "Package as a FHIR ValueSet with explicit concept entries, a CSV, or an RF2 reference set",
+              "Must be refreshed on each SNOMED CT release to pick up new or inactivated concepts"
+            ]
+          }
+        ]
       },
       {
         "title": "Author and publish with versioning",
