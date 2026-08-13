@@ -608,7 +608,7 @@
       "Information Manager",
       "Software provider"
     ],
-    "overview": "A value set is a uniquely identifiable set of valid concept identifiers selected from one or more code systems for use in a specific context. In SNOMED CT, value sets define which concepts are valid for a given data element \u2014 such as a problem list, a diagnosis field, or a procedure picker. The recommended approach is to define value sets intensionally using Expression Constraint Language (ECL): an expression that captures the intended concept scope from the SNOMED CT hierarchy. ECL-based definitions are self-maintaining \u2014 new concepts that satisfy the constraint are automatically included on each release \u2014 and can be evaluated at runtime against any SNOMED CT edition by a terminology service. Where ECL cannot fully capture the intended scope, explicit concept lists (extensional definitions) may be used, but require manual review on every SNOMED CT release.",
+    "overview": "A value set is a uniquely identifiable set of valid concept identifiers selected from one or more code systems for use in a specific context. In SNOMED CT, value sets define which concepts are valid for a given data element such as a problem list, a diagnosis field, or a procedure picker. The recommended approach is to define value sets intensionally using Expression Constraint Language (ECL): an expression that captures the intended concept scope from the SNOMED CT hierarchy. ECL-based definitions are self-maintaining: new concepts that satisfy the constraint are automatically included on each release and can be evaluated at runtime against any SNOMED CT edition by a terminology service. Where ECL cannot fully capture the intended scope, explicit concept lists (extensional definitions) may be used, but require manual review on every SNOMED CT release.",
     "decisions": [
       {
         "question": "What is the clinical purpose and context of this value set?",
@@ -616,7 +616,7 @@
       },
       {
         "question": "Should the value set be defined intensionally (ECL) or extensionally (explicit list)?",
-        "guidance": "Intensional ECL definitions are strongly preferred \u2014 they are self-maintaining, adapt to new SNOMED CT content, and are declarative. Explicit lists are appropriate only for small, highly curated sets where clinical judgement over individual concepts is required, or where the content cannot be expressed by ECL alone."
+        "guidance": "Intensional ECL definitions are strongly preferred: they are self-maintaining, adapt to new SNOMED CT content, and are declarative. Explicit lists are appropriate only for small, highly curated sets where clinical judgement over individual concepts is required, or where the content cannot be expressed by ECL alone."
       },
       {
         "question": "What SNOMED CT hierarchy, attribute constraint, or reference set membership best captures the clinical scope?",
@@ -624,10 +624,10 @@
       },
       {
         "question": "How will the value set be delivered to and consumed by clinical systems?",
-        "guidance": "Integrating a FHIR terminology service is best practice \u2014 it enables live ECL expansion, preferred term retrieval, and concept search at runtime. Where direct integration is not feasible, the value set must be exported as a static representation (FHIR ValueSet with explicit entries, CSV, or RF2 reference set) and refreshed on each SNOMED CT release."
+        "guidance": "Integrating a FHIR terminology service is best practice: it enables live ECL expansion, preferred term retrieval, and concept search at runtime. Where direct integration is not feasible, the value set must be exported as a static representation (FHIR ValueSet with explicit entries, CSV, or RF2 reference set) and refreshed on each SNOMED CT release. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for deployment options."
       },
       {
-        "question": "How should the value set be packaged and distributed \u2014 RF2 reference set or FHIR ValueSet?",
+        "question": "How should the value set be packaged and distributed: RF2 reference set or FHIR ValueSet?",
         "guidance": "RF2 simple reference sets are the native SNOMED CT format and integrate directly with Snowstorm. FHIR ValueSet resources are required for FHIR-based systems and support ECL via the compose.include.filter. Agree the packaging format with consuming systems before authoring."
       },
       {
@@ -642,19 +642,19 @@
       },
       {
         "title": "Explore the SNOMED CT hierarchy and define the concept scope",
-        "description": "Use the SNOMED CT Browser to navigate the hierarchy and identify the most appropriate ancestor concept and any necessary attribute refinements. Review whether existing reference sets or value sets already meet your need before creating a new one. Two approaches are available: (1) Intensional definition \u2014 write an ECL expression (e.g. <<404684003 for all clinical findings) that captures the intended scope; the terminology server expands this dynamically on each SNOMED CT release. (2) Extensional definition \u2014 manually select individual concepts where ECL cannot fully capture clinical intent. Either way, the output is a defined concept scope that bounds what the value set contains."
+        "description": "Use the SNOMED CT Browser to navigate the hierarchy and identify the most appropriate ancestor concept and any necessary attribute refinements. Review whether existing reference sets or value sets already meet your need before creating a new one. Two approaches are available: (1) Intensional definition - write an ECL expression (e.g. <<404684003 for all clinical findings) that captures the intended scope; the terminology server expands this dynamically on each SNOMED CT release. (2) Extensional definition - manually select individual concepts where ECL cannot fully capture clinical intent. Either way, the output is a defined concept scope that bounds what the value set contains."
       },
       {
         "title": "Write and test the ECL expression",
-        "description": "Write an ECL expression using subsumption (<<), attribute refinements, and set operators as needed. Test the expansion using the Browser's ECL search or the FHIR $expand endpoint against a terminology service. Verify the concept set boundary with clinical SMEs \u2014 both false inclusions and missing concepts."
+        "description": "Write an ECL expression using subsumption (<<), attribute refinements, and set operators as needed. Test the expansion using the Browser's ECL search or the FHIR $expand endpoint against a terminology service. Verify the concept set boundary with clinical SMEs: both false inclusions and missing concepts."
       },
       {
         "title": "Choose how the value set will be delivered",
-        "description": "Integrating a FHIR terminology service directly into the clinical system is best practice \u2014 it enables live ECL expansion, concept search, and preferred term retrieval against the current SNOMED CT release. Where direct integration is not feasible, a separate terminology server can be used to extract and export the concept list. In either case, a raw list of concept IDs is not yet a usable value set \u2014 see the next step."
+        "description": "Integrating a FHIR terminology service directly into the clinical system is best practice: it enables live ECL expansion, concept search, and preferred term retrieval against the current SNOMED CT release. Where direct integration is not feasible, a separate terminology server can be used to extract and export the concept list. In either case, a raw list of concept IDs is not yet a usable value set. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for deployment and integration guidance."
       },
       {
         "title": "Represent the value set in a form the clinical system can use",
-        "description": "A list of concept IDs alone is not sufficient \u2014 the clinical system needs terms and a structured format it can process. Two paths apply depending on your architecture: (1) FHIR terminology server integrated: define a named FHIR ValueSet resource with an ECL expression in the compose element; the terminology server resolves preferred terms at runtime. (2) No integrated terminology server: export the expanded concept list from a terminology server, including preferred and acceptable terms for your language. Package as a FHIR ValueSet with explicit concept entries, a CSV, or an RF2 reference set. Static representations must be refreshed on each SNOMED CT release."
+        "description": "A list of concept IDs alone is not sufficient: the clinical system needs terms and a structured format it can process. Two paths apply depending on your architecture: (1) FHIR terminology server integrated: define a named FHIR ValueSet resource with an ECL expression in the compose element; the terminology server resolves preferred terms at runtime. (2) No integrated terminology server: export the expanded concept list from a terminology server, including preferred and acceptable terms for your language. Package as a FHIR ValueSet with explicit concept entries, a CSV, or an RF2 reference set. Static representations must be refreshed on each SNOMED CT release."
       },
       {
         "title": "Author and publish with versioning",
@@ -662,7 +662,7 @@
       },
       {
         "title": "Establish governance and release management",
-        "description": "Review the value set on each relevant SNOMED CT release \u2014 the International Edition is released monthly, and national extensions follow their own release cycle. Check whether new concepts satisfy the ECL constraint and whether inactivated concepts have been handled. Define who reviews the value set, how inactivated concepts are handled in existing data, and how consumers are notified of changes."
+        "description": "Review the value set on each relevant SNOMED CT release: the International Edition is released monthly, and national extensions follow their own release cycle. Check whether new concepts satisfy the ECL constraint and whether inactivated concepts have been handled. Define who reviews the value set, how inactivated concepts are handled in existing data, and how consumers are notified of changes. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance."
       }
     ],
     "dependencies": [
@@ -680,12 +680,12 @@
       }
     ],
     "pitfalls": [
-      "Using extensional (explicit list) definitions where ECL would suffice \u2014 lists require manual maintenance on every SNOMED CT release",
-      "Using a static value set extracted from a terminology server without a refresh process \u2014 new clinically relevant concepts added in SNOMED CT releases are silently excluded",
-      "No clinical review \u2014 value sets not validated by clinical SMEs may exclude concepts clinicians expect, or include concepts that are inappropriate in context",
-      "Publishing without versioning \u2014 consuming systems cannot detect changes and continue using stale pre-expanded sets",
-      "Not checking whether an existing value set meets the need \u2014 duplicating content that is already maintained creates unnecessary ongoing maintenance burden",
-      "No governance \u2014 value sets with no named clinical owner degrade in quality as the SNOMED CT release evolves"
+      "Using extensional (explicit list) definitions where ECL would suffice: lists require manual maintenance on every SNOMED CT release",
+      "Using a static value set extracted from a terminology server without a refresh process: new clinically relevant concepts added in SNOMED CT releases are silently excluded",
+      "No clinical review: value sets not validated by clinical SMEs may exclude concepts clinicians expect, or include concepts that are inappropriate in context",
+      "Publishing without versioning: consuming systems cannot detect changes and continue using stale pre-expanded sets",
+      "Not checking whether an existing value set meets the need: duplicating content that is already maintained creates unnecessary ongoing maintenance burden",
+      "No governance: value sets with no named clinical owner degrade in quality as the SNOMED CT release evolves"
     ],
     "resources": [
       {
@@ -874,7 +874,7 @@
       },
       {
         "title": "Implement autocomplete search with ECL constraint applied",
-        "description": "Integrate the terminology service search API into the data entry UI. Apply the field's ECL constraint as a search filter. Return preferred terms as the primary display label, with synonyms as supporting context. Implement minimum character threshold (typically 2\u20133 characters) before search fires."
+        "description": "Integrate the terminology service search API into the data entry UI. Apply the field's ECL constraint as a search filter. Return preferred terms as the primary display label, with synonyms as supporting context. Implement minimum character threshold (typically 2–3 characters) before search fires."
       },
       {
         "title": "Configure result ranking and quick-pick lists",
@@ -1009,7 +1009,7 @@
       "Treating the SNOMED CT to ICD-10 map as a simple lookup - the map has rule groups, priorities, and advice fields that must be applied to get the correct ICD-10 code",
       "Creating a custom map when the official map already meets the need - custom maps require active maintenance on every SNOMED CT release",
       "Not validating map output with clinical coders - technical correctness does not guarantee clinical coding correctness",
-      "Attempting bidirectional mapping - SNOMED CT is more granular than ICD-10, so SNOMED CT \u2192 ICD-10 loses information that cannot be recovered in the reverse direction",
+      "Attempting bidirectional mapping - SNOMED CT is more granular than ICD-10, so SNOMED CT → ICD-10 loses information that cannot be recovered in the reverse direction",
       "Ignoring history supplements when migrating legacy data - historical SNOMED CT concept IDs from older releases may be inactivated and need resolution before mapping"
     ],
     "resources": [
