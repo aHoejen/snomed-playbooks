@@ -79,6 +79,53 @@ function icon(name, size = 16) {
   return svg.replace(/width="\d+"/, `width="${size}"`).replace(/height="\d+"/, `height="${size}"`);
 }
 
+// ── Example popup ────────────────────────────────────────────────────────
+const _examples = [];
+
+function exampleBtn(ex) {
+  const idx = _examples.push(ex) - 1;
+  return `<button class="example-btn" data-ex="${idx}">${icon('code', 12)} ${ex.label}</button>`;
+}
+
+function initExampleModal() {
+  const overlay = document.getElementById('example-modal');
+  const titleEl = document.getElementById('example-modal-title');
+  const codeEl  = document.getElementById('example-modal-code');
+  const copyBtn = document.getElementById('example-copy-btn');
+
+  function openModal(idx) {
+    const ex = _examples[idx];
+    titleEl.textContent = ex.label;
+    codeEl.textContent  = ex.code;
+    overlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    overlay.hidden = true;
+    document.body.style.overflow = '';
+    copyBtn.textContent = 'Copy';
+  }
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal();
+  });
+  overlay.querySelector('.example-modal-close').addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(codeEl.textContent).then(() => {
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1800);
+    });
+  });
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.example-btn');
+    if (btn) openModal(Number(btn.dataset.ex));
+  });
+}
+
 // ── Data loading ─────────────────────────────────────────────────────────
 async function loadData() {
   const [qRes, pbRes, aRes, dRes] = await Promise.all([
@@ -439,7 +486,9 @@ function renderPlaybook(id) {
                   <div class="step-option-card">
                     <div class="step-option-label">${o.label}</div>
                     <ul class="step-option-points">${o.points.map(p => `<li>${p}</li>`).join('')}</ul>
+                    ${o.example ? `<div class="example-triggers" style="margin-top:10px">${exampleBtn(o.example)}</div>` : ''}
                   </div>`).join('')}</div>` : ''}
+                ${s.examples && s.examples.length ? `<div class="example-triggers">${s.examples.map(exampleBtn).join('')}</div>` : ''}
               </div>
             </div>
           `).join('')}
@@ -847,6 +896,7 @@ function closeSearch() {
 // ── Boot ─────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initSearch();
+  initExampleModal();
   loadData().catch(err => {
     document.getElementById('main').innerHTML =
       `<div class="container" style="padding:80px 0;text-align:center;color:#B83535">

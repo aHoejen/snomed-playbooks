@@ -43,7 +43,13 @@
       },
       {
         "title": "Define the problem list value set",
-        "description": "Define the concept scope using an ECL expression (e.g. <<404684003 for all clinical findings, or a narrower constraint) or a curated subset. ECL is preferred - it automatically includes new concepts added in each SNOMED CT release. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for authoring and testing guidance."
+        "description": "Define the concept scope using an ECL expression (e.g. <<404684003 for all clinical findings, or a narrower constraint) or a curated subset. ECL is preferred - it automatically includes new concepts added in each SNOMED CT release. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for authoring and testing guidance.",
+        "examples": [
+          {
+            "label": "ECL for clinical findings",
+            "code": "# All clinical findings (broadest scope)\n<<404684003 |Clinical finding (finding)|\n\n# Disorders only (common for problem lists)\n<<64572001 |Disease (disorder)|\n\n# Exclude administrative concepts\n<<404684003 MINUS <<413350009 |Finding with explicit context|"
+          }
+        ]
       },
       {
         "title": "Choose how the value set will be delivered",
@@ -646,7 +652,17 @@
       },
       {
         "title": "Write and test the ECL expression",
-        "description": "Write an ECL expression using subsumption (<<), attribute refinements, and set operators as needed. Test the expansion using the Browser's ECL search or the FHIR $expand endpoint against a terminology service. Verify the concept set boundary with clinical SMEs: both false inclusions and missing concepts."
+        "description": "Write an ECL expression using subsumption (<<), attribute refinements, and set operators as needed. Test the expansion using the Browser's ECL search or the FHIR $expand endpoint against a terminology service. Verify the concept set boundary with clinical SMEs: both false inclusions and missing concepts.",
+        "examples": [
+          {
+            "label": "ECL expression",
+            "code": "# All clinical findings (broad scope)\n<<404684003 |Clinical finding (finding)|\n\n# Narrowed to disorders only\n<<64572001 |Disease (disorder)|\n\n# Attribute refinement: findings with finding site = heart structure\n<<404684003 |Clinical finding| : 363698007 |Finding site| = <<80891009 |Heart structure|"
+          },
+          {
+            "label": "FHIR $expand call",
+            "code": "GET /fhir/ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=ecl/<<404684003&count=10\n\n# With edition and display language\nGET /fhir/ValueSet/$expand\n  ?url=http://snomed.info/sct?fhir_vs=ecl/<<404684003\n  &system-version=http://snomed.info/sct|http://snomed.info/sct/900000000000207008/version/20250301\n  &displayLanguage=en\n  &count=20\n  &offset=0"
+          }
+        ]
       },
       {
         "title": "Choose how the value set will be delivered",
@@ -662,7 +678,11 @@
               "Define a named FHIR ValueSet resource with an ECL expression in the compose element",
               "The terminology server resolves preferred terms at runtime from the configured language reference set",
               "No static export needed - the value set stays current with each SNOMED CT release"
-            ]
+            ],
+            "example": {
+              "label": "FHIR ValueSet with ECL compose (intensional)",
+              "code": "{\n  \"resourceType\": \"ValueSet\",\n  \"id\": \"problem-list-value-set\",\n  \"url\": \"https://example.org/ValueSet/problem-list-value-set\",\n  \"version\": \"1.0.0\",\n  \"name\": \"ProblemListValueSet\",\n  \"title\": \"Problem List Value Set\",\n  \"status\": \"active\",\n  \"compose\": {\n    \"include\": [\n      {\n        \"system\": \"http://snomed.info/sct\",\n        \"filter\": [\n          {\n            \"property\": \"constraint\",\n            \"op\": \"=\",\n            \"value\": \"<<404684003 |Clinical finding (finding)|\"\n          }\n        ]\n      }\n    ]\n  }\n}"
+            }
           },
           {
             "label": "No integrated terminology server",
@@ -670,7 +690,11 @@
               "Export the expanded concept list from a terminology server, including preferred and acceptable terms for your language",
               "Package as a FHIR ValueSet with explicit concept entries, a CSV, or an RF2 reference set",
               "Must be refreshed on each SNOMED CT release to pick up new or inactivated concepts"
-            ]
+            ],
+            "example": {
+              "label": "FHIR ValueSet with explicit entries (extensional)",
+              "code": "{\n  \"resourceType\": \"ValueSet\",\n  \"id\": \"hypertension-value-set\",\n  \"url\": \"https://example.org/ValueSet/hypertension-value-set\",\n  \"version\": \"20250301\",\n  \"name\": \"HypertensionValueSet\",\n  \"status\": \"active\",\n  \"compose\": {\n    \"include\": [\n      {\n        \"system\": \"http://snomed.info/sct\",\n        \"concept\": [\n          {\n            \"code\": \"38341003\",\n            \"display\": \"Hypertensive disorder, systemic arterial\"\n          },\n          {\n            \"code\": \"73410007\",\n            \"display\": \"Benign secondary renovascular hypertension\"\n          },\n          {\n            \"code\": \"57684003\",\n            \"display\": \"Parenchymal renal hypertension\"\n          }\n        ]\n      }\n    ]\n  }\n}"
+            }
           }
         ]
       },
@@ -780,7 +804,21 @@
       },
       {
         "title": "Expose and test FHIR Terminology Service endpoints",
-        "description": "Enable the FHIR R4 Terminology Service endpoints. Test $expand with ECL expressions, $validate-code for both valid and invalid concepts, $subsumes for parent-child relationships, and $translate for map-based operations. Test with the FHIR Terminology Service test harness."
+        "description": "Enable the FHIR R4 Terminology Service endpoints. Test $expand with ECL expressions, $validate-code for both valid and invalid concepts, $subsumes for parent-child relationships, and $translate for map-based operations. Test with the FHIR Terminology Service test harness.",
+        "examples": [
+          {
+            "label": "$expand with ECL",
+            "code": "# Expand all descendants of Clinical finding\nGET /fhir/ValueSet/$expand\n  ?url=http://snomed.info/sct?fhir_vs=ecl/<<404684003\n  &count=10\n\n# Response (abbreviated)\n{\n  \"resourceType\": \"ValueSet\",\n  \"expansion\": {\n    \"total\": 84321,\n    \"contains\": [\n      { \"system\": \"http://snomed.info/sct\", \"code\": \"73211009\", \"display\": \"Diabetes mellitus\" },\n      { \"system\": \"http://snomed.info/sct\", \"code\": \"38341003\", \"display\": \"Hypertensive disorder, systemic arterial\" }\n    ]\n  }\n}"
+          },
+          {
+            "label": "$validate-code",
+            "code": "# Validate a concept against a value set\nGET /fhir/ValueSet/$validate-code\n  ?url=http://snomed.info/sct?fhir_vs=ecl/<<404684003\n  &system=http://snomed.info/sct\n  &code=73211009\n\n# Response\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    { \"name\": \"result\", \"valueBoolean\": true },\n    { \"name\": \"display\", \"valueString\": \"Diabetes mellitus\" }\n  ]\n}"
+          },
+          {
+            "label": "$subsumes",
+            "code": "# Test whether concept A subsumes concept B\nGET /fhir/CodeSystem/$subsumes\n  ?system=http://snomed.info/sct\n  &codeA=404684003\n  &codeB=73211009\n\n# Response\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    { \"name\": \"outcome\", \"valueCode\": \"subsumes\" }\n  ]\n}"
+          }
+        ]
       },
       {
         "title": "Integrate with clinical applications",
