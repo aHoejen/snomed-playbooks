@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────
-   SNOMED CT Implementation Navigator
+   SNOMED CT Implementation Playbooks
    Vanilla JS SPA - hash-based routing, search, deep linking
    ───────────────────────────────────────────────────────────────────── */
 
