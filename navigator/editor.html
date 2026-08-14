@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Playbook Editor</title>
+  <title>SNOMED CT Implementation Playbooks - Editor</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -40,7 +40,7 @@
       overflow: hidden;
     }
 
-    /* ── Top bar ── */
+    /* Top bar */
     .topbar {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -105,14 +105,14 @@
     }
     .btn-ghost:hover:not(:disabled) { background: var(--bg); }
 
-    /* ── Layout ── */
+    /* Layout */
     .layout {
       display: flex;
       flex: 1;
       overflow: hidden;
     }
 
-    /* ── Sidebar ── */
+    /* Sidebar */
     .sidebar {
       width: 220px;
       flex-shrink: 0;
@@ -155,7 +155,7 @@
       line-height: 1.3;
     }
 
-    /* ── Empty state ── */
+    /* Empty state */
     .empty-state {
       flex: 1;
       display: flex;
@@ -172,7 +172,7 @@
     .empty-state h2 { font-size: 16px; color: var(--text-mid); font-weight: 500; }
     .empty-state p { font-size: 13px; max-width: 260px; text-align: center; line-height: 1.6; }
 
-    /* ── Main form area ── */
+    /* Main form area */
     .main {
       flex: 1;
       overflow-y: auto;
@@ -202,7 +202,7 @@
     }
     .section-body { padding: 18px; }
 
-    /* ── Fields ── */
+    /* Fields */
     .field { margin-bottom: 16px; }
     .field:last-child { margin-bottom: 0; }
     label {
@@ -243,7 +243,7 @@
       gap: 12px;
     }
 
-    /* ── Audience tags ── */
+    /* Audience tags */
     .audience-tags {
       display: flex;
       flex-wrap: wrap;
@@ -272,7 +272,7 @@
       color: var(--accent);
     }
 
-    /* ── List items (decisions, steps, pitfalls, etc.) ── */
+    /* List items (decisions, steps, pitfalls, etc.) */
     .list-items { display: flex; flex-direction: column; gap: 10px; }
 
     .list-card {
@@ -362,7 +362,7 @@
       align-items: flex-start;
     }
 
-    /* ── Browser note ── */
+    /* Browser note */
     .browser-note {
       background: var(--amber-bg);
       border: 1px solid #FDE68A;
@@ -374,7 +374,7 @@
       margin-bottom: 20px;
     }
 
-    /* ── Mode toggle ── */
+    /* Mode toggle */
     .mode-toggle {
       display: flex;
       background: var(--bg);
@@ -402,11 +402,27 @@
       box-shadow: var(--shadow);
     }
 
-    /* ── Scrollbar ── */
+    /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+    /* Step sub-sections (options and code examples) */
+    .step-sub { margin-top:10px; border:1px solid var(--border-light); border-radius:var(--radius); }
+    .step-sub > summary { padding:8px 12px; font-size:12px; font-weight:600; color:var(--text-mid); cursor:pointer; background:var(--bg); list-style:none; display:flex; align-items:center; gap:6px; }
+    .step-sub > summary::-webkit-details-marker { display:none; }
+    .step-sub-count { font-size:10px; background:var(--border); padding:1px 6px; border-radius:10px; color:var(--text-muted); }
+    .step-sub > div { padding:10px; display:flex; flex-direction:column; gap:8px; }
+    .step-option-item, .step-ex-item { border:1px solid var(--border-light); border-radius:var(--radius); padding:10px; background:var(--surface); }
+    .step-opt-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .step-sub-inner { margin-top:6px; border:1px dashed var(--border); border-radius:var(--radius); padding:8px; }
+    .step-sub-inner > summary { font-size:11px; color:var(--text-muted); cursor:pointer; list-style:none; margin-bottom:6px; }
+    .step-sub-inner > summary::-webkit-details-marker { display:none; }
+    .point-row { display:flex; gap:6px; align-items:flex-start; }
+    .point-row textarea { min-height:40px; flex:1; font-size:13px; }
+    textarea.code-area { font-family:'JetBrains Mono','Fira Code',Menlo,monospace; font-size:12px; min-height:100px; line-height:1.6; background:#f8fafc; }
+    .add-btn-sm { padding:5px 10px; font-size:12px; }
   </style>
 </head>
 <body>
@@ -448,7 +464,7 @@
 </div>
 
 <script>
-// ── State ──────────────────────────────────────────────────────────────────
+// State
 let fileHandle = null;
 let data = {};
 let currentKey = null;
@@ -458,13 +474,13 @@ const COLORS = ['blue','teal','green','amber','red','purple','gray','orange','ca
 const ICONS = ['notes','list-details','brain','chart-bar','arrows-exchange','filter','server','search','arrows-right-left','shield-check','pencil-plus','language'];
 const AUDIENCES = ['Software provider','Clinician','Information Manager','Governance Lead'];
 const DEP_ICONS = ['server','filter','shield-check','database','key','cloud','lock','users','language','code','certificate','file-import','file-description','id-badge','clipboard-list','search','shield'];
-const RES_TYPES = ['Guide','Tool','Spec'];
+const RES_TYPES = ['Guide','Tool','Spec','Demo'];
 const COLOR_MAP = {
   blue:'#2563EB', teal:'#0D9488', green:'#16A34A', amber:'#D97706',
   red:'#DC2626', purple:'#7C3AED', gray:'#6B7280', orange:'#EA580C', camelot:'#9333EA'
 };
 
-// ── Icons ──────────────────────────────────────────────────────────────────
+// Icons
 const ic = {
   up:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>`,
   down: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>`,
@@ -472,7 +488,7 @@ const ic = {
   plus: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
 };
 
-// ── Folder picker ─────────────────────────────────────────────────────────
+// Folder picker
 let dirHandle = null;
 
 document.getElementById('btn-open-folder').addEventListener('click', async () => {
@@ -487,7 +503,6 @@ document.getElementById('btn-open-folder').addEventListener('click', async () =>
 });
 
 async function loadAllFromDir(dir) {
-  // Read all three files from the data/ subfolder if present, else root
   let dataDir = dir;
   try { dataDir = await dir.getDirectoryHandle('data'); } catch(_) {}
 
@@ -509,13 +524,10 @@ async function loadAllFromDir(dir) {
   if (ans) { answersFileHandle = ans.handle; answersData = ans.data; document.getElementById('btn-save').disabled = false; }
 
   showStatus('clean');
-  // Refresh current mode view
   switchMode(mode);
 }
 
-// ── File I/O (delegated to mode-aware handlers below) ─────────────────────
-
-// ── Load data ─────────────────────────────────────────────────────────────
+// Load data
 function loadData(parsed) {
   data = parsed;
   currentKey = null;
@@ -528,9 +540,9 @@ function loadData(parsed) {
 function showStatus(state) {
   const el = document.getElementById('status-badge');
   if (state === 'unsaved') {
-    el.textContent = '● Unsaved changes'; el.className = 'status-badge unsaved';
+    el.textContent = 'Unsaved changes'; el.className = 'status-badge unsaved';
   } else if (state === 'saved') {
-    el.textContent = '✓ Saved'; el.className = 'status-badge saved';
+    el.textContent = 'Saved'; el.className = 'status-badge saved';
     setTimeout(() => { el.className = 'status-badge'; }, 2500);
   } else if (state === 'fallback') {
     el.textContent = 'Use Save to download'; el.className = 'status-badge unsaved';
@@ -543,7 +555,7 @@ function markDirty() {
   if (!dirty) { dirty = true; showStatus('unsaved'); }
 }
 
-// ── Sidebar ────────────────────────────────────────────────────────────────
+// Sidebar
 function renderSidebar() {
   const sb = document.getElementById('sidebar');
   sb.innerHTML = '<div class="sidebar-label">Playbooks</div>';
@@ -558,7 +570,7 @@ function renderSidebar() {
   });
 }
 
-// ── Select playbook ────────────────────────────────────────────────────────
+// Select playbook
 function selectPlaybook(key) {
   if (currentKey) commitCurrent();
   currentKey = key;
@@ -569,7 +581,7 @@ function selectPlaybook(key) {
   document.getElementById('form-area').style.display = 'block';
 }
 
-// ── Commit current form state back to data ─────────────────────────────────
+// Commit current form state back to data
 function commitCurrent() {
   if (!currentKey) return;
   const fa = document.getElementById('form-area');
@@ -591,10 +603,38 @@ function commitCurrent() {
     guidance: card.querySelector('[data-f="guidance"]').value
   }));
 
-  pb.steps = collectList('steps-list', card => ({
-    title: card.querySelector('[data-f="title"]').value,
-    description: card.querySelector('[data-f="description"]').value
-  }));
+  pb.steps = collectList('steps-list', card => {
+    const step = {
+      title: card.querySelector('[data-f="title"]').value,
+      description: card.querySelector('[data-f="description"]').value
+    };
+
+    // Collect options
+    const optItems = card.querySelectorAll('.step-option-item');
+    if (optItems.length) {
+      step.options = Array.from(optItems).map(optEl => {
+        const label = (optEl.querySelector('[data-f="opt-label"]') || {}).value || '';
+        const pointEls = optEl.querySelectorAll('[data-f="point"]');
+        const points = Array.from(pointEls).map(t => t.value).filter(Boolean);
+        const exLabel = (optEl.querySelector('[data-f="opt-ex-label"]') || {}).value || '';
+        const exCode  = (optEl.querySelector('[data-f="opt-ex-code"]')  || {}).value || '';
+        const opt = { label, points };
+        if (exLabel || exCode) opt.example = { label: exLabel, code: exCode };
+        return opt;
+      });
+    }
+
+    // Collect code examples
+    const exItems = card.querySelectorAll('.step-ex-item');
+    if (exItems.length) {
+      step.examples = Array.from(exItems).map(exEl => ({
+        label: (exEl.querySelector('[data-f="ex-label"]') || {}).value || '',
+        code:  (exEl.querySelector('[data-f="ex-code"]')  || {}).value || ''
+      }));
+    }
+
+    return step;
+  });
 
   pb.dependencies = collectList('deps-list', card => ({
     icon: card.querySelector('[data-f="icon"]').value,
@@ -621,7 +661,7 @@ function collectList(listId, extractor) {
   return Array.from(list.querySelectorAll(':scope > .list-card')).map(extractor);
 }
 
-// ── Render form ────────────────────────────────────────────────────────────
+// Render form
 function renderForm(pb) {
   const fa = document.getElementById('form-area');
   fa.innerHTML = `
@@ -748,7 +788,7 @@ function renderForm(pb) {
   });
 }
 
-// ── Card templates ─────────────────────────────────────────────────────────
+// Card templates
 function cardActions(listId, idx) {
   return `<div class="item-actions">
     <button class="icon-btn" title="Move up"    onclick="moveItem('${listId}',${idx},-1)">${ic.up}</button>
@@ -774,7 +814,62 @@ function decisionCard(d, i) {
   </div>`;
 }
 
+function stepOptionItem(opt, idx) {
+  const points = (opt.points && opt.points.length) ? opt.points : [''];
+  const ex = opt.example || null;
+  return `<div class="step-option-item">
+    <div class="step-opt-header">
+      <label style="margin:0;font-size:11px">Option ${idx+1}</label>
+      <button class="icon-btn danger" title="Remove option" onclick="removeStepSub(this,'.step-option-item')">${ic.del}</button>
+    </div>
+    <div class="field" style="margin-bottom:8px">
+      <label>Label</label>
+      <input type="text" data-f="opt-label" value="${esc(opt.label||'')}">
+    </div>
+    <div class="field" style="margin-bottom:6px">
+      <label>Bullet points</label>
+      <div class="points-list">
+        ${points.map(pt => `<div class="point-row">
+          <textarea data-f="point" rows="2">${esc(pt)}</textarea>
+          <button class="icon-btn danger" onclick="this.closest('.point-row').remove();markDirty()" title="Remove">${ic.del}</button>
+        </div>`).join('')}
+      </div>
+      <button class="add-btn add-btn-sm" onclick="addPoint(this)" style="margin-top:6px">${ic.plus} Add point</button>
+    </div>
+    <details class="step-sub-inner"${ex ? ' open' : ''}>
+      <summary>Code example (optional)</summary>
+      <div class="field" style="margin-bottom:6px">
+        <label>Example label</label>
+        <input type="text" data-f="opt-ex-label" value="${esc(ex && ex.label ? ex.label : '')}">
+      </div>
+      <div class="field">
+        <label>Code</label>
+        <textarea data-f="opt-ex-code" class="code-area">${esc(ex && ex.code ? ex.code : '')}</textarea>
+      </div>
+    </details>
+  </div>`;
+}
+
+function stepExampleItem(ex, idx) {
+  return `<div class="step-ex-item">
+    <div class="step-opt-header">
+      <label style="margin:0;font-size:11px">Example ${idx+1}</label>
+      <button class="icon-btn danger" title="Remove example" onclick="removeStepSub(this,'.step-ex-item')">${ic.del}</button>
+    </div>
+    <div class="field" style="margin-bottom:8px">
+      <label>Label</label>
+      <input type="text" data-f="ex-label" value="${esc(ex.label||'')}">
+    </div>
+    <div class="field">
+      <label>Code</label>
+      <textarea data-f="ex-code" class="code-area">${esc(ex.code||'')}</textarea>
+    </div>
+  </div>`;
+}
+
 function stepCard(s, i) {
+  const opts = s.options || [];
+  const exs  = s.examples || [];
   return `<div class="list-card">
     <div class="list-card-header">
       <span class="item-num">${i+1}</span>
@@ -788,6 +883,24 @@ function stepCard(s, i) {
       <label>Description</label>
       <textarea data-f="description">${esc(s.description||'')}</textarea>
     </div>
+    <details class="step-sub"${opts.length ? ' open' : ''}>
+      <summary>Options <span class="step-sub-count">${opts.length}</span></summary>
+      <div>
+        <div class="options-list">
+          ${opts.map((opt, oi) => stepOptionItem(opt, oi)).join('')}
+        </div>
+        <button class="add-btn add-btn-sm" onclick="addStepOption(this)">${ic.plus} Add option</button>
+      </div>
+    </details>
+    <details class="step-sub"${exs.length ? ' open' : ''}>
+      <summary>Code examples <span class="step-sub-count">${exs.length}</span></summary>
+      <div>
+        <div class="examples-list">
+          ${exs.map((ex, ei) => stepExampleItem(ex, ei)).join('')}
+        </div>
+        <button class="add-btn add-btn-sm" onclick="addStepExample(this)">${ic.plus} Add example</button>
+      </div>
+    </details>
   </div>`;
 }
 
@@ -843,7 +956,50 @@ function resourceCard(r, i) {
   </div>`;
 }
 
-// ── List mutations ─────────────────────────────────────────────────────────
+// Step sub-section helpers
+function addStepOption(btn) {
+  const list = btn.previousElementSibling;
+  const count = list.querySelectorAll('.step-option-item').length;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = stepOptionItem({label:'', points:[''], example:null}, count);
+  list.appendChild(wrap.firstElementChild);
+  rewireCard(list.closest('.list-card'));
+  markDirty();
+}
+
+function addStepExample(btn) {
+  const list = btn.previousElementSibling;
+  const count = list.querySelectorAll('.step-ex-item').length;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = stepExampleItem({label:'', code:''}, count);
+  list.appendChild(wrap.firstElementChild);
+  rewireCard(list.closest('.list-card'));
+  markDirty();
+}
+
+function addPoint(btn) {
+  const list = btn.previousElementSibling;
+  const row = document.createElement('div');
+  row.className = 'point-row';
+  row.innerHTML = `<textarea data-f="point" rows="2"></textarea><button class="icon-btn danger" onclick="this.closest('.point-row').remove();markDirty()" title="Remove">${ic.del}</button>`;
+  list.appendChild(row);
+  row.querySelector('textarea').addEventListener('input', markDirty);
+  markDirty();
+}
+
+function removeStepSub(btn, cls) {
+  btn.closest(cls).remove();
+  markDirty();
+}
+
+function rewireCard(card) {
+  card.querySelectorAll('input,textarea,select').forEach(el => {
+    el.addEventListener('input', markDirty);
+    el.addEventListener('change', markDirty);
+  });
+}
+
+// List mutations
 function mutateList(listId, fn) {
   commitCurrent();
   const pb = data[currentKey];
@@ -859,13 +1015,16 @@ function mutateList(listId, fn) {
   renderForm(pb);
   markDirty();
   // Re-wire listeners
-  document.getElementById('form-area').querySelectorAll('input, textarea, select').forEach(el => {
+  const fa = document.getElementById('form-area');
+  fa.querySelectorAll('input, textarea, select').forEach(el => {
     el.addEventListener('input', markDirty);
     el.addEventListener('change', markDirty);
   });
-  document.getElementById('form-area').querySelectorAll('.audience-tag input').forEach(cb => {
+  fa.querySelectorAll('.audience-tag input').forEach(cb => {
     cb.addEventListener('change', () => cb.closest('.audience-tag').classList.toggle('checked', cb.checked));
   });
+  // Rewire step cards so options/examples textareas get listeners
+  fa.querySelectorAll('#steps-list .list-card').forEach(rewireCard);
 }
 
 function moveItem(listId, idx, dir) {
@@ -881,12 +1040,12 @@ function removeItem(listId, idx) {
 }
 
 function addDecision()  { mutateList('decisions-list', arr => arr.push({ question: '', guidance: '' })); }
-function addStep()      { mutateList('steps-list',     arr => arr.push({ title: '', description: '' })); }
+function addStep()      { mutateList('steps-list',     arr => arr.push({ title: '', description: '', options: [], examples: [] })); }
 function addDep()       { mutateList('deps-list',       arr => arr.push({ icon: 'server', text: '' })); }
 function addPitfall()   { mutateList('pitfalls-list',   arr => arr.push('')); }
 function addResource()  { mutateList('resources-list',  arr => arr.push({ type: 'Guide', title: '', url: '' })); }
 
-// ── Utility ────────────────────────────────────────────────────────────────
+// Utility
 function esc(s) {
   return String(s)
     .replace(/&/g,'&amp;')
@@ -900,7 +1059,7 @@ window.addEventListener('beforeunload', e => {
   if (dirty) { e.preventDefault(); e.returnValue = ''; }
 });
 
-// ── Mode switching ─────────────────────────────────────────────────────────
+// Mode switching
 let mode = 'playbooks'; // 'playbooks' | 'answers'
 let answersFileHandle = null;
 let questionsData = [];
@@ -951,20 +1110,24 @@ function showEmpty(msg) {
   document.getElementById('empty-state').querySelector('p').textContent = msg;
 }
 
-// ── Save (mode-aware) ──────────────────────────────────────────────────────
+// Save (mode-aware)
 document.getElementById('btn-save').addEventListener('click', () => {
   if (mode === 'playbooks') savePb(); else saveAnswers();
 });
 
 async function savePb() {
+  commitCurrent();
+  const jsonStr = JSON.stringify(data, null, 2);
+  if (jsonStr.includes('—')) {
+    alert('Warning: em dash (—) found in content. Please replace with a hyphen or colon before saving.');
+  }
   if (!fileHandle) {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const blob = new Blob([jsonStr], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'playbooks.json'; a.click();
     showStatus('saved'); return;
   }
-  commitCurrent();
   const w = await fileHandle.createWritable();
-  await w.write(JSON.stringify(data, null, 2)); await w.close();
+  await w.write(jsonStr); await w.close();
   showStatus('saved');
 }
 
@@ -980,7 +1143,7 @@ async function saveAnswers() {
   showStatus('saved');
 }
 
-// ── Answers sidebar ────────────────────────────────────────────────────────
+// Answers sidebar
 function renderAnswersSidebar() {
   const sb = document.getElementById('sidebar');
   sb.innerHTML = '';
@@ -1039,7 +1202,7 @@ function commitCurrentAnswer() {
   ans.playbooks = Array.from(fa.querySelectorAll('[data-pb]:checked')).map(cb => cb.dataset.pb);
 }
 
-// ── Answer form ────────────────────────────────────────────────────────────
+// Answer form
 function renderAnswerForm(id) {
   const q = questionsData.find(q => q.id === id);
   const ans = answersData[id] || { answer: '', keyPoints: [], playbooks: [] };
