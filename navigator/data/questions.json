@@ -696,6 +696,17 @@
   },
   {
     "id": "I063",
+    "text": "Which SNOMED CT edition and version should be declared in exchanged resources?",
+    "perspective": "capability",
+    "category": "Interoperability",
+    "playbook": "interop",
+    "audience": [
+      "Software provider",
+      "Information Manager"
+    ]
+  },
+  {
+    "id": "I063",
     "text": "How do I support multiple languages in SNOMED CT?",
     "perspective": "capability",
     "category": "Interoperability",

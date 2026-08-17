@@ -938,5 +938,21 @@
       "term-service",
       "governance"
     ]
+  },
+  "I063": {
+    "answer": "SNOMED CT edition and version are declared using the URI pattern defined in the SNOMED CT URI Specification (https://confluence.ihtsdotools.org/display/DOCURI). In FHIR, the code system URI is always http://snomed.info/sct. The edition module ID and release date are declared in the version URI: http://snomed.info/sct/{moduleId}/version/{YYYYMMDD}. For example, the January 2024 international release is declared as http://snomed.info/sct/900000000000207008/version/20240101. National editions use their own module ID - for example, the UK Clinical edition module is 999000041000000102. Sender and receiver must agree on the edition and version before exchange, and the declared version must be loaded in both parties' terminology services for validation and display to work correctly.",
+    "keyPoints": [
+      "Code system URI is always http://snomed.info/sct regardless of edition",
+      "Version URI pattern: http://snomed.info/sct/{moduleId}/version/{YYYYMMDD} - defined in the SNOMED CT URI Specification",
+      "International edition module ID: 900000000000207008",
+      "National editions use their own module ID - check with your national release centre (NRC)",
+      "Both sender and receiver must load the agreed edition and version in their terminology service",
+      "Mismatched versions cause $validate-code failures - align versions before go-live and at each release upgrade"
+    ],
+    "playbooks": [
+      "interop",
+      "term-service",
+      "governance"
+    ]
   }
 }
