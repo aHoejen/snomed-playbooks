@@ -711,7 +711,7 @@
       },
       {
         "title": "Implement code validation on receipt",
-        "description": "On receiving a FHIR resource, call $validate-code for each SNOMED CT-coded element against the declared edition/version and the expected value set. If validation succeeds, the concept is active and within scope - proceed normally. If $validate-code fails, identify the failure mode and apply the corresponding resolution strategy as detailed in the Validation Error Resolution section above. Do not treat all validation failures as equivalent.",
+        "description": "On receiving a FHIR resource, call $validate-code for each SNOMED CT-coded element against the declared edition/version and the expected value set. If validation succeeds, the concept is active and within scope - proceed normally. If $validate-code fails, identify the failure mode and apply the corresponding resolution strategy. Define and document these strategies for each exchange partner relationship before go-live.",
         "examples": [
           {
             "label": "$validate-code - success response",
@@ -720,6 +720,26 @@
           {
             "label": "$validate-code - failure responses",
             "code": "# Failure: concept not found in declared version/edition\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    { \"name\": \"result\", \"valueBoolean\": false },\n    { \"name\": \"message\", \"valueString\": \"Unknown code '99999999' in system 'http://snomed.info/sct'\" }\n  ]\n}\n\n# Failure: concept inactive (inactivated in this version)\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    { \"name\": \"result\", \"valueBoolean\": false },\n    { \"name\": \"message\", \"valueString\": \"Code '154283005' is not active in version 'http://snomed.info/sct/900000000000207008/version/20250301'\" }\n  ]\n}\n\n# Failure: concept valid but outside the declared value set scope\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    { \"name\": \"result\", \"valueBoolean\": false },\n    { \"name\": \"message\", \"valueString\": \"Code is valid but not in the specified value set\" }\n  ]\n}"
+          }
+        ],
+        "options": [
+          {
+            "label": "CONCEPT NOT FOUND",
+            "points": [
+              "The sender may be using a newer release or a different national edition",
+              "Check the national terminology server first for a newer version of the national edition",
+              "If still unresolved, query a multi-edition server for the closest international ancestor",
+              "Log unresolved cases for review with the exchange partner"
+            ]
+          },
+          {
+            "label": "CONCEPT INACTIVE",
+            "points": [
+              "The sender used an older release in which the concept was still active",
+              "Apply the proposed replacement from SNOMED CT's historical association reference sets",
+              "Historical association types: SAME AS, REPLACED BY, POSSIBLY EQUIVALENT TO - use in order of confidence",
+              "Where no unambiguous replacement exists, flag for clinical review before processing"
+            ]
           }
         ]
       },
@@ -836,7 +856,27 @@
       },
       {
         "title": "Explore the SNOMED CT hierarchy and define the concept scope",
-        "description": "Use the SNOMED CT Browser to navigate the hierarchy and identify the most appropriate ancestor concept and any necessary attribute refinements. Review whether existing reference sets or value sets already meet your need before creating a new one. Two approaches are available: (1) Intensional definition - write an ECL expression (e.g. &lt;&lt;404684003 for all clinical findings) that captures the intended scope; the terminology server expands this dynamically on each SNOMED CT release. (2) Extensional definition - manually select individual concepts where ECL cannot fully capture clinical intent. Either way, the output is a defined concept scope that bounds what the value set contains."
+        "description": "Use the SNOMED CT Browser to navigate the hierarchy and identify the most appropriate ancestor concept and any necessary attribute refinements. Review whether existing reference sets or value sets already meet your need before creating a new one. Two definition approaches are available - choose based on whether clinical intent can be fully expressed as an ECL expression.",
+        "options": [
+          {
+            "label": "INTENSIONAL DEFINITION",
+            "points": [
+              "Write an ECL expression (e.g. &lt;&lt;404684003 for all clinical findings) that captures the intended scope",
+              "The terminology server expands this dynamically on each SNOMED CT release",
+              "New subtypes added in future releases are automatically included",
+              "Preferred approach - requires less maintenance and adapts to release updates"
+            ]
+          },
+          {
+            "label": "EXTENSIONAL DEFINITION",
+            "points": [
+              "Manually select individual concepts where ECL cannot fully capture clinical intent",
+              "Useful when the set cannot be expressed as a hierarchy or attribute pattern",
+              "Requires explicit review and update on each SNOMED CT release",
+              "Use when intensional definition would include clinically inappropriate concepts"
+            ]
+          }
+        ]
       },
       {
         "title": "Write and test the ECL expression",
