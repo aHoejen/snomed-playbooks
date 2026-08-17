@@ -681,7 +681,7 @@
       },
       {
         "title": "Deploy or configure a FHIR Terminology Service",
-        "description": "Ensure a FHIR R4-compliant terminology service is available to both sender and receiver systems. It must support $expand with ECL, $validate-code, $lookup, $subsumes, and $translate (for map-based translation via the <a href=\"#/playbook/mapping\">Mapping playbook</a>). For cross-edition or cross-version exchange, access to a public multi-edition terminology server - such as the one operated by SNOMED International - is required to resolve version and edition mismatches. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for full deployment guidance.",
+        "description": "Ensure a FHIR R4-compliant terminology service is available to both sender and receiver systems. It must support $expand with ECL, $validate-code, $lookup, $subsumes, and $translate (for map-based translation via the <a href=\"#/playbook/mapping\">Mapping playbook</a>). Implementers must deploy or license their own terminology service for production use - the public terminology server operated by SNOMED International is intended for evaluation and testing only, not for production clinical systems. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for full deployment guidance.",
         "options": [
           {
             "label": "SELF-HOSTED TERMINOLOGY SERVICE",
@@ -700,11 +700,11 @@
           {
             "label": "PUBLIC OR HOSTED TERMINOLOGY SERVICE",
             "points": [
-              "Use a terminology service hosted by SNOMED International or your national release centre (NRC)",
+              "The public SNOMED International terminology server is for evaluation and testing only - not for production use by implementers",
+              "For production, use a terminology service hosted by your national release centre (NRC) or a licensed commercial provider",
               "Reduces operational burden - no infrastructure to provision or upgrade pipeline to manage",
               "Multi-edition servers can resolve concepts from editions not available locally",
-              "Assess latency, uptime SLA, and data sovereignty requirements before selecting",
-              "Suitable as a fallback for version/edition mismatch resolution even when a local server is primary"
+              "Assess latency, uptime SLA, and data sovereignty requirements before selecting a hosted provider"
             ]
           }
         ]
