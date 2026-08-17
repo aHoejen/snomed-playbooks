@@ -725,7 +725,7 @@
       },
       {
         "title": "Handle display text using the receiver's language reference set",
-        "description": "When rendering received SNOMED CT codes, call $lookup against the terminology service with the displayLanguage parameter set to the receiver's language reference set. Display the resulting preferred term - do not use the display text from the received resource as authoritative, as it reflects the sender's locale. When a concept has been resolved via a mismatch strategy, display the preferred term for the resolved concept and indicate the original received concept to the user if clinically relevant.",
+        "description": "When rendering received SNOMED CT codes, call $lookup against the terminology service with the displayLanguage parameter set to the receiver's language reference set. Display the resulting preferred term - do not use the display text from the received resource as authoritative, as it reflects the sender's locale. Good practice is to preserve the sender's original display text as a secondary label or tooltip so clinicians can see what the sending system recorded - this matters when preferred terms differ significantly across locales for the same concept. When a concept has been resolved via a mismatch strategy, indicate the original received concept to the user if clinically relevant.",
         "examples": [
           {
             "label": "$lookup with language reference set parameter",

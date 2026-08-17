@@ -706,6 +706,17 @@
     ]
   },
   {
+    "id": "I064",
+    "text": "What display text strategy will be used for different locales?",
+    "perspective": "capability",
+    "category": "Interoperability",
+    "playbook": "interop",
+    "audience": [
+      "Software provider",
+      "Information Manager"
+    ]
+  },
+  {
     "id": "I063",
     "text": "How do I support multiple languages in SNOMED CT?",
     "perspective": "capability",

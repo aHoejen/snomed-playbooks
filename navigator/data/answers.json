@@ -954,5 +954,20 @@
       "term-service",
       "governance"
     ]
+  },
+  "I064": {
+    "answer": "The receiver always resolves display text using their own language reference set by calling $lookup with the displayLanguage parameter - the display text carried in the received resource reflects the sender's locale and must never be treated as authoritative. Good practice is to ensure the sender's original term remains accessible to the receiver, for example as a secondary display or tooltip, so clinicians can see exactly what the sending system recorded. This is particularly important where preferred terms differ significantly across locales for the same concept - a clinician reviewing a referral letter should be able to see both the locally preferred term and the term as the sender expressed it.",
+    "keyPoints": [
+      "Receiver always resolves display text using their own language reference set via $lookup - never rely on the sender's display text",
+      "Good practice: preserve the sender's original display text as a secondary label or tooltip so clinicians can see what the sending system recorded",
+      "This is especially important where preferred terms differ across locales for the same concept",
+      "Store the concept ID - not the display text - and resolve display at render time in each locale",
+      "Where a concept was resolved via a mismatch strategy, indicate the original received concept to the user if clinically relevant"
+    ],
+    "playbooks": [
+      "interop",
+      "multilingual",
+      "search-ux"
+    ]
   }
 }
