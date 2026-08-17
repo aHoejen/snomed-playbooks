@@ -1329,18 +1329,18 @@
   },
   "mapping": {
     "title": "Mapping and legacy data migration",
-    "subtitle": "Mapping SNOMED CT to ICD-10 and migrating from legacy code systems using Snap2SNOMED",
+    "subtitle": "Mapping SNOMED CT to classification and billing code systems, and migrating from legacy code systems, using Snap2SNOMED",
     "icon": "arrows-right-left",
     "color": "gray",
     "audience": [
       "Information Manager",
       "Software provider"
     ],
-    "overview": "SNOMED CT mapping enables translation to other code systems (primarily ICD-10 for statutory reporting) and migration of legacy-coded data into SNOMED CT. The official SNOMED CT to ICD-10 extended map - maintained by SNOMED International - provides rule-based, condition-aware mapping for reporting and is the starting point for any ICD-10 output requirement. For custom mapping projects, Snap2SNOMED is the recommended tool, providing a structured workflow for human-curated mapping with automation-assisted suggestions, audit trail, and versioning. Mapping always involves some loss of clinical meaning: SNOMED CT is more granular than ICD-10, and that information cannot be recovered in the reverse direction.",
+    "overview": "SNOMED CT mapping enables translation to other code systems for reporting, billing, or interoperability, and migration of legacy-coded data into SNOMED CT. Target systems vary by jurisdiction and use case - ICD-10 for statutory morbidity/mortality reporting is the most common example, but the same approach applies to other classification or billing systems such as OPCS-4, CPT, or national reimbursement codes. Where SNOMED International maintains an official rule-based map to a target system - as it does for ICD-10 - that map is the starting point and should be assessed before building anything custom. For custom mapping projects, or where no official map exists, Snap2SNOMED is the recommended tool, providing a structured workflow for human-curated mapping with automation-assisted suggestions, audit trail, and versioning. Mapping to a less granular target system always involves some loss of clinical meaning, and that information cannot be recovered in the reverse direction.",
     "decisions": [
       {
         "question": "What is the purpose and direction of mapping?",
-        "guidance": "Clarify whether you need SNOMED CT to ICD-10 (for billing or statutory reporting), a legacy code system to SNOMED CT (for data migration or dual-coding), or bidirectional mapping. Each direction has different tools, reference maps, and quality requirements. Do not attempt to design a bidirectional map from a unidirectional tool. For ICD-10 reporting from SNOMED CT data, see the <a href=\"#/playbook/analytics\">Analytics and reporting playbook</a> for how map output feeds downstream reporting."
+        "guidance": "Clarify whether you need SNOMED CT to a classification or billing system such as ICD-10, OPCS-4, or CPT (for billing or statutory reporting), a legacy code system to SNOMED CT (for data migration or dual-coding), or bidirectional mapping. Each direction has different tools, reference maps, and quality requirements. Do not attempt to design a bidirectional map from a unidirectional tool. For reporting from SNOMED CT coded data, see the <a href=\"#/playbook/analytics\">Analytics and reporting playbook</a> for how map output feeds downstream reporting."
       },
       {
         "question": "Can the official SNOMED CT to ICD-10 extended map meet your reporting needs?",
