@@ -43,7 +43,7 @@
       },
       {
         "title": "Define the problem list value set",
-        "description": "Define the concept scope using an ECL expression (e.g. <<404684003 for all clinical findings, or a narrower constraint) or a curated subset. ECL is preferred - it automatically includes new concepts added in each SNOMED CT release. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for authoring and testing guidance.",
+        "description": "Define the concept scope using an ECL expression (e.g. &lt;&lt;404684003 for all clinical findings, or a narrower constraint) or a curated subset. ECL is preferred - it automatically includes new concepts added in each SNOMED CT release. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for authoring and testing guidance.",
         "examples": [
           {
             "label": "ECL for clinical findings",
@@ -335,7 +335,7 @@
       },
       {
         "title": "Write ECL expressions for each rule element",
-        "description": "Express each rule element as an ECL constraint. Use subsumption (<<) to capture entire disease or drug families. Combine constraints using set operators (AND, OR, MINUS) and attribute refinements for precision. Test expressions using the terminology service $expand operation to confirm the concept set is clinically complete. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for ECL authoring guidance.",
+        "description": "Express each rule element as an ECL constraint. Use subsumption (&lt;&lt;) to capture entire disease or drug families. Combine constraints using set operators (AND, OR, MINUS) and attribute refinements for precision. Test expressions using the terminology service $expand operation to confirm the concept set is clinically complete. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for ECL authoring guidance.",
         "options": [
           {
             "label": "REAL-TIME SUBSUMPTION CHECK",
@@ -458,7 +458,7 @@
       "Software provider",
       "Information Manager"
     ],
-    "overview": "SNOMED CT's hierarchical concept model, queried using Expression Constraint Language (ECL), enables dramatically more powerful cohort queries than flat code matching. A single ECL expression such as <<73211009 |Diabetes mellitus| returns all subtypes - including specific types added in future SNOMED CT releases - without list maintenance. ECL queries are executed against a SNOMED CT terminology service (via the FHIR $expand operation or Snowstorm's ECL endpoint) and the resulting concept sets are applied against coded clinical data. If ICD-10 output is required for statutory reporting, see the <a href=\"#/playbook/mapping\">Mapping playbook</a> for applying the official SNOMED CT to ICD-10 extended map.",
+    "overview": "SNOMED CT's hierarchical concept model, queried using Expression Constraint Language (ECL), enables dramatically more powerful cohort queries than flat code matching. ECL expressions using subsumption automatically cover all subtypes of a concept - including types added in future releases - without list maintenance. ECL queries are executed against a terminology service and the resulting concept sets are applied against coded clinical data. If ICD-10 output is required for statutory reporting, see the Mapping playbook for applying the official SNOMED CT to ICD-10 extended map.",
     "decisions": [
       {
         "question": "What clinical questions need to be answered from SNOMED CT-coded data?",
@@ -488,7 +488,7 @@
       },
       {
         "title": "Write ECL expressions for each concept group",
-        "description": "Use subsumption (<<) to capture disease or procedure families. Attribute refinements narrow the expression to a specific clinical meaning - for example, procedures by finding site, or clinical findings by associated morphology. Decide whether queries will run live against the terminology service or use pre-expanded concept sets stored in your data platform.",
+        "description": "Use subsumption (&lt;&lt;) to capture disease or procedure families. Attribute refinements narrow the expression to a specific clinical meaning - for example, procedures by finding site, or clinical findings by associated morphology. Decide whether queries will run live against the terminology service or use pre-expanded concept sets stored in your data platform.",
         "options": [
           {
             "label": "LIVE ECL VIA TERMINOLOGY SERVICE",
@@ -608,7 +608,7 @@
     "audience": [
       "Software provider"
     ],
-    "overview": "SNOMED CT combined with HL7 FHIR provides a globally interoperable foundation for clinical data exchange. FHIR resources such as Condition, Observation, Procedure, and AllergyIntolerance carry SNOMED CT codes, and FHIR terminology bindings define which value sets (expressed as ECL constraints) are valid for each coded element. A FHIR Terminology Service - implementing operations including $expand, $validate-code, $lookup, $subsumes, and $translate - is the runtime component that validates, expands, and translates SNOMED CT content. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for deployment guidance.",
+    "overview": "SNOMED CT combined with HL7 FHIR provides a globally interoperable foundation for clinical data exchange. FHIR resources such as Condition, Observation, Procedure, and AllergyIntolerance carry SNOMED CT codes, and FHIR terminology bindings define which value sets (expressed as ECL constraints) are valid for each coded element. A FHIR Terminology Service - implementing operations including $expand, $validate-code, $lookup, $subsumes, and $translate - is the runtime component that validates, expands, and translates SNOMED CT content. See the Terminology service playbook for deployment guidance.",
     "decisions": [
       {
         "question": "Which FHIR resources and elements will carry SNOMED CT codes, and with what binding strength?",
@@ -671,7 +671,7 @@
       },
       {
         "title": "Define value sets for each terminology binding using ECL",
-        "description": "Write ECL expressions for each FHIR terminology binding (e.g., <<404684003 for a condition code field). Package these as FHIR ValueSet resources with canonical URLs and an explicit SNOMED CT edition and version in the compose. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for ECL authoring and packaging guidance.",
+        "description": "Write ECL expressions for each FHIR terminology binding (e.g., &lt;&lt;404684003 for a condition code field). Package these as FHIR ValueSet resources with canonical URLs and an explicit SNOMED CT edition and version in the compose. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for ECL authoring and packaging guidance.",
         "examples": [
           {
             "label": "FHIR ValueSet with ECL binding (intensional)",
@@ -836,11 +836,11 @@
       },
       {
         "title": "Explore the SNOMED CT hierarchy and define the concept scope",
-        "description": "Use the SNOMED CT Browser to navigate the hierarchy and identify the most appropriate ancestor concept and any necessary attribute refinements. Review whether existing reference sets or value sets already meet your need before creating a new one. Two approaches are available: (1) Intensional definition - write an ECL expression (e.g. <<404684003 for all clinical findings) that captures the intended scope; the terminology server expands this dynamically on each SNOMED CT release. (2) Extensional definition - manually select individual concepts where ECL cannot fully capture clinical intent. Either way, the output is a defined concept scope that bounds what the value set contains."
+        "description": "Use the SNOMED CT Browser to navigate the hierarchy and identify the most appropriate ancestor concept and any necessary attribute refinements. Review whether existing reference sets or value sets already meet your need before creating a new one. Two approaches are available: (1) Intensional definition - write an ECL expression (e.g. &lt;&lt;404684003 for all clinical findings) that captures the intended scope; the terminology server expands this dynamically on each SNOMED CT release. (2) Extensional definition - manually select individual concepts where ECL cannot fully capture clinical intent. Either way, the output is a defined concept scope that bounds what the value set contains."
       },
       {
         "title": "Write and test the ECL expression",
-        "description": "Write an ECL expression using subsumption (<<), attribute refinements, and set operators as needed. Test the expansion using the Browser's ECL search or the FHIR $expand endpoint against a terminology service. Verify the concept set boundary with clinical SMEs: both false inclusions and missing concepts.",
+        "description": "Write an ECL expression using subsumption (&lt;&lt;), attribute refinements, and set operators as needed. Test the expansion using the Browser's ECL search or the FHIR $expand endpoint against a terminology service. Verify the concept set boundary with clinical SMEs: both false inclusions and missing concepts.",
         "examples": [
           {
             "label": "ECL expression",
@@ -1584,7 +1584,7 @@
     "audience": [
       "Information Manager"
     ],
-    "overview": "A SNOMED CT extension allows national release centres (NRCs) or organisations to add concepts, descriptions, and reference sets that are not in the international release. Extension concepts must follow the same design principles as international SNOMED CT content: applying the concept model as defined in the Machine Readable Concept Model (MRCM), using defining relationships consistent with the international hierarchy, and undergoing description logic classification. Extension authoring should be a last resort: always search the international and national release thoroughly, and submit a content request to SNOMED International before creating local extension concepts. See the <a href=\"#/playbook/governance\">Governance playbook</a> for extension governance responsibilities.",
+    "overview": "A SNOMED CT extension allows national release centres (NRCs) or organisations to add concepts, descriptions, and reference sets that are not in the international release. Extension concepts must follow the same design principles as international SNOMED CT content: applying the concept model as defined in the MRCM, using defining relationships consistent with the international hierarchy, and undergoing description logic classification. Extension authoring should be a last resort - always search the international and national release thoroughly before creating local extension concepts. See the Governance playbook for extension governance responsibilities.",
     "decisions": [
       {
         "question": "Has a thorough search confirmed the concept is genuinely not in the international or national release?",
