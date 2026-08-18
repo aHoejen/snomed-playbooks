@@ -1816,7 +1816,37 @@
     "decisions": [
       {
         "question": "Which of the four extension purposes applies: content, translation, mapping, or configuration?",
-        "guidance": "Most extension work is not new-concept authoring. (1) Content - new concepts or descriptions genuinely missing from the release. (2) Language and dialect terms - translations, patient-friendly terms, local synonyms, added as descriptions and controlled with language reference sets; see the Multilingual playbook. (3) Mapping - map reference sets linking SNOMED CT to other code systems such as ICD-10 or legacy local codes, or interface terminology maps back into SNOMED CT; see the Mapping playbook. (4) Configuration - reference sets that tailor SNOMED CT for a use case without adding clinical content, such as specialty subsets, reporting or analytics groupings, search-result ranking, components flagged to trigger a guideline, or associations recording language preference or inactivation reason; see the Value set playbook for subset design. Naming the purpose first avoids defaulting to concept authoring when a reference set or a language addition would serve the need with far less ongoing maintenance."
+        "guidance": "Most extension work is not new-concept authoring. Naming the purpose first avoids defaulting to concept authoring when a reference set or a language addition would serve the need with far less ongoing maintenance.",
+        "options": [
+          {
+            "label": "Content",
+            "points": [
+              "New concepts or descriptions genuinely missing from the international or national release",
+              "The highest-maintenance option - confirm the gap thoroughly before authoring (see the next question)"
+            ]
+          },
+          {
+            "label": "Language and dialect terms",
+            "points": [
+              "Translations, patient-friendly terms, and local synonyms, added as descriptions",
+              "Controlled with language reference sets - see the <a href=\"#/playbook/multilingual\">Multilingual playbook</a>"
+            ]
+          },
+          {
+            "label": "Mapping",
+            "points": [
+              "Map reference sets linking SNOMED CT to other code systems such as ICD-10 or legacy local codes",
+              "Also covers interface terminology maps back into SNOMED CT - see the <a href=\"#/playbook/mapping\">Mapping playbook</a>"
+            ]
+          },
+          {
+            "label": "Configuration",
+            "points": [
+              "Reference sets that tailor SNOMED CT for a use case without adding any new clinical content",
+              "Specialty subsets, reporting/analytics groupings, search ranking, guideline triggers, or associations - see the <a href=\"#/playbook/value-sets\">Value set playbook</a> for subset design"
+            ]
+          }
+        ]
       },
       {
         "question": "For new content: has a thorough search confirmed the concept is genuinely not in the international or national release?",

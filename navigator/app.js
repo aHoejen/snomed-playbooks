@@ -429,6 +429,11 @@ function renderPlaybook(id) {
               <div class="consideration-body">
                 <div class="consideration-q">${d.question}</div>
                 ${d.guidance ? `<div class="consideration-guidance">${d.guidance}</div>` : ''}
+                ${d.options ? `<div class="step-options">${d.options.map(o => `
+                  <div class="step-option-card">
+                    <div class="step-option-label">${o.label}</div>
+                    <ul class="step-option-points">${o.points.map(p => `<li>${p}</li>`).join('')}</ul>
+                  </div>`).join('')}</div>` : ''}
               </div>
             </div>
           `).join('')}
