@@ -1812,7 +1812,7 @@
     "audience": [
       "Information Manager"
     ],
-    "overview": "A SNOMED CT extension is content maintained outside the international release: new concepts, language terms, maps to/from other code systems, or reference sets that configure SNOMED CT for a use case. Local concepts are only one of these four purposes, and often not the best one - a translation, a map, or a configuration reference set usually carries far less long-term maintenance. All extension content must follow international design principles: the MRCM concept model, hierarchy-consistent relationships, and classification for new concepts. See the <a href=\"#/playbook/multilingual\">Multilingual</a>, <a href=\"#/playbook/mapping\">Mapping</a>, and <a href=\"#/playbook/value-sets\">Value set</a> playbooks for those three purposes, and <a href=\"#/playbook/governance\">Governance</a> for extension governance.",
+    "overview": "A SNOMED CT extension is content maintained outside the international release: new concepts, language terms, maps, or reference sets that configure SNOMED CT for a use case. Local concepts are only one of these four purposes, and often not the best one - a translation, a map, or a configuration reference set usually carries far less long-term maintenance. All extension content must follow international design principles: the MRCM concept model, hierarchy-consistent relationships, and classification. See the Multilingual, Mapping, Value set, and Governance playbooks for the other extension purposes.",
     "decisions": [
       {
         "question": "Which of the four extension purposes applies: content, translation, mapping, or configuration?",
