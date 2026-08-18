@@ -1805,40 +1805,48 @@
     ]
   },
   "extensions": {
-    "title": "Extensions and concept authoring",
-    "subtitle": "Creating and maintaining SNOMED CT extensions when international content is insufficient",
+    "title": "Extensions and customization",
+    "subtitle": "Adding content, translations, mappings, and configuration when the international release isn't enough",
     "icon": "pencil-plus",
     "color": "green",
     "audience": [
       "Information Manager"
     ],
-    "overview": "A SNOMED CT extension allows national release centres (NRCs) or organisations to add concepts, descriptions, and reference sets that are not in the international release. Extension concepts must follow the same design principles as international SNOMED CT content: applying the concept model as defined in the MRCM, using defining relationships consistent with the international hierarchy, and undergoing description logic classification. Extension authoring should be a last resort - always search the international and national release thoroughly before creating local extension concepts. See the Governance playbook for extension governance responsibilities.",
+    "overview": "A SNOMED CT extension is content maintained outside the international release: new concepts, additional language terms, maps to other code systems, or reference sets that configure SNOMED CT for a specific use case. Adding local concepts is only one of these four purposes, and often not the right one - many needs are better met by a translation, a map, or a configuration reference set, each with a much lower long-term maintenance burden than new concept authoring. Extension content must follow the same design principles as international content: applying the concept model as defined in the MRCM, using defining relationships consistent with the international hierarchy, and undergoing description logic classification where new concepts are involved. See the <a href=\"#/playbook/multilingual\">Multilingual playbook</a> for translation work, the <a href=\"#/playbook/mapping\">Mapping playbook</a> for cross-maps, the <a href=\"#/playbook/value-sets\">Value set playbook</a> for subset design, and the <a href=\"#/playbook/governance\">Governance playbook</a> for extension governance responsibilities.",
     "decisions": [
       {
-        "question": "Has a thorough search confirmed the concept is genuinely not in the international or national release?",
-        "guidance": "Use the SNOMED CT Browser (browser.ihtsdotools.org) to search across all descriptions including synonyms and inactive terms. Check the national edition if one exists. Many apparent gaps are already covered by existing concepts with different descriptions. An extension concept that duplicates international content creates long-term maintenance risk."
+        "question": "Which of the four extension purposes applies: content, translation, mapping, or configuration?",
+        "guidance": "Most extension work is not new-concept authoring. (1) Content - new concepts or descriptions genuinely missing from the release. (2) Language and dialect terms - translations, patient-friendly terms, local synonyms, added as descriptions and controlled with language reference sets; see the Multilingual playbook. (3) Mapping - map reference sets linking SNOMED CT to other code systems such as ICD-10 or legacy local codes, or interface terminology maps back into SNOMED CT; see the Mapping playbook. (4) Configuration - reference sets that tailor SNOMED CT for a use case without adding clinical content, such as specialty subsets, reporting or analytics groupings, search-result ranking, components flagged to trigger a guideline, or associations recording language preference or inactivation reason; see the Value set playbook for subset design. Naming the purpose first avoids defaulting to concept authoring when a reference set or a language addition would serve the need with far less ongoing maintenance."
+      },
+      {
+        "question": "For new content: has a thorough search confirmed the concept is genuinely not in the international or national release?",
+        "guidance": "Use the SNOMED CT Browser (browser.ihtsdotools.org) to search across all descriptions including synonyms and inactive terms. Check the national edition if one exists. Many apparent gaps are already covered by existing concepts with different descriptions, or by an existing configuration reference set rather than a new concept. An extension concept that duplicates international content creates long-term maintenance risk."
       },
       {
         "question": "Should a content request be submitted to SNOMED International instead of creating an extension?",
         "guidance": "If the concept is likely to be needed internationally, submit a request via the SNOMED CT Content Request Service. International concepts are maintained by SNOMED International, eliminating the local maintenance burden. Extension concepts promoted to the international release must be retired in the extension with historical association reference set entries pointing to the international replacement."
       },
       {
-        "question": "What namespace will be used for new concept SCTIDs?",
-        "guidance": "Extension concepts require SCTIDs with a registered namespace identifying the maintaining organisation. NRCs manage a national namespace for content released as part of the national edition. Organisations requiring a private extension register their own namespace via SNOMED International. Using an unregistered or shared namespace creates identifier conflicts that cannot be resolved without retiring and replacing all affected concepts."
+        "question": "What namespace will be used for new component IDs?",
+        "guidance": "Extension content requires SCTIDs with a registered namespace identifying the maintaining organisation, whether the new component is a concept, a description, or a reference set. NRCs manage a national namespace for content released as part of the national edition. Organisations requiring a private extension register their own namespace via SNOMED International. Using an unregistered or shared namespace creates identifier conflicts that cannot be resolved without retiring and replacing all affected components."
+      },
+      {
+        "question": "Will the extension be distributed on its own, or packaged as an edition?",
+        "guidance": "An extension is the new content itself; an edition bundles that content together with everything it depends on (the International Edition, and any national extension) into a standalone package consuming systems can load directly. Most extension producers publish as an edition rather than a bare extension, because it removes the burden of assembling the dependency chain from every consuming system. Decide this before distribution planning, since it changes what you package and version."
       },
       {
         "question": "How will extension content be aligned with each international SNOMED CT release?",
-        "guidance": "Each SNOMED CT international release may include new concepts that supersede extension content, or may inactivate concepts that extension concepts depend on as parents or attribute values. Define who is responsible for reviewing the release delta, retiring superseded extension concepts, and updating relationships. The International Edition is released monthly - build a release review process before authoring begins."
+        "guidance": "Each SNOMED CT international release may include new concepts that supersede extension content, or may inactivate concepts or reference set members that extension content depends on as parents, attribute values, or map targets. Define who is responsible for reviewing the release delta, retiring superseded extension content, and updating relationships. The International Edition is released monthly - build a release review process before authoring begins."
       },
       {
         "question": "What classification and validation checks are required before publishing?",
-        "guidance": "All new concepts must be classified using a description logic reasoner - the SNOMED Authoring Platform handles this automatically. Validation using SNOMED CT Drools rules must pass before a concept can be published. Drools rules encode the MRCM and editorial guidance, catching modelling errors that a reasoner alone does not detect. Define the required pass rate and who approves exceptions before authoring begins."
+        "guidance": "All new concepts must be classified using a description logic reasoner - the SNOMED Authoring Platform handles this automatically. Reference set content (language, map, or configuration members) is not classified but still requires RF2 structural validation. Validation using SNOMED CT Drools rules must pass before any content is published. Drools rules encode the MRCM and editorial guidance, catching modelling errors that a reasoner alone does not detect. Define the required pass rate and who approves exceptions before authoring begins."
       }
     ],
     "steps": [
       {
-        "title": "Confirm the gap via Browser search and concept request assessment",
-        "description": "Search the SNOMED CT Browser across all descriptions, synonyms, and inactive terms. If the concept is needed internationally, submit a request via the Content Request Service before considering extension authoring. Document the search scope, search terms used, and the rationale for choosing extension authoring over a content request."
+        "title": "Identify the extension's purpose and confirm the need",
+        "description": "Determine whether the requirement is new content, a language/dialect addition, a map, or a configuration reference set (see the decision above) - each has a dedicated path and, for three of the four, a dedicated playbook. For new content, search the SNOMED CT Browser across all descriptions, synonyms, and inactive terms, and submit a Content Request Service request if the concept is likely to be needed internationally, before considering extension authoring. For translation needs, see the <a href=\"#/playbook/multilingual\">Multilingual playbook</a>. For code-system mapping, see the <a href=\"#/playbook/mapping\">Mapping playbook</a>. Document the chosen purpose, the search scope and terms used, and the rationale for choosing extension authoring over an existing mechanism."
       },
       {
         "title": "Register a namespace and configure the authoring environment",
@@ -1873,32 +1881,54 @@
         ]
       },
       {
-        "title": "Author concepts following the SNOMED CT concept model",
-        "description": "Use the MRCM to identify required and permitted attribute-value pairs for each new concept. Write the Fully Specified Name (FSN), preferred term, and acceptable synonyms according to SNOMED CT naming conventions. Place the concept correctly in the hierarchy using IS-A relationships and add defining attribute-value pairs from the MRCM. A concept with only IS-A relationships is primitive; a fully defined concept requires a complete set of necessary and sufficient defining characteristics.",
-        "examples": [
+        "title": "Author content matching the chosen purpose",
+        "description": "New concepts are the highest-maintenance option and should follow the MRCM closely; configuration reference sets are often a lighter-weight alternative that adds no new clinical meaning at all. Language content and map sets follow the same namespace and module rules but are covered in depth in their own playbooks.",
+        "options": [
           {
-            "label": "RF2 stated relationship rows (IS-A and attribute)",
-            "code": "# RF2 Relationship file - stated view\n# Columns: id, effectiveTime, active, moduleId, sourceId, destinationId,\n#          relationshipGroup, typeId, characteristicTypeId, modifierId\n#\n# IS-A relationship (places concept in hierarchy)\n# typeId 116680003 = Is a (attribute)\n# characteristicTypeId 900000000000010007 = Stated relationship\n# modifierId 900000000000451002 = Existential restriction\n10991000036113  20250701  1  32506021000036107  10991000036103  404684003   0  116680003     900000000000010007  900000000000451002\n#                                               ^^^^^^^^^^^^^^  ^^^^^^^^^^\n#                                               new concept     parent: Clinical finding\n#\n# Defining attribute: Finding site = Lung structure\n10991000036121  20250701  1  32506021000036107  10991000036103  39607008    0  363698007     900000000000010007  900000000000451002\n#                                                               ^^^^^^^^^  ^\n#                                              Lung structure   group 0    Finding site (363698007)"
+            "label": "NEW CONCEPTS",
+            "points": [
+              "Use the MRCM to identify required and permitted attribute-value pairs for each new concept",
+              "Write the FSN, preferred term, and acceptable synonyms according to SNOMED CT naming conventions",
+              "Place the concept in the hierarchy using IS-A relationships and add defining attribute-value pairs from the MRCM",
+              "A concept with only IS-A relationships is primitive; a fully defined concept requires a complete set of necessary and sufficient defining characteristics"
+            ],
+            "example": {
+              "label": "RF2 stated relationship rows (IS-A and attribute)",
+              "code": "# RF2 Relationship file - stated view\n# Columns: id, effectiveTime, active, moduleId, sourceId, destinationId,\n#          relationshipGroup, typeId, characteristicTypeId, modifierId\n#\n# IS-A relationship (places concept in hierarchy)\n# typeId 116680003 = Is a (attribute)\n# characteristicTypeId 900000000000010007 = Stated relationship\n# modifierId 900000000000451002 = Existential restriction\n10991000036113  20250701  1  32506021000036107  10991000036103  404684003   0  116680003     900000000000010007  900000000000451002\n#                                               ^^^^^^^^^^^^^^  ^^^^^^^^^^\n#                                               new concept     parent: Clinical finding\n#\n# Defining attribute: Finding site = Lung structure\n10991000036121  20250701  1  32506021000036107  10991000036103  39607008    0  363698007     900000000000010007  900000000000451002\n#                                                               ^^^^^^^^^^^  ^\n#                                              Lung structure   group 0    Finding site (363698007)"
+            }
+          },
+          {
+            "label": "CONFIGURATION REFERENCE SETS",
+            "points": [
+              "No new clinical meaning is created - members simply link existing SNOMED CT components to the extra information the use case needs",
+              "Common examples: a specialty subset, a reporting/analytics grouping, a search-result ranking or ordering, components flagged to trigger a guideline, or an association recording a language preference or inactivation reason",
+              "Define the reference set type (simple, ordered, attribute-value, association, etc.) that matches the data being attached, then add members pointing at the existing concepts or descriptions",
+              "No classification is required since no new concept is created, but RF2 structural validation still applies"
+            ],
+            "example": {
+              "label": "RF2 simple reference set member row",
+              "code": "# RF2 Reference Set file - simple type member\n# Columns: id, effectiveTime, active, moduleId, refsetId, referencedComponentId\n#\n# refsetId identifies the reference set itself (also a concept, authored once)\n# referencedComponentId is the existing SNOMED CT component being added to the set\n#\n# Example: adding a concept to a cardiology reporting subset\nb1c1e6b0-1a2b-4c3d-9e8f-1234567890ab  20250701  1  32506021000036107  45991000036104  22298006\n#                                                                     ^^^^^^^^^^^^^^  ^^^^^^^^\n#                                                                     subset refsetId  Myocardial infarction (disorder)"
+            }
           }
         ]
       },
       {
         "title": "Classify and validate with Drools rules",
-        "description": "Run the description logic reasoner to classify the concept and confirm it is placed correctly in the inferred hierarchy. The reasoner checks logical consistency: a concept modelled incorrectly will be classified in an unexpected position, indicating a modelling error. After classification, run SNOMED CT Drools validation rules: these encode the MRCM, editorial conventions, and content quality checks that the reasoner alone does not cover - for example, missing required attributes, incorrect semantic tag, or FSN format errors. Resolve all Drools errors and warnings before submission. Peer review by a second author is strongly recommended before promoting to any release.",
+        "description": "For new concepts, run the description logic reasoner to classify the concept and confirm it is placed correctly in the inferred hierarchy. The reasoner checks logical consistency: a concept modelled incorrectly will be classified in an unexpected position, indicating a modelling error. After classification, run SNOMED CT Drools validation rules on all extension content, including reference sets: these encode the MRCM, editorial conventions, and structural checks that the reasoner alone does not cover - for example, missing required attributes, incorrect semantic tag, or a reference set member pointing at an inactive component. Resolve all Drools errors and warnings before submission. Peer review by a second author is strongly recommended before promoting to any release.",
         "examples": [
           {
             "label": "Common Drools rule categories",
-            "code": "# SNOMED CT Drools validation rule categories\n#\n# MRCM attribute range checks\n#   e.g. \"Finding site\" value must be a subtype of Body structure (123037004)\n#   Drools flags: Finding site = 73211009 |Diabetes mellitus| (wrong range)\n#\n# FSN semantic tag rules\n#   Clinical finding FSN must end with (finding) or (disorder)\n#   Procedure FSN must end with (procedure)\n#   Example error: FSN \"Acute bronchitis\" missing semantic tag\n#   Correct:       \"Acute bronchitis (disorder)\"\n#\n# Ungrouped attribute rules\n#   Some attributes must always appear in a relationship group\n#   Others must always be ungrouped (e.g. IS-A must be group 0)\n#\n# Preferred term uniqueness\n#   Preferred term must be unique within the same semantic tag\n#   and must not duplicate the FSN\n#\n# The SNOMED Authoring Platform runs Drools automatically\n# and displays errors/warnings in the concept editor panel."
+            "code": "# SNOMED CT Drools validation rule categories\n#\n# MRCM attribute range checks\n#   e.g. \"Finding site\" value must be a subtype of Body structure (123037004)\n#   Drools flags: Finding site = 73211009 |Diabetes mellitus| (wrong range)\n#\n# FSN semantic tag rules\n#   Clinical finding FSN must end with (finding) or (disorder)\n#   Procedure FSN must end with (procedure)\n#   Example error: FSN \"Acute bronchitis\" missing semantic tag\n#   Correct:       \"Acute bronchitis (disorder)\"\n#\n# Ungrouped attribute rules\n#   Some attributes must always appear in a relationship group\n#   Others must always be ungrouped (e.g. IS-A must be group 0)\n#\n# Preferred term uniqueness\n#   Preferred term must be unique within the same semantic tag\n#   and must not duplicate the FSN\n#\n# Reference set member checks\n#   referencedComponentId must resolve to an active component\n#   (unless the refset is specifically for historical/inactive associations)\n#\n# The SNOMED Authoring Platform runs Drools automatically\n# and displays errors/warnings in the concept editor panel."
           }
         ]
       },
       {
         "title": "Align with each international SNOMED CT release",
-        "description": "On each international release, review the release delta for: new concepts that supersede extension content (retire the extension concept and add a historical association reference set entry pointing to the international replacement); inactivations affecting parent concepts or attribute values used by extension concepts (update relationships to use the replacement concept); and new parent concepts that improve the position of existing extension content. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance."
+        "description": "On each international release, review the release delta for: new concepts that supersede extension content (retire the extension concept and add a historical association reference set entry pointing to the international replacement); inactivations affecting parent concepts, attribute values, or map targets used by extension content (update relationships or map members to use the replacement concept); and new parent concepts that improve the position of existing extension content. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance."
       },
       {
         "title": "Publish as RF2, version consistently, and load into the terminology service",
-        "description": "Package extension content as RF2 files aligned to SNOMED CT release dates. Assign a version date and module ID. Distribute to consuming systems with the full dependency chain documented: international release, national edition (if applicable), and the extension in that order. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for loading extension RF2 files into Snowstorm and verifying concept counts after load."
+        "description": "Package extension content as RF2 files aligned to SNOMED CT release dates. Assign a version date and module ID. Decide whether to distribute as a bare extension or as an edition (see the decision above), and document the full dependency chain either way: international release, national edition (if applicable), and the extension in that order. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for loading extension RF2 files into Snowstorm and verifying concept counts after load."
       }
     ],
     "dependencies": [
@@ -1912,7 +1942,7 @@
       },
       {
         "icon": "shield-check",
-        "text": "Classification (description logic reasoner) and Drools validation - both required before release"
+        "text": "Classification (for new concepts) and Drools validation (for all content) - both required before release"
       },
       {
         "icon": "key",
@@ -1920,11 +1950,12 @@
       }
     ],
     "pitfalls": [
-      "Creating extension concepts without an exhaustive Browser search - many apparent gaps are already covered by existing SNOMED CT content with different term labels",
+      "Assuming an extension is only for adding local concepts - many needs are better served by a configuration reference set, a translation, or a map, each with far less ongoing maintenance than new concept authoring",
+      "Creating extension concepts without an exhaustive Browser search - many apparent gaps are already covered by existing SNOMED CT content with different term labels, or by an existing reference set",
       "Not submitting an international content request when the concept has global applicability - missing the opportunity for SNOMED International to maintain the concept and eliminate local maintenance burden",
       "Poor concept modelling that breaks classification - concepts with incorrect attribute-value pairs are classified in unexpected positions and produce misleading query results",
       "Using Drools validation only superficially - Drools warnings (not just errors) often indicate real modelling problems; review all warnings before release",
-      "No alignment process with international releases - extension concepts built on superseded parents or inactivated attribute values become technically invalid and cause terminology service errors",
+      "No alignment process with international releases - extension content built on superseded parents, inactivated attribute values, or retired map targets becomes technically invalid and causes terminology service errors",
       "Extension concepts promoted to the international release without retirement in the extension - consuming systems that load both end up with duplicate active concepts for the same meaning",
       "Distributing an extension without documenting the full load order - consuming systems that load the extension without the correct underlying edition get classification and validation errors"
     ],
@@ -1946,8 +1977,13 @@
       },
       {
         "type": "Guide",
-        "title": "Extension guide",
-        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-extension-guide/"
+        "title": "Extension guide - purpose (content, language, mapping, configuration)",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-extension-guide/3-purpose"
+      },
+      {
+        "type": "Guide",
+        "title": "Extension guide - logical design (namespaces, modules, editions)",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-extension-guide/4-logical-design"
       },
       {
         "type": "Guide",
@@ -1963,6 +1999,11 @@
         "type": "Spec",
         "title": "Release file specification (RF2)",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-release-file-specification/"
+      },
+      {
+        "type": "Video",
+        "title": "Implementation Module: Extensions and Editions (7-part video series)",
+        "url": "https://www.youtube.com/playlist?list=PLyEMmgWz-ul0ILLagSJb1Kr73rUTFhUor"
       }
     ]
   },
