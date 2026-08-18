@@ -1821,8 +1821,9 @@
           {
             "label": "Content",
             "points": [
-              "New concepts or descriptions genuinely missing from the international or national release",
-              "The highest-maintenance option - confirm the gap thoroughly before authoring (see the next question)"
+              "New concepts or descriptions genuinely missing from the international or national release - the highest-maintenance option",
+              "Search the SNOMED CT Browser (browser.ihtsdotools.org) across all descriptions, synonyms, and inactive terms first - many apparent gaps are already covered by existing content",
+              "If the concept has global applicability, submit a SNOMED CT Content Request Service request instead of authoring locally - SNOMED International then carries the maintenance burden"
             ]
           },
           {
@@ -1847,14 +1848,6 @@
             ]
           }
         ]
-      },
-      {
-        "question": "For new content: has a thorough search confirmed the concept is genuinely not in the international or national release?",
-        "guidance": "Use the SNOMED CT Browser (browser.ihtsdotools.org) to search across all descriptions including synonyms and inactive terms. Check the national edition if one exists. Many apparent gaps are already covered by existing concepts with different descriptions, or by an existing configuration reference set rather than a new concept. An extension concept that duplicates international content creates long-term maintenance risk."
-      },
-      {
-        "question": "Should a content request be submitted to SNOMED International instead of creating an extension?",
-        "guidance": "If the concept is likely to be needed internationally, submit a request via the SNOMED CT Content Request Service. International concepts are maintained by SNOMED International, eliminating the local maintenance burden. Extension concepts promoted to the international release must be retired in the extension with historical association reference set entries pointing to the international replacement."
       },
       {
         "question": "What namespace will be used for new component IDs?",
