@@ -1946,14 +1946,14 @@
       }
     ],
     "pitfalls": [
-      "Assuming an extension is only for adding local concepts - many needs are better served by a configuration reference set, a translation, or a map, each with far less ongoing maintenance than new concept authoring",
-      "Creating extension concepts without an exhaustive Browser search - many apparent gaps are already covered by existing SNOMED CT content with different term labels, or by an existing reference set",
-      "Not submitting an international content request when the concept has global applicability - missing the opportunity for SNOMED International to maintain the concept and eliminate local maintenance burden",
-      "Poor concept modelling that breaks classification - concepts with incorrect attribute-value pairs are classified in unexpected positions and produce misleading query results",
-      "Using automated validation only superficially - warnings (not just errors) often indicate real modelling problems; review all warnings before release",
-      "No alignment process with international releases - extension content built on superseded parents, inactivated attribute values, or retired map targets becomes technically invalid and causes terminology service errors",
-      "Extension concepts promoted to the international release without retirement in the extension - consuming systems that load both end up with duplicate active concepts for the same meaning",
-      "Distributing an extension without documenting the full load order - consuming systems that load the extension without the correct underlying edition get classification and validation errors"
+      "Assuming an extension is only for adding local concepts - a reference set, translation, or map is often the better, lower-maintenance fit",
+      "Skipping an exhaustive Browser search before authoring - the gap may already be covered by existing content or a reference set",
+      "Not submitting an international content request for a globally-applicable concept - missing SNOMED International's maintenance and keeping the local burden",
+      "Poor concept modelling - incorrect attribute-value pairs misclassify the concept and produce misleading query results",
+      "Treating validation warnings as optional - they often flag real modelling problems, not just errors",
+      "No release alignment process - content built on superseded parents, inactivated values, or retired map targets becomes invalid and breaks the terminology service",
+      "Promoting a concept internationally without retiring it in the extension - systems loading both get duplicate active concepts for the same meaning",
+      "Distributing without documenting the load order - loading the extension on the wrong edition causes classification and validation errors"
     ],
     "resources": [
       {
