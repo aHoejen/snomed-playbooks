@@ -1614,7 +1614,7 @@
       },
       {
         "icon": "server",
-        "text": "Terminology server (for example, Snowstorm, or a vendor-hosted service - see the SNOMED International Terminology Services page for options) once three or more systems consume SNOMED CT-coded data"
+        "text": "Terminology server (for example, Snowstorm, or a vendor-hosted service - see <a href=\"http://implementation.snomed.org/terminology-services\" target=\"_blank\" rel=\"noopener\">SNOMED International's Terminology Services page</a> for options) once three or more systems consume SNOMED CT-coded data"
       },
       {
         "icon": "clipboard-list",
