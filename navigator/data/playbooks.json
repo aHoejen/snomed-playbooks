@@ -1373,7 +1373,7 @@
         "description": "Mapping cannot fix poor-quality source data. Review source codes and terms for ambiguous abbreviations, symbols, or free-text artifacts (for example \"#\", \"/\", \"?\", or shorthand comorbidity strings) before mapping begins. Agree and document interpretation rules for ambiguous entries so mappers apply them consistently, and flag entries that cannot be reliably mapped without clinical input rather than forcing a guess."
       },
       {
-        "title": "Path A - mapping SNOMED CT to a target system: load and apply the official map",
+        "title": "Path A - mapping SNOMED CT to a target system",
         "description": "This step and the next are two independent paths, not a sequence - follow whichever matches your mapping direction, or both if you need mapping both ways. Where an official map exists - such as the SNOMED CT to ICD-10 extended map, included in the international release as a complex map reference set - load it into your terminology service as a ConceptMap and implement the full map application algorithm (rule groups, priorities, advice, correlation codes), not a simple lookup; invoke it at runtime via FHIR $translate. Where no official map exists, author a custom one: use the relationship types agreed above, choose a simple or rule-based structure depending on target complexity, apply the agreed QA process, and publish it as an RF2 map reference set or FHIR ConceptMap so it works the same way. See the <a href=\"#/playbook/analytics\">Analytics and reporting playbook</a> for integrating map output into reporting.",
         "examples": [
           {
