@@ -1343,8 +1343,8 @@
         "guidance": "Clarify whether you need SNOMED CT to a classification or billing system such as ICD-10, OPCS-4, or CPT (for billing or statutory reporting), a legacy code system to SNOMED CT (for data migration or dual-coding), or bidirectional mapping. Each direction has different tools, reference maps, and quality requirements. Do not attempt to design a bidirectional map from a unidirectional tool. For reporting from SNOMED CT coded data, see the <a href=\"#/playbook/analytics\">Analytics and reporting playbook</a> for how map output feeds downstream reporting."
       },
       {
-        "question": "Can the official SNOMED CT to ICD-10 extended map meet your reporting needs?",
-        "guidance": "The official map covers the majority of ICD-10 reporting needs. Before creating a custom map, assess whether the official map applied with correct rule logic meets your statutory reporting requirements. Custom maps diverge from the official map on each SNOMED CT release and create ongoing maintenance burden. Load and test the official map first."
+        "question": "Does an existing map to your target system already exist and can it be adopted or adapted?",
+        "guidance": "Check whether SNOMED International, a national release centre, or another organization already maintains a map to your target system - for example, the official SNOMED CT to ICD-10 extended map. Where one exists, assess whether it applied with correct rule logic meets your requirements before building anything custom. Custom maps require ongoing maintenance against every SNOMED CT release, so an existing, actively maintained map is almost always preferable. Load and test any existing map first."
       },
       {
         "question": "How will ambiguous or unmappable concepts be handled?",
