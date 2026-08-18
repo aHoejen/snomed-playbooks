@@ -1387,7 +1387,7 @@
         ]
       },
       {
-        "title": "Path B - mapping another code system to SNOMED CT (for interoperability or analysis, not migration)",
+        "title": "Path B - mapping another code system to SNOMED CT",
         "sameNumberAsPrevious": true,
         "description": "The second independent path - follow it if you're mapping a source code system into SNOMED CT on an ongoing basis (for example, translating incoming data from a partner system, or supporting search and analytics), without retiring the source system. Snap2SNOMED is the tool for this direction: structured workflows with automation-assisted suggestions, human review, audit trail, and FHIR ConceptMap export. If you're instead migrating your own system of record onto SNOMED CT - retiring a legacy system, running a dual-coding transition - see the <a href=\"#/playbook/migration\">Migrating to SNOMED CT playbook</a> for the full process; it uses the map built here as one input."
       },
