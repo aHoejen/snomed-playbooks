@@ -1812,7 +1812,7 @@
     "audience": [
       "Information Manager"
     ],
-    "overview": "A SNOMED CT extension is content maintained outside the international release: new concepts, additional language terms, maps to/from other code systems, or reference sets that configure SNOMED CT for a specific use case. Adding local concepts is only one of these four purposes, and often not the right one - many needs are better met by a translation, a map, or a configuration reference set, each with a much lower long-term maintenance burden than new concept authoring. Extension content must follow the same design principles as international content: applying the concept model as defined in the MRCM, using defining relationships consistent with the international hierarchy, and undergoing description logic classification where new concepts are involved. See the <a href=\"#/playbook/multilingual\">Multilingual playbook</a> for translation work, the <a href=\"#/playbook/mapping\">Mapping playbook</a> for cross-maps, the <a href=\"#/playbook/value-sets\">Value set playbook</a> for subset design, and the <a href=\"#/playbook/governance\">Governance playbook</a> for extension governance responsibilities.",
+    "overview": "A SNOMED CT extension is content maintained outside the international release: new concepts, language terms, maps to/from other code systems, or reference sets that configure SNOMED CT for a use case. Local concepts are only one of these four purposes, and often not the best one - a translation, a map, or a configuration reference set usually carries far less long-term maintenance. All extension content must follow international design principles: the MRCM concept model, hierarchy-consistent relationships, and classification for new concepts. See the <a href=\"#/playbook/multilingual\">Multilingual</a>, <a href=\"#/playbook/mapping\">Mapping</a>, and <a href=\"#/playbook/value-sets\">Value set</a> playbooks for those three purposes, and <a href=\"#/playbook/governance\">Governance</a> for extension governance.",
     "decisions": [
       {
         "question": "Which of the four extension purposes applies: content, translation, mapping, or configuration?",
@@ -1851,7 +1851,7 @@
       },
       {
         "question": "What namespace will be used for new component IDs?",
-        "guidance": "Extension content requires SCTIDs with a registered namespace identifying the maintaining organisation, whether the new component is a concept, a description, or a reference set. NRCs manage a national namespace for content released as part of the national edition. Organisations requiring a private extension register their own namespace via SNOMED International. Using an unregistered or shared namespace creates identifier conflicts that cannot be resolved without retiring and replacing all affected components."
+        "guidance": "Every new component - concept, description, or reference set - needs an SCTID built on a registered namespace. NRCs manage a national namespace for national edition content; organisations building a private extension <a href=\"https://ihtsdo.freshdesk.com/support/solutions/articles/4000161260-how-do-i-obtain-a-namespace-identifier-\">obtain their own namespace identifier</a> via SNOMED International. An unregistered or shared namespace causes identifier conflicts fixable only by retiring and replacing every affected component."
       },
       {
         "question": "Will the extension be distributed on its own, or packaged as an edition?",
@@ -1869,7 +1869,7 @@
     "steps": [
       {
         "title": "Prepare the technical foundation: namespace, module, and tooling",
-        "description": "Confirm your namespace with your NRC or SNOMED International. NRC-managed namespaces are used for content released in the national edition; organisation-registered namespaces for private extensions. Create at least one module concept that every extension component and reference set will belong to, and record what it depends on - the International Edition, a national edition, or another extension - in the module dependency reference set: this is what tells consuming systems what else they need to load. Configure the SNOMED Authoring Platform (or equivalent tool) with the correct extension module ID, namespace, and dependency configuration.",
+        "description": "Confirm your namespace with your NRC or SNOMED International - NRC-managed for national edition content, organisation-registered for private extensions. Create a module concept for every extension component and reference set, and record its dependencies (the International Edition, a national edition, or another extension) in the module dependency reference set, so consuming systems know what else to load. Configure the SNOMED Authoring Platform (or equivalent tool) with the resulting module ID, namespace, and dependencies.",
         "options": [
           {
             "label": "NRC-MANAGED NAMESPACE (national content)",
@@ -1902,15 +1902,15 @@
       },
       {
         "title": "Assess the request against the extension's purpose and scope",
-        "description": "Determine whether the requirement is new content, a language/dialect addition, a map, or a configuration reference set (see the decision above) - each has a dedicated path and, for three of the four, a dedicated playbook. For new content, search the SNOMED CT Browser across all descriptions, synonyms, and inactive terms, and submit a Content Request Service request instead of extension authoring if the concept is likely to be needed internationally or nationally. Where clinical need cannot wait for that decision, add the content as an interim extension addition and track it for reconciliation once the international or national outcome is known. For translation needs, see the <a href=\"#/playbook/multilingual\">Multilingual playbook</a>. For code-system mapping, see the <a href=\"#/playbook/mapping\">Mapping playbook</a>. Document the chosen purpose, the search scope and terms used, and the rationale for choosing extension authoring over an existing mechanism."
+        "description": "Confirm which purpose applies (see the decision above); translation and mapping needs go straight to the <a href=\"#/playbook/multilingual\">Multilingual</a> and <a href=\"#/playbook/mapping\">Mapping</a> playbooks. For new content, search the SNOMED CT Browser across all descriptions, synonyms, and inactive terms, and submit a Content Request Service request instead of extension authoring if the concept has wider applicability. If clinical need can't wait for that decision, add it as an interim extension addition and reconcile later. Document the purpose chosen, the search performed, and why extension authoring won over an existing mechanism."
       },
       {
         "title": "Author content matching the chosen purpose",
-        "description": "Use the authoring tool identified in the previous step to create the content itself - new concepts and descriptions, or reference set members for subsets, configuration, and maps - applying the modelling and editorial principles set out in the Machine Readable Concept Model and the Editorial Guide, whichever content type is being authored. New concepts and descriptions carry new clinical meaning and take the most care to get right; reference set members carry none and simply link existing components to the extra information the use case needs."
+        "description": "Use the authoring tool from the previous step to create the content - new concepts and descriptions, or reference set members for subsets, configuration, and maps - following the Machine Readable Concept Model and Editorial Guide throughout. New concepts and descriptions carry new clinical meaning and need the most care; reference set members carry none, simply linking existing components to the extra information the use case needs."
       },
       {
         "title": "Review and validate in three stages",
-        "description": "Validation happens in three stages, not one. During authoring: for new concepts, run the description logic reasoner to classify the concept and confirm it is placed correctly in the inferred hierarchy - a concept modelled incorrectly will be classified in an unexpected position, indicating a modelling error - and run SNOMED CT's automated validation rules on all extension content, including reference sets, to catch what the reasoner does not, such as missing required attributes, incorrect semantic tags, or a reference set member pointing at an inactive component. After authoring: a peer reviewer checks the content against editorial guidance and clinical usability - judgement automation cannot replace. Before release: run a final validation pass over the release as a whole to confirm its overall correctness and consistency. Resolve all errors and warnings at every stage before promoting content further.",
+        "description": "Validation happens in three stages. During authoring: classify new concepts with the description logic reasoner - incorrect placement in the inferred hierarchy signals a modelling error - and run SNOMED CT's automated validation rules on all content, including reference sets, to catch what the reasoner doesn't (missing attributes, wrong semantic tags, a member pointing at an inactive component). After authoring: a peer reviewer checks editorial guidance and clinical usability - judgement automation can't replace. Before release: run a final validation pass over the release as a whole. Resolve all errors and warnings at every stage before promoting content further.",
         "examples": [
           {
             "label": "Common automated validation rule categories",
@@ -1920,11 +1920,11 @@
       },
       {
         "title": "Package, license, and distribute",
-        "description": "Package extension content as RF2 files aligned to SNOMED CT release dates. Assign a version date and module ID. Decide whether to distribute as a bare extension or as an edition (see the decision above), and document the full dependency chain either way: international release, national edition (if applicable), and the extension in that order. As the extension producer you must issue an Affiliate license to everyone who receives it, and every recipient still needs their own SNOMED CT Affiliate License for the International Release - distributing the extension does not substitute for that underlying license. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for loading extension RF2 files into Snowstorm and verifying concept counts after load."
+        "description": "Package extension content as RF2 files aligned to SNOMED CT release dates, with a version date and module ID. Decide whether to distribute as a bare extension or an edition (see the decision above), and document the full dependency chain either way: international release, national edition (if applicable), then the extension. As producer, you must issue recipients an Affiliate license - which doesn't replace their own SNOMED CT Affiliate License for the International Release. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for loading extension RF2 files into Snowstorm and verifying counts after load."
       },
       {
         "title": "Maintain: process new requests and realign on each release",
-        "description": "Maintenance is continuous, not a one-off task. Keep collecting and triaging new change requests through the same assessment process used above. Alignment with the International Edition starts at authoring - every concept, relationship, or reference set member is built against the current, active version of its dependencies, recorded in the module dependency reference set - but each subsequent monthly international release still needs a review: evaluate the pre-production release where one is available, update the module dependency reference set to the new version, retire extension content superseded by new international content (adding a historical association reference set entry pointing to the replacement), update relationships or map members affected by inactivations, and reposition content under new parent concepts that improve its place in the hierarchy. Allow time for an alpha or beta validation pass on the updated extension before publishing it. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance."
+        "description": "Maintenance is continuous: keep triaging new change requests through the same assessment process above. Alignment starts at authoring - every component is built against the current version of its dependencies, recorded in the module dependency reference set - but each monthly international release still needs a review: evaluate the pre-production release where available, update the module dependency reference set, retire content superseded by new international content (with a historical association pointing to the replacement), update relationships or map members hit by inactivations, and reposition content under better new parents. Allow time for an alpha/beta validation pass before publishing an update. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management guidance."
       }
     ],
     "dependencies": [
@@ -1960,6 +1960,11 @@
         "type": "Tool",
         "title": "SNOMED CT Browser - concept search before authoring",
         "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Guide",
+        "title": "How do I obtain a namespace identifier?",
+        "url": "https://ihtsdo.freshdesk.com/support/solutions/articles/4000161260-how-do-i-obtain-a-namespace-identifier-"
       },
       {
         "type": "Tool",
