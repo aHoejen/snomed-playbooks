@@ -1614,7 +1614,7 @@
       },
       {
         "icon": "server",
-        "text": "Terminology server (for example, Snowstorm, Ontoserver, or a vendor-hosted service) once three or more systems consume SNOMED CT-coded data"
+        "text": "Terminology server (for example, Snowstorm, or a vendor-hosted service - see the SNOMED International Terminology Services page for options) once three or more systems consume SNOMED CT-coded data"
       },
       {
         "icon": "clipboard-list",
@@ -1636,6 +1636,11 @@
       "No ongoing terminology governance after go-live - maps age and value sets drift without a named owner and a release-aligned review process"
     ],
     "resources": [
+      {
+        "type": "Guide",
+        "title": "Terminology Services options",
+        "url": "http://implementation.snomed.org/terminology-services"
+      },
       {
         "type": "Tool",
         "title": "Snap2SNOMED - mapping tool",
