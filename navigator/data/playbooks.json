@@ -1328,8 +1328,8 @@
     ]
   },
   "mapping": {
-    "title": "Mapping SNOMED CT to other code systems",
-    "subtitle": "Mapping SNOMED CT to classification and billing systems, and mapping other code systems into SNOMED CT for interoperability or analysis",
+    "title": "Mapping SNOMED CT to/from other code systems",
+    "subtitle": "Mapping SNOMED CT to and from classification, billing, and other code systems, for reporting, interoperability, or analysis",
     "icon": "arrows-right-left",
     "color": "gray",
     "audience": [
