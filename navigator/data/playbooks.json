@@ -1328,23 +1328,23 @@
     ]
   },
   "mapping": {
-    "title": "Mapping and legacy data migration",
-    "subtitle": "Mapping SNOMED CT to classification and billing code systems, and migrating from legacy code systems to SNOMED CT using Snap2SNOMED",
+    "title": "Mapping SNOMED CT to other code systems",
+    "subtitle": "Mapping SNOMED CT to classification and billing systems, and mapping other code systems into SNOMED CT for interoperability or analysis",
     "icon": "arrows-right-left",
     "color": "gray",
     "audience": [
       "Information Manager",
       "Software provider"
     ],
-    "overview": "SNOMED CT mapping enables translation to other code systems for reporting, billing, or interoperability, and migration of legacy-coded data into SNOMED CT. Target systems vary by jurisdiction and use case - ICD-10 for statutory morbidity/mortality reporting is the most common example, but the same approach applies to other classification or billing systems such as OPCS-4, CPT, national reimbursement codes, or domain-specific systems like LOINC or MedDRA. Where SNOMED International maintains an official rule-based map to a target system - as it does for ICD-10 - that map is the starting point and should be assessed before building anything custom. For migrating a legacy or local code system into SNOMED CT, Snap2SNOMED is the recommended tool, providing a structured workflow for human-curated mapping with automation-assisted suggestions, audit trail, and versioning - it maps source codes to SNOMED CT, not the reverse direction of mapping SNOMED CT out to a classification or billing system, which relies on an official map where one exists or custom rule-based map authoring where it does not. Mapping to a less granular target system always involves some loss of clinical meaning, and that information cannot be recovered in the reverse direction.",
+    "overview": "SNOMED CT mapping enables translation to other code systems - for reporting, billing, or interoperability - and translation of other code systems into SNOMED CT, for example to support search, decision support, or analytics on incoming coded data. Target systems vary by jurisdiction and use case - ICD-10 for statutory morbidity/mortality reporting is the most common example, but the same approach applies to other classification or billing systems such as OPCS-4, CPT, national reimbursement codes, or domain-specific systems like LOINC or MedDRA. Where SNOMED International maintains an official rule-based map to a target system - as it does for ICD-10 - that map is the starting point and should be assessed before building anything custom. For mapping another code system into SNOMED CT, Snap2SNOMED is the recommended tool, providing a structured workflow for human-curated mapping with automation-assisted suggestions, audit trail, and versioning - it maps source codes to SNOMED CT, not the reverse direction. Mapping to a less granular target system always involves some loss of clinical meaning, and that information cannot be recovered in the reverse direction. This playbook covers building the map itself, in either direction. If your goal is to migrate your organization's own system of record onto SNOMED CT - retiring a legacy code system, running a dual-coding transition, and managing the wider organizational and clinical change involved - see the <a href=\"#/playbook/migration\">Migrating to SNOMED CT playbook</a> instead.",
     "decisions": [
       {
         "question": "Is mapping the right solution, given the ongoing maintenance burden it creates?",
-        "guidance": "Building and maintaining a map is not always the best option, particularly where the source and target systems update on very different cycles (for example, a monthly-updated medication terminology against an annually revised classification). Where the goal is SNOMED CT-coded data - for example, migrating a legacy or local code system - weigh a map against integrating SNOMED CT directly into data entry at the point of documentation. Native capture removes the need to build and maintain a map at all, and is often more accurate and sustainable long-term than mapping from an existing source system. Only commit to a mapping project once it is clearly the better option than capturing SNOMED CT natively."
+        "guidance": "Building and maintaining a map is not always the best option, particularly where the source and target systems update on very different cycles (for example, a monthly-updated medication terminology against an annually revised classification). Where the goal is SNOMED CT-coded data, weigh a map against integrating SNOMED CT directly into data entry at the point of documentation. Native capture removes the need to build and maintain a map at all, and is often more accurate and sustainable long-term than mapping from an existing source system. Only commit to a mapping project once it is clearly the better option than capturing SNOMED CT natively. If this map is one part of a wider organizational migration onto SNOMED CT, see the <a href=\"#/playbook/migration\">Migrating to SNOMED CT playbook</a> for how this decision fits into the overall migration strategy."
       },
       {
         "question": "What is the purpose and direction of mapping?",
-        "guidance": "Clarify whether you need SNOMED CT to a classification or billing system such as ICD-10, OPCS-4, or CPT (for billing or statutory reporting), a legacy code system to SNOMED CT (for data migration or dual-coding), or bidirectional mapping. Each direction has different tools, reference maps, and quality requirements. Do not attempt to design a bidirectional map from a unidirectional tool. Before committing, also confirm the source and target code systems have compatible semantic domains - similar representation, structural modelling, and context of use - since incompatible domains undermine any map regardless of tooling. For reporting from SNOMED CT coded data, see the <a href=\"#/playbook/analytics\">Analytics and reporting playbook</a> for how map output feeds downstream reporting."
+        "guidance": "Clarify whether you need SNOMED CT to a classification or billing system such as ICD-10, OPCS-4, or CPT (for billing or statutory reporting), another code system to SNOMED CT (for interoperability, search, or analytics), or bidirectional mapping. Each direction has different tools, reference maps, and quality requirements. Do not attempt to design a bidirectional map from a unidirectional tool. Before committing, also confirm the source and target code systems have compatible semantic domains - similar representation, structural modelling, and context of use - since incompatible domains undermine any map regardless of tooling. For reporting from SNOMED CT coded data, see the <a href=\"#/playbook/analytics\">Analytics and reporting playbook</a> for how map output feeds downstream reporting."
       },
       {
         "question": "Does an existing map to your target system already exist and can it be adopted or adapted?",
@@ -1357,10 +1357,6 @@
       {
         "question": "How will ambiguous or unmappable concepts be handled?",
         "guidance": "Some source concepts have no direct target equivalent, or map to multiple targets depending on clinical context (for example, laterality or episode of care). Record this precisely using standard map relationship types - equivalent, broader, narrower, inexact, or no match - rather than forcing an approximate one-to-one link. For a genuine no-match case, define the handling policy before implementation: escalation to a subject matter expert, a post-coordinated expression as the target, a request for new content, or a structured fallback. Do not leave this decision to the map application algorithm alone."
-      },
-      {
-        "question": "What is the strategy for historical data coded in legacy systems?",
-        "guidance": "Legacy data coded in ICD-10, local code systems, or older SNOMED CT editions may require batch migration rather than real-time mapping. Clarify whether a retrospective batch conversion, a dual-coding transition period, or a cutover with forward-only SNOMED CT coding best suits your operational context. Each strategy has different implications for data continuity and reporting."
       },
       {
         "question": "How will mapping quality be validated and maintained over time?",
@@ -1391,35 +1387,9 @@
         ]
       },
       {
-        "title": "Path B - migrating a legacy or local code system to SNOMED CT: use Snap2SNOMED",
+        "title": "Path B - mapping another code system to SNOMED CT (for interoperability or analysis, not migration)",
         "sameNumberAsPrevious": true,
-        "description": "This is the second of two independent implementation paths - follow it if your project migrates a legacy or local code system into SNOMED CT, alongside Path A above if you also need mapping in the other direction. Snap2SNOMED maps source codes to SNOMED CT - it is not used for the reverse direction of mapping SNOMED CT out to a classification or billing system such as ICD-10. It supports structured mapping workflows with automation-assisted suggestions, human review, audit trail, and export to FHIR ConceptMap format. The appropriate workflow depends on your operational context.",
-        "options": [
-          {
-            "label": "BATCH MIGRATION (full cutover)",
-            "points": [
-              "Map the entire legacy code set to SNOMED CT before the go-live date",
-              "Convert all historical records in a single batch job after the map is validated",
-              "After cutover, new data is captured in SNOMED CT only - the legacy system is retired",
-              "Use Snap2SNOMED to manage the mapping project: assign source codes, review suggestions, track completion status, and export the final FHIR ConceptMap",
-              "Validate map coverage: any unmapped source codes in historical data must be resolved before go-live"
-            ],
-            "example": {
-              "label": "FHIR ConceptMap export from Snap2SNOMED",
-              "code": "{\n  \"resourceType\": \"ConceptMap\",\n  \"id\": \"local-codes-to-snomed\",\n  \"url\": \"https://example.org/ConceptMap/local-codes-to-snomed\",\n  \"version\": \"1.0.0\",\n  \"status\": \"active\",\n  \"sourceUri\": \"https://example.org/ValueSet/local-code-system\",\n  \"targetUri\": \"http://snomed.info/sct?fhir_vs=ecl/<<404684003\",\n  \"group\": [\n    {\n      \"source\": \"https://example.org/local-codes\",\n      \"target\": \"http://snomed.info/sct\",\n      \"element\": [\n        {\n          \"code\": \"LOCAL-001\",\n          \"display\": \"Chest pain on exertion\",\n          \"target\": [\n            {\n              \"code\": \"29857009\",\n              \"display\": \"Chest pain\",\n              \"equivalence\": \"narrower\",\n              \"comment\": \"Local code includes exertion context not present in SNOMED CT concept\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}"
-            }
-          },
-          {
-            "label": "DUAL-CODING TRANSITION PERIOD",
-            "points": [
-              "Capture both the legacy code and the SNOMED CT code for a defined transition window (typically 6-12 months)",
-              "Clinicians or coders assign SNOMED CT codes while the legacy code remains active for reporting continuity",
-              "Use Snap2SNOMED to pre-map the most frequent legacy codes to SNOMED CT suggestions, reducing per-encounter coder effort",
-              "Monitor dual-coding completeness and coding quality throughout the transition period",
-              "At the end of the transition, retire the legacy code capture and complete the historical batch conversion for pre-transition records"
-            ]
-          }
-        ]
+        "description": "This is the second of two independent implementation paths - follow it if your project maps a source code system into SNOMED CT on an ongoing basis, for example to translate incoming coded data from a partner system at the point of exchange, or to support search and analytics over externally coded data, without retiring the source system or migrating your own records onto SNOMED CT. Snap2SNOMED maps source codes to SNOMED CT - it is not used for the reverse direction of mapping SNOMED CT out to a classification or billing system such as ICD-10. It supports structured mapping workflows with automation-assisted suggestions, human review, audit trail, and export to FHIR ConceptMap format. If your goal is instead to migrate your organization's own system of record onto SNOMED CT - retiring a legacy code system, running a dual-coding transition, and managing the wider organizational change involved - see the <a href=\"#/playbook/migration\">Migrating to SNOMED CT playbook</a> for the full migration process, including cutover strategy, dual-coding transition periods, and historical data handling; that playbook uses the map built here as one input."
       },
       {
         "title": "Validate map results against a defined QA process",
@@ -1431,7 +1401,7 @@
       },
       {
         "title": "Establish map maintenance aligned to SNOMED CT releases",
-        "description": "Review the official map delta and any custom map entries on each SNOMED CT release. Where SNOMED CT is the source of the map (mapping out to a classification or billing system), retired source concepts must be resolved via the historical association reference sets before the map entry is updated. Where SNOMED CT is the target (for example, a legacy code system migration via Snap2SNOMED), check whether previously mapped SNOMED CT target concepts have since been retired, and update the map to their historical association replacement. New concepts on either side must be checked for coverage. Use Snap2SNOMED's versioning and review workflow to manage ongoing maintenance for legacy-to-SNOMED CT maps. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance."
+        "description": "Review the official map delta and any custom map entries on each SNOMED CT release. Where SNOMED CT is the source of the map (mapping out to a classification or billing system), retired source concepts must be resolved via the historical association reference sets before the map entry is updated. Where SNOMED CT is the target (for example, mapping another code system into SNOMED CT via Snap2SNOMED), check whether previously mapped SNOMED CT target concepts have since been retired, and update the map to their historical association replacement. New concepts on either side must be checked for coverage. Use Snap2SNOMED's versioning and review workflow to manage ongoing maintenance for source-to-SNOMED CT maps. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance."
       }
     ],
     "dependencies": [
@@ -1461,7 +1431,7 @@
       "Creating a custom map when the official map already meets the need - custom maps require active maintenance on every SNOMED CT release",
       "Not validating map output against a defined QA process - technical correctness does not guarantee clinical coding correctness",
       "Attempting to reverse a unidirectional map - it is not intended for use in the reverse direction, and reversing it can produce nonsensical results because SNOMED CT is typically more granular than the target system",
-      "Ignoring history supplements when migrating legacy data - historical SNOMED CT concept IDs from older releases may be inactivated and must be resolved to current equivalents before mapping",
+      "Ignoring history supplements for retired concepts - historical SNOMED CT concept IDs from older releases may be inactivated and must be resolved to current equivalents before mapping or maintaining a map",
       "No map maintenance process - the official map is updated on each SNOMED CT release and custom maps must be reviewed against the delta to remain valid",
       "Treating AI- or automation-assisted map suggestions (for example, from Snap2SNOMED) as reviewed output - AI should be used as an additional mapper, not a replacement for QA; check suggested concepts are genuine and apply risk-based human review",
       "Assuming a technically well-formed map alone improves clinical utility or analytics - a map that only reproduces the source system's existing scope gives no analytic benefit until expanded into a proper SNOMED CT value set, and reports built on mapped data may not be directly comparable to reports built on native SNOMED CT data"
@@ -1491,6 +1461,190 @@
         "type": "Guide",
         "title": "Snap2SNOMED user guide",
         "url": "https://docs.snomed.org/snomed-ct-user-guides/snap2snomed-user-guide/"
+      }
+    ]
+  },
+  "migration": {
+    "title": "Migrating to SNOMED CT",
+    "subtitle": "Planning, executing, and verifying an organization-wide migration from legacy code systems and workflows onto SNOMED CT",
+    "icon": "database",
+    "color": "red",
+    "audience": [
+      "Information Manager",
+      "Software provider",
+      "Governance Lead"
+    ],
+    "overview": "Migrating an organization to SNOMED CT is more than a data conversion project - it combines data conversion, system and workflow change, terminology governance, and clinical adoption, and treating it as purely technical work is a common root cause of failed or stalled migrations. This playbook covers deciding scope and approach, choosing a terminology strategy, managing legacy data quality, executing the rollout, and verifying the migration actually succeeded rather than just declaring it complete. It assumes a map from your legacy or local code system to SNOMED CT exists or is being built alongside this work - see the <a href=\"#/playbook/mapping\">Mapping playbook</a> for the technical work of building and maintaining that map itself, including tooling, relationship types, and QA.",
+    "decisions": [
+      {
+        "question": "What is driving this migration, and how much scope should the first phase cover?",
+        "guidance": "Migrations are typically driven by one or more of eight strategic objectives - comprehensive system integration, AI and advanced clinical decision support, standards-based interoperability, legacy data preservation, data quality and governance improvement, keeping pace with the biannual SNOMED CT release cycle, specialty content support, and clinical user adoption. Identify which of these - and which underlying driver (a regulatory deadline, clinical ambition, a greenfield build, or a multi-provider programme) - applies before scoping. Favor a contained first phase (for example, allergies alone) over pursuing all objectives simultaneously; pick three or four objectives you can measure, not all eight at once."
+      },
+      {
+        "question": "Will SNOMED CT be a reference terminology or a primary terminology, for each data domain?",
+        "guidance": "Decide, per data domain, where you sit on the reference-to-primary spectrum. As a reference terminology, SNOMED CT is attached behind the scenes via interface terminology binding or batch mapping while clinicians keep using familiar terms - but coding granularity is then constrained by the map, and mapping errors produce silent coding errors, so map governance is as important as map creation. As a primary terminology, clinicians search and select SNOMED CT directly with no mapping layer, which needs more training investment but removes that constraint. Most organizations use a mixed pattern - for example, primary terminology for problem lists and allergies, reference terminology for medications, and reference terminology with downstream classification mapping for diagnoses used in billing. Document the choice per domain; see the <a href=\"#/playbook/mapping\">Mapping playbook</a> for building and maintaining the underlying map where you choose reference terminology."
+      },
+      {
+        "question": "Is this a data migration, a system migration, or both?",
+        "guidance": "Data migration (converting historical records) and system migration (changing the tools and workflows clinicians use) are distinct axes with different risks and stakeholders - conflating them creates avoidable failure. Consider the four patterns this produces: full modernisation (both together), behind-the-scenes migration (data only, workflow unchanged), partial system migration (some workflows change, data conversion partial), and phased hybrid (staggered by domain or department). Also decide whether a minimum viable migration - a deliberately narrow scope delivering a defined subset of value quickly - meets your immediate need, understanding what it does not deliver, rather than treating it as a permanent end state."
+      },
+      {
+        "question": "What data migration strategy and rollout timing fits your risk tolerance and resources?",
+        "guidance": "Four data migration strategies trade off upfront effort against ongoing cost: full FHIR conversion (highest upfront effort, lowest ongoing cost), API integration/facade (lower upfront effort, higher ongoing cost), strategic archiving of low-value historical data, and a hybrid approach combining these by data type and age (typically 30-50% cheaper than converting everything the same way). Separately, choose a rollout timing approach: an API-first bridge, a microservices migration, a big bang cutover with a safety net, or a phased departmental rollout - the most common pattern for larger organizations. Make these two choices together, not independently."
+      },
+      {
+        "question": "What is the risk assessment across every affected domain, and what mitigates each risk?",
+        "guidance": "Assess patient safety, interoperability, data quality, operational, and compliance risk separately - each needs its own named mitigation, not a single generic sign-off. Typical mitigations include three-tier testing (technical, standards conformance, and clinical validation), parallel running of the legacy and new system for safety-critical data such as allergies before decommissioning the legacy system, and piloting in a lower-acuity department before a wider rollout."
+      },
+      {
+        "question": "How will legacy data quality and code-system diversity be handled?",
+        "guidance": "Legacy data typically has systematic errors, inconsistent coding, missing clinical context, and drift across code system versions, and code systems differ in granularity, producing one-to-many and many-to-one relationships that a simple lookup cannot resolve. Standard published maps (for example, ICD-10-CM, RxNorm, or LOINC to SNOMED CT) are a starting point but need review for your specific use case before being assumed fit for purpose - see the <a href=\"#/playbook/mapping\">Mapping playbook</a> for how to assess, adapt, or build these. For large volumes, an AI-assisted mapping tool that learns from expert decisions can help, but expert clinical review of a statistically significant sample remains mandatory."
+      },
+      {
+        "question": "How will migration success be verified and demonstrated, not just declared complete?",
+        "guidance": "Technical completion of a data conversion is not the same as a successful migration. Pick three or four of the strategic objectives identified at the start as measurable targets - for example, drug-allergy alert accuracy, FHIR conformance rate, data exchange success rate, SNOMED CT coverage on the problem list, or semantic search coverage - set a baseline and target for each before go-live, and measure again at go-live, 3 months, and 12 months."
+      }
+    ],
+    "steps": [
+      {
+        "title": "Assess objectives and scope the first phase",
+        "description": "Inventory candidate data domains and apply a value-effort assessment - clinical value against conversion effort - to decide what belongs in phase one versus a later phase. Select a small, measurable set of objectives (three or four, not all eight) for this phase, and document the driver behind the migration, since a regulatory deadline, a clinical ambition, a greenfield build, and a multi-provider programme each imply different scope and executive expectations."
+      },
+      {
+        "title": "Decide the terminology strategy and system/data migration pattern per domain",
+        "description": "For each data domain in scope, decide whether SNOMED CT will be a reference terminology (bound behind the scenes) or a primary terminology (selected directly by clinicians), and whether the domain needs a full system migration, a behind-the-scenes data migration, or a minimum viable subset of both. Document these decisions domain by domain - most organizations end up with a mixed pattern rather than one approach applied uniformly."
+      },
+      {
+        "title": "Choose a data migration strategy",
+        "description": "Select how historical data will be converted, matching your risk tolerance, timeline, and available resources.",
+        "options": [
+          {
+            "label": "FULL FHIR CONVERSION",
+            "points": [
+              "Convert all in-scope historical data to FHIR resources with SNOMED CT coding upfront",
+              "Highest upfront effort (typically 8-15 months) but lowest ongoing maintenance cost",
+              "Best suited to a clear long-term commitment to FHIR as the system of record"
+            ]
+          },
+          {
+            "label": "API INTEGRATION / FACADE",
+            "points": [
+              "Leave historical data in the legacy system and expose it through an API or facade that translates on demand",
+              "Lower upfront effort (typically 2-4 months) but higher ongoing operational cost",
+              "Useful when the legacy system must keep running alongside new SNOMED CT-based capability"
+            ]
+          },
+          {
+            "label": "STRATEGIC ARCHIVING",
+            "points": [
+              "Archive low-value historical data in its original form rather than converting it",
+              "Appropriate for data with limited ongoing clinical or reporting value",
+              "Reduces conversion effort but forfeits SNOMED CT-based access to the archived data"
+            ]
+          },
+          {
+            "label": "HYBRID (BY DATA TYPE AND AGE)",
+            "points": [
+              "Apply full conversion, API integration, or archiving selectively by data type and age band",
+              "Typically 30-50% cheaper than applying full conversion universally",
+              "Requires an explicit data-type by age-band decision table, agreed with clinical and governance stakeholders"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Choose a rollout timing approach",
+        "description": "Match the rollout mechanism to your organization's risk tolerance and readiness for change.",
+        "options": [
+          {
+            "label": "API-FIRST BRIDGE",
+            "points": [
+              "Stand up a FHIR API in front of existing systems before migrating any underlying data or workflows",
+              "Lets consuming systems start using SNOMED CT-coded data immediately while the underlying migration continues",
+              "Good first step when downstream interoperability is the most urgent driver"
+            ]
+          },
+          {
+            "label": "MICROSERVICES MIGRATION",
+            "points": [
+              "Migrate one bounded capability (for example, allergy recording) into an independent service at a time",
+              "Limits the blast radius of any single migration step and allows incremental rollback",
+              "Suits organizations already moving toward a service-oriented architecture"
+            ]
+          },
+          {
+            "label": "BIG BANG WITH SAFETY NET",
+            "points": [
+              "Cut over all in-scope systems and data at a single go-live date",
+              "Requires a tested rollback plan and parallel running of safety-critical data beforehand",
+              "Fastest route to a single, consistent SNOMED CT system of record, but the highest single-event risk"
+            ]
+          },
+          {
+            "label": "PHASED DEPARTMENTAL",
+            "points": [
+              "Roll out department by department or site by site, in a defined sequence",
+              "The most common pattern for larger organizations - contains risk and lets lessons from each phase improve the next",
+              "Requires maintaining interoperability between migrated and not-yet-migrated departments throughout the rollout"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Apply the five data-migration principles regardless of strategy",
+        "description": "Whichever strategy and timing you choose, apply these principles consistently: retain the original data rather than discarding it after conversion; preserve clinical context (status, verification status, category, and post-coordination where a single SNOMED CT concept cannot capture the original detail); track provenance for every converted record (source system, conversion date, process version, mapping rules applied, and validation outcome, recorded for example in a FHIR Provenance resource); validate at all three verification tiers before relying on the data clinically; and plan for ongoing change rather than treating the migration as a one-time event."
+      },
+      {
+        "title": "Verify at all three tiers before relying on migrated data clinically",
+        "description": "Tier 1 (automated technical): FHIR structural validity, record counts, referential integrity, and performance - gates every deployment. Tier 2 (standards conformance): implementation guide conformance, SNOMED CT semantic validity, and cross-map validation. Tier 3 (clinical validation): medical appropriateness, context preservation, and decision-support correctness - this tier needs qualified clinical reviewers and cannot be automated. For safety-critical domains such as allergies, run the legacy and new system in parallel and investigate every discrepancy before decommissioning the legacy system."
+      },
+      {
+        "title": "Measure success against the objectives set in phase one, and establish ongoing governance",
+        "description": "For each objective selected at the start, set a baseline and target and measure again at go-live, 3 months, and 12 months (example measurable targets: drug-allergy alert accuracy, FHIR conformance rate, data exchange success rate, SNOMED CT coverage on the problem list, semantic search coverage). Migration is not a one-time event: establish release management aligned to the biannual SNOMED CT release cycle (impact assessment, staging, rollback plan), ongoing value-set and data-quality monitoring, and a named terminology governance owner. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management guidance."
+      }
+    ],
+    "dependencies": [
+      {
+        "icon": "id-badge",
+        "text": "Named executive sponsor and terminology governance owner accountable for the migration"
+      },
+      {
+        "icon": "users",
+        "text": "Core team: SNOMED CT terminology specialist, FHIR specialist, clinical subject matter experts, legacy system expert, and integration architect"
+      },
+      {
+        "icon": "server",
+        "text": "Terminology server (for example, Snowstorm, Ontoserver, or a vendor-hosted service) once three or more systems consume SNOMED CT-coded data"
+      },
+      {
+        "icon": "clipboard-list",
+        "text": "Toolchain: FHIR server, FHIR validator, a mapping tool, a testing framework, and CI/CD for staged rollout"
+      },
+      {
+        "icon": "shield-check",
+        "text": "Change management and training plan for clinical adoption, especially where SNOMED CT becomes a primary terminology"
+      }
+    ],
+    "pitfalls": [
+      "Treating migration as purely a data conversion project - system and workflow change, terminology governance, and clinical adoption are just as consequential, and user adoption is consistently identified as a root cause when migrations fail",
+      "Attempting all eight strategic objectives simultaneously instead of a contained, measurable first phase",
+      "Conflating data migration and system migration decisions - they carry different risk profiles and need different stakeholders in the room",
+      "Treating all legacy data as equally worth converting, instead of applying a value-effort assessment and choosing a hybrid strategy where it saves effort",
+      "Assuming a standard published map (such as ICD-10-CM, RxNorm, or LOINC to SNOMED CT) fits your use case without reviewing it in context",
+      "Decommissioning a legacy system for safety-critical data (such as allergies) without a parallel-running verification period first",
+      "Staying indefinitely at minimum viable migration scope with no plan to expand it, or treating it as a final state rather than a deliberate first step",
+      "No ongoing terminology governance after go-live - maps age and value sets drift without a named owner and a release-aligned review process"
+    ],
+    "resources": [
+      {
+        "type": "Guide",
+        "title": "SNOMED CT Migration Practical Guide",
+        "url": "https://snomed-international.gitbook.io/uat-snomed-international-docs/kdfQQ4zexrP8YsnhBh12/snomed-practical-guides/snomed-ct-migration-practical-guide"
+      },
+      {
+        "type": "Tool",
+        "title": "Snap2SNOMED - mapping tool",
+        "url": "https://app.snap2snomed.org/"
       }
     ]
   },

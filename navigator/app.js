@@ -33,7 +33,7 @@ const PERSPECTIVE = {
 
 const PLAYBOOK_ORDER = [
   'problem-list','clin-docs','cds','analytics','interop',
-  'value-sets','term-service','search-ux','mapping','governance',
+  'value-sets','term-service','search-ux','mapping','migration','governance',
   'extensions','multilingual'
 ];
 

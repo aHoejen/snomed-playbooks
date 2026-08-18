@@ -822,7 +822,7 @@
       "Document all mapping decisions for auditability"
     ],
     "playbooks": [
-      "mapping"
+      "migration"
     ]
   },
   "U020": {
@@ -834,7 +834,7 @@
       "Legacy codes must be preserved for historical data integrity"
     ],
     "playbooks": [
-      "mapping",
+      "migration",
       "governance"
     ]
   },
