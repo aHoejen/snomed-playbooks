@@ -129,10 +129,10 @@ function initExampleModal() {
 // ── Data loading ─────────────────────────────────────────────────────────
 async function loadData() {
   const [qRes, pbRes, aRes, dRes] = await Promise.all([
-    fetch('data/questions.json'),
-    fetch('data/playbooks.json'),
-    fetch('data/answers.json'),
-    fetch('data/demonstrators.json'),
+    fetch('data/questions.json',     { cache: 'no-cache' }),
+    fetch('data/playbooks.json',     { cache: 'no-cache' }),
+    fetch('data/answers.json',       { cache: 'no-cache' }),
+    fetch('data/demonstrators.json', { cache: 'no-cache' }),
   ]);
   state.questions     = await qRes.json();
   state.playbooks     = await pbRes.json();
