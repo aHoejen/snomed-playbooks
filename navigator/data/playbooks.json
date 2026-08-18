@@ -1392,6 +1392,7 @@
       },
       {
         "title": "Path B - migrating a legacy or local code system to SNOMED CT: use Snap2SNOMED",
+        "sameNumberAsPrevious": true,
         "description": "This is the second of two independent implementation paths - follow it if your project migrates a legacy or local code system into SNOMED CT, alongside Path A above if you also need mapping in the other direction. Snap2SNOMED maps source codes to SNOMED CT - it is not used for the reverse direction of mapping SNOMED CT out to a classification or billing system such as ICD-10. It supports structured mapping workflows with automation-assisted suggestions, human review, audit trail, and export to FHIR ConceptMap format. The appropriate workflow depends on your operational context.",
         "options": [
           {

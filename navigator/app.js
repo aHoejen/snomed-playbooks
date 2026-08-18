@@ -476,9 +476,13 @@ function renderPlaybook(id) {
       <div class="pb-card">
         <div class="pb-card-title">${icon('stairs')} Implementation steps</div>
         <div class="step-list">
-          ${pb.steps.map((s, i) => `
+          ${(() => {
+            let stepNum = 0;
+            return pb.steps.map(s => {
+              if (!s.sameNumberAsPrevious) stepNum++;
+              return `
             <div class="step-item">
-              <div class="step-num c-${pb.color}" style="background:var(--c-bg);color:var(--c-text)">${i + 1}</div>
+              <div class="step-num c-${pb.color}" style="background:var(--c-bg);color:var(--c-text)">${stepNum}</div>
               <div class="step-body">
                 <div class="step-title">${s.title}</div>
                 ${s.description ? `<div class="step-desc">${s.description}</div>` : ''}
@@ -491,7 +495,9 @@ function renderPlaybook(id) {
                 ${s.examples && s.examples.length ? `<div class="example-triggers">${s.examples.map(exampleBtn).join('')}</div>` : ''}
               </div>
             </div>
-          `).join('')}
+          `;
+            }).join('');
+          })()}
         </div>
       </div>
 
