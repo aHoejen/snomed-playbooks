@@ -1377,8 +1377,8 @@
         "description": "Mapping cannot fix poor-quality source data. Review source codes and terms for ambiguous abbreviations, symbols, or free-text artifacts (for example \"#\", \"/\", \"?\", or shorthand comorbidity strings) before mapping begins. Agree and document interpretation rules for ambiguous entries so mappers apply them consistently, and flag entries that cannot be reliably mapped without clinical input rather than forcing a guess."
       },
       {
-        "title": "Load and apply the official map",
-        "description": "Where an official map exists for your target system - such as the SNOMED CT to ICD-10 extended map - obtain it from the relevant release files (the ICD-10 map is included in SNOMED International's international release as a complex map reference set; other official maps may be published separately). Load it into your terminology service as a ConceptMap resource. Implement the full map application algorithm - including map rule groups, rule priorities, map advice, and correlation codes - not a simple concept-to-code lookup, since rule-based extended maps require this regardless of target system. Use the FHIR $translate operation to invoke the map at runtime. For reporting from SNOMED CT coded data, see the <a href=\"#/playbook/analytics\">Analytics and reporting playbook</a> for how to integrate map output into reporting pipelines.",
+        "title": "Path A - mapping SNOMED CT to a target system: load and apply the official map",
+        "description": "This step and the next describe two independent implementation paths, not a strict sequence - follow whichever matches the mapping direction decided above, or both if your project needs mapping in both directions. Where an official map exists for your target system - such as the SNOMED CT to ICD-10 extended map - obtain it from the relevant release files (the ICD-10 map is included in SNOMED International's international release as a complex map reference set; other official maps may be published separately). Load it into your terminology service as a ConceptMap resource. Implement the full map application algorithm - including map rule groups, rule priorities, map advice, and correlation codes - not a simple concept-to-code lookup, since rule-based extended maps require this regardless of target system. Use the FHIR $translate operation to invoke the map at runtime. For reporting from SNOMED CT coded data, see the <a href=\"#/playbook/analytics\">Analytics and reporting playbook</a> for how to integrate map output into reporting pipelines.",
         "examples": [
           {
             "label": "FHIR $translate call",
@@ -1391,8 +1391,8 @@
         ]
       },
       {
-        "title": "Use Snap2SNOMED for legacy code system to SNOMED CT migration",
-        "description": "For migrating a legacy or local code system into SNOMED CT, use Snap2SNOMED. It maps source codes to SNOMED CT - it is not used for the reverse direction of mapping SNOMED CT out to a classification or billing system such as ICD-10. Snap2SNOMED supports structured mapping workflows with automation-assisted suggestions, human review, audit trail, and export to FHIR ConceptMap format. The appropriate workflow depends on your operational context.",
+        "title": "Path B - migrating a legacy or local code system to SNOMED CT: use Snap2SNOMED",
+        "description": "This is the second of two independent implementation paths - follow it if your project migrates a legacy or local code system into SNOMED CT, alongside Path A above if you also need mapping in the other direction. Snap2SNOMED maps source codes to SNOMED CT - it is not used for the reverse direction of mapping SNOMED CT out to a classification or billing system such as ICD-10. It supports structured mapping workflows with automation-assisted suggestions, human review, audit trail, and export to FHIR ConceptMap format. The appropriate workflow depends on your operational context.",
         "options": [
           {
             "label": "BATCH MIGRATION (full cutover)",
