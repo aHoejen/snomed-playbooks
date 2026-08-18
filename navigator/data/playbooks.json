@@ -1637,11 +1637,6 @@
     ],
     "resources": [
       {
-        "type": "Guide",
-        "title": "SNOMED CT Migration Practical Guide",
-        "url": "https://snomed-international.gitbook.io/uat-snomed-international-docs/kdfQQ4zexrP8YsnhBh12/snomed-practical-guides/snomed-ct-migration-practical-guide"
-      },
-      {
         "type": "Tool",
         "title": "Snap2SNOMED - mapping tool",
         "url": "https://app.snap2snomed.org/"
