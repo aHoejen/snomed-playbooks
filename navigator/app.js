@@ -279,15 +279,11 @@ function renderBrowse(perspective, activeFilter, activeRole) {
             <div class="role-intro-body">
               <div class="role-intro-name">${r.name}</div>
               <div class="role-intro-desc">${r.description}</div>
+              <a href="#/browse/capability/role:${encodeURIComponent(r.name)}" class="role-iq-link">
+                ${icon('puzzle', 16)} View implementation questions for ${r.name}
+              </a>
             </div>
           </div>
-        `).join('')}
-      </div>
-      <div style="margin-top:32px">
-        ${roles.map(r => `
-          <a href="#/browse/capability/role:${encodeURIComponent(r.name)}" class="role-iq-link">
-            ${icon('puzzle', 16)} View implementation questions for ${r.name}
-          </a>
         `).join('')}
       </div>
     `;
