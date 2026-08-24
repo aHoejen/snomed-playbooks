@@ -1175,11 +1175,11 @@
       "Software provider",
       "Clinician"
     ],
-    "overview": "Search is the primary interface between clinicians and SNOMED CT. Effective SNOMED CT search requires scoping the concept space using ECL constraints per field, returning preferred terms from the language reference set (never FSNs), and ranking results by clinical relevance and preferred term match. The SNOMED CT Search and Data Entry Guide provides detailed UX design guidance. Clinicians do not need to understand SNOMED CT - they need a search that finds the right concept immediately using the words they naturally use.",
+    "overview": "Search is the primary interface between clinicians and SNOMED CT. Effective SNOMED CT search requires scoping the concept space using appropriate constraints per field, returning preferred terms from the language reference set (never FSNs), and ranking results by clinical relevance and preferred term match. The SNOMED CT Search and Data Entry Guide provides detailed UX design guidance. Clinicians do not need to understand SNOMED CT - they need a search that finds the right concept immediately using the words they naturally use.",
     "decisions": [
       {
         "question": "What is the intended concept search scope for each data entry field?",
-        "guidance": "Each field must be bound to a specific ECL constraint - for example, a diagnosis field to <<404684003 |Clinical finding| or a procedure field to <<71388002 |Procedure|. An unscoped search across all of SNOMED CT produces irrelevant results and a poor clinician experience. Define the ECL constraint for every field before designing the search UX, and see the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for constraint authoring guidance."
+        "guidance": "As a minimum each field must be bound to the correct area of the hierarchy, using ECL or another method. For example, a diagnosis field to <<404684003 |Clinical finding|, or a procedure field to <<71388002 |Procedure|. For procedures consider department specific constraints like <<363680008 |Radiographic imaging procedure|, or a curated value set of the actual procedures available. An unscoped search across all of SNOMED CT produces irrelevant results and a poor clinician experience. Define the constraint for every field before implementing the search UX. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for constraint authoring guidance."
       },
       {
         "question": "Which language reference set determines preferred terms and search synonyms for your users?",
@@ -1187,11 +1187,11 @@
       },
       {
         "question": "How should search results be ranked?",
-        "guidance": "Clinical frequency (how often a concept is selected in your context) combined with string match quality (preferred term match ranks above synonym match) produces the best clinician experience. The default server ranking is a useful starting point but rarely reflects local clinical usage patterns. Consider pre-configuring specialty-specific or department-specific top results for the most common concepts in each field."
+        "guidance": "Consider pre-configuring specialty-specific or department-specific top results for the most common concepts in each field."
       },
       {
         "question": "What should happen when no matching concept is found?",
-        "guidance": "Do not silently allow free-text entry as a fallback - this breaks structured data quality. Design a deliberate no-match pathway: a message explaining the concept is not in the system, guidance to try alternative terms, and a route to request a new concept from the terminology team or SNOMED International."
+        "guidance": "Do not silently allow free-text entry as a fallback - this breaks structured data quality. Design a deliberate no-match pathway: the system should record the search term for review, a message explaining the concept is not in the system with guidance to try alternative terms, and a route to request a new concept from the terminology team."
       },
       {
         "question": "How will the search UX be tested with clinical users?",
@@ -1200,7 +1200,7 @@
     ],
     "steps": [
       {
-        "title": "Define the ECL constraint for each data entry field",
+        "title": "Define the value set for each data entry field",
         "description": "Write and test an ECL expression that defines the valid concept space for each field. Validate the resulting concept set with clinical SMEs to confirm it is clinically appropriate and correctly bounded. Document the constraint as a named value set for use in search configuration and runtime validation. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for ECL authoring and testing guidance.",
         "examples": [
           {
@@ -1211,34 +1211,35 @@
       },
       {
         "title": "Configure the terminology service for language reference set-based search",
-        "description": "Configure Snowstorm (or equivalent) with the correct language reference set priority. Verify that search queries return preferred terms from the national language reference set and that results match against acceptable synonyms. Test that FSNs do not appear in search results. See the <a href=\"#/playbook/term-service\">Terminology service implementation playbook</a> for language reference set configuration guidance."
+        "description": "Configure the terminology server or request parameters with the correct language reference set priority. Verify that search queries return preferred terms from the national language reference set and that results match against acceptable synonyms. Test that FSNs do not appear in search results. See the <a href=\"#/playbook/term-service\">Terminology service implementation playbook</a> for language reference set configuration guidance."
       },
       {
-        "title": "Implement autocomplete search with ECL constraint applied",
+        "title": "Implement autocomplete search with value set constraints applied",
         "description": "Integrate the terminology service search API into the data entry UI. Choose between a live API call per keystroke or a pre-loaded static export - the right choice depends on your infrastructure and connectivity constraints.",
         "options": [
           {
             "label": "INTEGRATED TERMINOLOGY SERVICE (RECOMMENDED)",
             "points": [
-              "Call the Snowstorm search API (or FHIR $expand with a filter parameter) on each keystroke, passing the field's ECL constraint as the ecl parameter",
-              "Results reflect the current SNOMED CT release with no manual refresh needed",
+              "On each keystroke use the HL7 ValueSet expand operation against the relevant named ValueSet",
+              "Implicit ValueSets reflect the current SNOMED CT release with no manual refresh needed",
               "Preferred terms are resolved from the configured language reference set at runtime",
-              "Implement a minimum character threshold of 2-3 characters before the search fires to limit request volume",
-              "Return the preferred term as the primary display label, with the matched synonym shown as supporting context when it differs from the preferred term"
+              "Implement a minimum character threshold of 2-3 characters before the search fires to ensure results are relevant",
+              "Return the preferred term as the primary display label. Optionally show the matched synonym as supporting context when it differs from the preferred term"
             ],
             "example": {
-              "label": "Snowstorm search API call with ECL filter",
-              "code": "# Search for 'diabetes' within all clinical findings\nGET /browser/MAIN/descriptions\n  ?term=diabetes\n  &ecl=<<404684003 |Clinical finding (finding)|\n  &language=en\n  &active=true\n  &limit=10\n\n# Response (abbreviated)\n{\n  \"items\": [\n    {\n      \"concept\": {\n        \"conceptId\": \"73211009\",\n        \"fsn\": { \"term\": \"Diabetes mellitus (disorder)\" },\n        \"pt\": { \"term\": \"Diabetes mellitus\" }\n      },\n      \"term\": \"Diabetes mellitus\",\n      \"type\": \"SYNONYM\",\n      \"active\": true\n    },\n    {\n      \"concept\": {\n        \"conceptId\": \"44054006\",\n        \"fsn\": { \"term\": \"Diabetes mellitus type 2 (disorder)\" },\n        \"pt\": { \"term\": \"Type 2 diabetes mellitus\" }\n      },\n      \"term\": \"Diabetes, type 2\",\n      \"type\": \"SYNONYM\",\n      \"active\": true\n    }\n  ],\n  \"total\": 47\n}"
-            }
+              "label": "Value Set constrained term search, using a FHIR Terminology Server",
+              "code": "# Search for 'diabetes' within all clinical findings\nGET /fhir/ValueSet/$expand\n  ?url=http://snomed.info/sct?fhir_vs=ecl/<<404684003\n  &filter=diabetes\n  &count=10\n\n# Response (abbreviated)\n{\n  \"resourceType\": \"ValueSet\",\n  \"expansion\": {\n    \"total\": 47,\n    \"contains\": [\n      {\n        \"system\": \"http://snomed.info/sct\",\n        \"code\": \"73211009\",\n        \"display\": \"Diabetes mellitus\"\n      },\n      {\n        \"system\": \"http://snomed.info/sct\",\n        \"code\": \"44054006\",\n        \"display\": \"Type 2 diabetes mellitus\"\n      }\n    ]\n  }\n}"
+            },
+            "note": "Where possible, create named value sets on the terminology server. The $expand operation can then refer to known value sets by URL or identifier, and value set definitions can be maintained separately from the clients that use them. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for authoring guidance."
           },
           {
             "label": "PRE-LOADED STATIC EXPORT",
             "points": [
-              "Export the expanded concept list (concept ID, preferred term, acceptable synonyms) from a terminology server and load it into a local search index",
+              "Export the expanded concept list (concept ID, preferred term, acceptable synonyms) from a ValueSet within a terminology server and load it into a local search index",
               "Suitable when a live API is not available or latency is unacceptable in low-connectivity environments",
-              "Apply the ECL constraint at export time, not at search time",
-              "Must be refreshed on each SNOMED CT release to include new concepts and updated preferred terms",
-              "Implement client-side or local-server full-text search (e.g. Elasticsearch or SQLite FTS) over the exported concept list"
+              "Any ECL or other hierarchy constraint is applied at export time, not at search time",
+              "Note that this must be refreshed on each SNOMED CT release to include new concepts and updated preferred terms",
+              "Implement client-side or local-server full-text search (e.g. Lucene, Elasticsearch or SQLite FTS) over the exported concept list using all available terms"
             ]
           }
         ]
@@ -1259,9 +1260,9 @@
           {
             "label": "DEFAULT SERVER RANKING",
             "points": [
-              "Rely on Snowstorm's built-in ranking, which prioritises preferred term matches and active concepts",
+              "Rely on the FHIR Terminology Server's built-in ranking, which usually prioritises the shortest term matches on active concepts",
               "Simpler to implement but does not reflect local clinical usage patterns",
-              "Supplement with a manually curated quick-pick list of the most common concepts per field to improve the out-of-the-box experience",
+              "Consider supplementing with a manually curated quick-pick list of the most common concepts per field to improve the out-of-the-box experience",
               "Reassess with clinical users after go-live and move to frequency-based ranking if default results do not meet usability targets"
             ]
           }
@@ -1269,7 +1270,7 @@
       },
       {
         "title": "Design and test the no-match pathway",
-        "description": "When no concept is found, display a clear message and provide a structured pathway: a link to the content request process, a fallback escalation route, or a structured free-text capture with mandatory concept request. Never allow silent free-text entry in a field designed for SNOMED CT codes."
+        "description": "When no concept is found, display a clear message and provide a structured pathway: a link to the content request process, a fallback escalation route, or a structured free-text capture with mandatory concept request. Never allow silent free-text entry in a field designed for SNOMED CT codes. During the first few months of implementation it can be highly effective to log search requests that yield no results. These no-hit terms should be reviewed every week to assess adoption and supplement available synonyms or training."
       },
       {
         "title": "Conduct usability testing with clinicians and iterate",
@@ -1279,11 +1280,11 @@
     "dependencies": [
       {
         "icon": "server",
-        "text": "Terminology service with full-text search and ECL constraint filtering (Snowstorm)"
+        "text": "Terminology service with full-text search and ECL constraint filtering (e.g. Snowstorm)"
       },
       {
         "icon": "filter",
-        "text": "ECL-defined value sets per data entry field"
+        "text": "ECL or is-a-defined value sets per data entry field"
       },
       {
         "icon": "language",
@@ -1291,10 +1292,9 @@
       }
     ],
     "pitfalls": [
-      "Displaying FSNs (fully specified names) in search results - FSNs are technical identifiers not appropriate for clinician-facing display",
-      "Running search against all of SNOMED CT without ECL scoping - produces irrelevant results and a poor clinician experience",
+      "Displaying FSNs (fully specified names) or concept codes in search results - FSNs are technical identifiers not appropriate for clinician-facing display",
+      "Running search against all of SNOMED CT without specific hierarchy scoping - produces irrelevant results and a poor clinician experience",
       "Allowing silent free-text fallback when no match is found - destroys structured data quality",
-      "Relying on default server ranking without tuning for local clinical usage - common concepts are buried below less relevant results",
       "Not testing search with clinical users before go-live - irrelevant results or missing preferred terms are only discovered in production",
       "Ignoring synonym configuration - clinicians use different terms than those in the preferred term label, and missing synonyms force workarounds",
       "Using a pre-loaded static export without a refresh process on each SNOMED CT release - new concepts are silently unavailable for selection"
