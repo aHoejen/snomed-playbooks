@@ -1205,7 +1205,7 @@
         "examples": [
           {
             "label": "ECL constraints for common fields",
-            "code": "# Diagnosis / problem list field: all clinical findings\n<<404684003 |Clinical finding (finding)|\n\n# Narrowed to disorders only\n<<64572001 |Disease (disorder)|\n\n# Procedure field\n<<71388002 |Procedure (procedure)|\n\n# Allergy causative agent (substances and products)\n<<105590001 |Substance (substance)| OR <<373873005 |Pharmaceutical / biologic product|\n\n# Exclude administrative context findings from a finding-based field\n<<404684003 MINUS <<413350009 |Finding with explicit context (situation)|"
+            "code": "# Diagnosis / problem list field: all clinical findings\n<<404684003 |Clinical finding (finding)|\n\n# Narrowed to disorders only\n<<64572001 |Disease (disorder)|\n\n# Procedure field\n<<71388002 |Procedure (procedure)|\n\n# Allergy causative agent (substances and products)\n<<105590001 |Substance (substance)| OR <<373873005 |Pharmaceutical / biologic product|"
           }
         ]
       },
