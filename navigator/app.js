@@ -478,13 +478,12 @@ function renderPlaybook(id) {
         <div class="pb-card-title">${icon('stairs')} Implementation steps</div>
         ${pb.steps.some(s => s.pedagogy) ? `
         <div class="mode-bar">
-          <span class="mode-bar-label">Mode</span>
+          <span class="mode-bar-label">Agent mode</span>
           <div class="mode-toggles">
-            <button class="mode-btn active" data-mode="automate">Automate</button>
             <button class="mode-btn" data-mode="support">Support</button>
             <button class="mode-btn" data-mode="apprentice">Apprentice</button>
           </div>
-          <span class="mode-bar-hint" id="mode-hint">Steps only</span>
+          <span class="mode-bar-hint" id="mode-hint">Select a mode to see agent guidance</span>
         </div>` : ''}
         <div class="step-list" id="step-list-${id}" data-mode="automate">
           ${(() => {
@@ -917,12 +916,19 @@ document.addEventListener('click', e => {
   const btn = e.target.closest('.mode-btn');
   if (!btn) return;
   const bar = btn.closest('.pb-card');
-  const mode = btn.dataset.mode;
-  bar.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b === btn));
+  const wasActive = btn.classList.contains('active');
+  bar.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   const list = bar.querySelector('.step-list');
-  if (list) list.dataset.mode = mode;
   const hint = bar.querySelector('#mode-hint');
-  if (hint) hint.textContent = mode === 'automate' ? 'Steps only' : mode === 'support' ? 'Agent guidance shown before each step' : 'Agent guidance + reflection questions';
+  if (wasActive) {
+    if (list) list.dataset.mode = 'automate';
+    if (hint) hint.textContent = 'Select a mode to see agent guidance';
+  } else {
+    btn.classList.add('active');
+    const mode = btn.dataset.mode;
+    if (list) list.dataset.mode = mode;
+    if (hint) hint.textContent = mode === 'support' ? 'Agent guidance shown before each step' : 'Agent guidance + reflection questions';
+  }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
