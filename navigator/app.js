@@ -476,7 +476,17 @@ function renderPlaybook(id) {
       <!-- Implementation steps -->
       <div class="pb-card">
         <div class="pb-card-title">${icon('stairs')} Implementation steps</div>
-        <div class="step-list">
+        ${pb.steps.some(s => s.pedagogy) ? `
+        <div class="mode-bar">
+          <span class="mode-bar-label">Mode</span>
+          <div class="mode-toggles">
+            <button class="mode-btn active" data-mode="automate">Automate</button>
+            <button class="mode-btn" data-mode="support">Support</button>
+            <button class="mode-btn" data-mode="apprentice">Apprentice</button>
+          </div>
+          <span class="mode-bar-hint" id="mode-hint">Steps only</span>
+        </div>` : ''}
+        <div class="step-list" id="step-list-${id}" data-mode="automate">
           ${(() => {
             let stepNum = 0;
             return pb.steps.map(s => {
@@ -485,6 +495,7 @@ function renderPlaybook(id) {
             <div class="step-item">
               <div class="step-num c-${pb.color}" style="background:var(--c-bg);color:var(--c-text)">${stepNum}</div>
               <div class="step-body">
+                ${s.pedagogy ? `<div class="pedagogy-scaffold"><span class="pedagogy-label">Before you start</span>${s.pedagogy.scaffold}</div>` : ''}
                 <div class="step-title">${s.title}</div>
                 ${s.description ? `<div class="step-desc">${s.description}</div>` : ''}
                 ${s.options ? `<div class="step-options">${s.options.map(o => `
@@ -494,6 +505,7 @@ function renderPlaybook(id) {
                     ${o.example ? `<div class="example-triggers" style="margin-top:10px">${exampleBtn(o.example)}</div>` : ''}
                   </div>`).join('')}</div>` : ''}
                 ${s.examples && s.examples.length ? `<div class="example-triggers">${s.examples.map(exampleBtn).join('')}</div>` : ''}
+                ${s.pedagogy ? `<div class="pedagogy-articulate"><span class="pedagogy-label">Reflect</span>${s.pedagogy.articulate}</div>` : ''}
               </div>
             </div>
           `;
@@ -901,6 +913,18 @@ function closeSearch() {
 }
 
 // ── Boot ─────────────────────────────────────────────────────────────────
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.mode-btn');
+  if (!btn) return;
+  const bar = btn.closest('.pb-card');
+  const mode = btn.dataset.mode;
+  bar.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b === btn));
+  const list = bar.querySelector('.step-list');
+  if (list) list.dataset.mode = mode;
+  const hint = bar.querySelector('#mode-hint');
+  if (hint) hint.textContent = mode === 'automate' ? 'Steps only' : mode === 'support' ? 'Agent guidance shown before each step' : 'Agent guidance + reflection questions';
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   initSearch();
   initExampleModal();
