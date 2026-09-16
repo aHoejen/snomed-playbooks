@@ -492,7 +492,6 @@ function renderPlaybook(id) {
                     <div class="step-option-label">${o.label}</div>
                     <ul class="step-option-points">${o.points.map(p => `<li>${p}</li>`).join('')}</ul>
                     ${o.example ? `<div class="example-triggers" style="margin-top:10px">${exampleBtn(o.example)}</div>` : ''}
-                    ${o.note ? `<div class="step-desc" style="margin-top:10px">${o.note}</div>` : ''}
                   </div>`).join('')}</div>` : ''}
                 ${s.examples && s.examples.length ? `<div class="example-triggers">${s.examples.map(exampleBtn).join('')}</div>` : ''}
               </div>
