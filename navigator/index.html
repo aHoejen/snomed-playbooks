@@ -330,7 +330,8 @@
     <p>
       © SNOMED International ·
       <a href="https://www.snomed.org" target="_blank" rel="noopener">snomed.org</a> ·
-      <a href="https://docs.snomed.org" target="_blank" rel="noopener">docs.snomed.org</a>
+      <a href="https://docs.snomed.org" target="_blank" rel="noopener">docs.snomed.org</a> ·
+      <a href="#" id="draft-access-link" style="color:var(--text-muted);font-size:11px">Preview drafts</a>
     </p>
   </div>
 </footer>
@@ -353,5 +354,17 @@
 </div>
 
 <script src="app.js"></script>
+<div id="draft-pin-overlay" class="draft-pin-overlay" hidden>
+  <div class="draft-pin-box" role="dialog" aria-modal="true" aria-labelledby="draft-pin-title">
+    <div class="draft-pin-title" id="draft-pin-title">Preview drafts</div>
+    <p class="draft-pin-desc">Enter the access PIN to view draft playbooks.</p>
+    <input id="draft-pin-input" class="draft-pin-input" type="password" placeholder="PIN" autocomplete="off" />
+    <p id="draft-pin-error" class="draft-pin-error" hidden>Incorrect PIN - try again.</p>
+    <div class="draft-pin-actions">
+      <button id="draft-pin-cancel" class="draft-pin-btn draft-pin-btn-cancel">Cancel</button>
+      <button id="draft-pin-submit" class="draft-pin-btn draft-pin-btn-submit">Unlock</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

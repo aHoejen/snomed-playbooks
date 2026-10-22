@@ -129,7 +129,8 @@
         "title": "Mapping guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
       }
-    ]
+    ],
+    "status": "published"
   },
   "clin-docs": {
     "title": "Structured clinical documentation",
@@ -289,7 +290,8 @@
         "title": "Expression constraint language specification",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
       }
-    ]
+    ],
+    "status": "draft"
   },
   "cds": {
     "title": "Clinical decision support",
@@ -447,7 +449,8 @@
         "title": "Terminology services guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"
       }
-    ]
+    ],
+    "status": "draft"
   },
   "analytics": {
     "title": "Analytics and reporting",
@@ -598,7 +601,8 @@
         "title": "Mapping guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
       }
-    ]
+    ],
+    "status": "draft"
   },
   "interop": {
     "title": "Interoperability and data exchange",
@@ -811,7 +815,8 @@
         "title": "SNOMED CT URI standard",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-uri-standard/"
       }
-    ]
+    ],
+    "status": "draft"
   },
   "value-sets": {
     "title": "Value set design and management",
@@ -983,7 +988,8 @@
         "title": "Simplex user guide",
         "url": "https://docs.snomed.org/snomed-ct-user-guides/simplex-user-guide/"
       }
-    ]
+    ],
+    "status": "published"
   },
   "term-service": {
     "title": "Terminology service implementation",
@@ -1200,7 +1206,8 @@
         "title": "SNOMED CT URI standard",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-uri-standard/"
       }
-    ]
+    ],
+    "status": "draft"
   },
   "search-ux": {
     "title": "Search and data entry",
@@ -1397,7 +1404,8 @@
         "title": "Snowstorm terminology server (open source)",
         "url": "https://github.com/IHTSDO/snowstorm"
       }
-    ]
+    ],
+    "status": "draft"
   },
   "mapping": {
     "title": "Mapping SNOMED CT to/from other code systems",
@@ -1549,7 +1557,8 @@
         "title": "Snap2SNOMED user guide",
         "url": "https://docs.snomed.org/snomed-ct-user-guides/snap2snomed-user-guide/"
       }
-    ]
+    ],
+    "status": "draft"
   },
   "migration": {
     "title": "Migrating to SNOMED CT",
@@ -1733,7 +1742,8 @@
         "title": "Snap2SNOMED - mapping tool",
         "url": "https://app.snap2snomed.org/"
       }
-    ]
+    ],
+    "status": "draft"
   },
   "governance": {
     "title": "Governance and quality assurance",
@@ -1874,7 +1884,8 @@
         "title": "Implementation fact sheets",
         "url": "https://docs.snomed.org/implementation-guides/implementation-fact-sheets/"
       }
-    ]
+    ],
+    "status": "draft"
   },
   "extensions": {
     "title": "Extensions and customization",
@@ -2088,7 +2099,8 @@
         "title": "Implementation Module: Extensions and Editions (7-part video series)",
         "url": "https://www.youtube.com/playlist?list=PLyEMmgWz-ul0ILLagSJb1Kr73rUTFhUor"
       }
-    ]
+    ],
+    "status": "draft"
   },
   "multilingual": {
     "title": "Multilingual implementation",
@@ -2237,6 +2249,7 @@
         "title": "Translation management guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-translation-management-guide/"
       }
-    ]
+    ],
+    "status": "draft"
   }
 }

@@ -5,6 +5,42 @@
 
 'use strict';
 
+// ── Draft access ─────────────────────────────────────────────────────────
+const DRAFT_KEY = 'draft_access';
+const DRAFT_HASH = '7f6a3d9c2e1b8f4a'; // sha-like token, not the real PIN
+function draftUnlocked() { return sessionStorage.getItem(DRAFT_KEY) === DRAFT_HASH; }
+function unlockDrafts() { sessionStorage.setItem(DRAFT_KEY, DRAFT_HASH); }
+function lockDrafts()   { sessionStorage.removeItem(DRAFT_KEY); }
+function checkPin(pin)  { return pin === 'playbooks2026'; }
+
+function promptDraftAccess(onSuccess) {
+  const overlay = document.getElementById('draft-pin-overlay');
+  const input   = document.getElementById('draft-pin-input');
+  const err     = document.getElementById('draft-pin-error');
+  const cancel  = document.getElementById('draft-pin-cancel');
+  const submit  = document.getElementById('draft-pin-submit');
+  overlay.hidden = false;
+  input.value = '';
+  err.hidden = true;
+  input.focus();
+  const close = () => { overlay.hidden = true; };
+  const attempt = () => {
+    if (checkPin(input.value.trim())) {
+      unlockDrafts();
+      close();
+      if (onSuccess) onSuccess();
+    } else {
+      err.hidden = false;
+      input.value = '';
+      input.focus();
+    }
+  };
+  submit.onclick = attempt;
+  cancel.onclick = close;
+  input.onkeydown = e => { if (e.key === 'Enter') attempt(); if (e.key === 'Escape') close(); };
+  overlay.onclick = e => { if (e.target === overlay) close(); };
+}
+
 // ── State ───────────────────────────────────────────────────────────────
 const state = {
   questions: [],
@@ -380,6 +416,10 @@ function renderPlaybook(id) {
   setView('view-playbook');
   const pb = state.playbooks[id];
   if (!pb) return renderLanding();
+  if (pb.status === 'draft' && !draftUnlocked()) {
+    promptDraftAccess(() => renderPlaybook(id));
+    return renderAllPlaybooks();
+  }
 
   const related = state.questions.filter(q => q.playbook === id);
 
@@ -573,19 +613,20 @@ function renderAllPlaybooks(activeRole) {
 
   // Cards
   const grid = document.getElementById('all-playbooks-grid');
-  const filtered = PLAYBOOK_ORDER.filter(id => state.playbooks[id]);
 
-  const cards = filtered.map(id => {
+  const cards = PLAYBOOK_ORDER.filter(id => state.playbooks[id]).map(id => {
     const pb = state.playbooks[id];
     const band = bandColour[pb.color] || '#003865';
-    const qCount = state.questions.filter(q => q.playbook === id).length;
+    const isDraft = pb.status === 'draft' && !draftUnlocked();
+    const draftAttr = isDraft ? ' data-draft="true"' : '';
+    const draftClass = isDraft ? ' pb-full-card--draft' : '';
     return `
-      <a href="#/playbook/${id}" class="pb-full-card">
+      <a href="#/playbook/${id}" class="pb-full-card${draftClass}"${draftAttr}>
         <div class="pb-full-card-accent" style="background:${band}">
           <span class="c-${pb.color}" style="color:var(--c-text)">${icon(pb.icon || 'file', 20)}</span>
         </div>
         <div class="pb-full-card-body">
-          <div class="pb-full-card-title">${pb.title}</div>
+          <div class="pb-full-card-title">${pb.title}${isDraft ? ' <span class="draft-badge">In review</span>' : ''}</div>
           <div class="pb-full-card-subtitle">${pb.subtitle}</div>
           <div class="pb-full-card-overview">${pb.overview}</div>
           <div class="pb-full-card-footer">
@@ -593,7 +634,7 @@ function renderAllPlaybooks(activeRole) {
               ${pb.audience.map(a => `<span class="audience-pill c-${pb.color}" style="color:var(--c-text);border-color:var(--c-border);background:var(--c-bg)">${a}</span>`).join('')}
             </div>
             <span class="pb-full-card-cta c-${pb.color}" style="color:var(--c-text)">
-              Open playbook ${icon('arrow-right', 13)}
+              ${isDraft ? icon('lock', 13) + ' Preview' : 'Open playbook ' + icon('arrow-right', 13)}
             </span>
           </div>
         </div>
@@ -913,6 +954,18 @@ function closeSearch() {
 
 // ── Boot ─────────────────────────────────────────────────────────────────
 document.addEventListener('click', e => {
+  // Intercept clicks on draft (locked) playbook cards
+  const draftCard = e.target.closest('.pb-full-card--draft');
+  if (draftCard) {
+    e.preventDefault();
+    promptDraftAccess(() => {
+      const dl = document.getElementById('draft-access-link');
+      if (dl) dl.textContent = 'Lock drafts';
+      renderAllPlaybooks();
+    });
+    return;
+  }
+
   const btn = e.target.closest('.mode-btn');
   if (!btn) return;
   const bar = btn.closest('.pb-card');
@@ -934,6 +987,25 @@ document.addEventListener('click', e => {
 document.addEventListener('DOMContentLoaded', () => {
   initSearch();
   initExampleModal();
+
+  // Draft access footer link
+  const draftLink = document.getElementById('draft-access-link');
+  if (draftLink) {
+    const updateDraftLink = () => {
+      draftLink.textContent = draftUnlocked() ? 'Lock drafts' : 'Preview drafts';
+    };
+    updateDraftLink();
+    draftLink.addEventListener('click', e => {
+      e.preventDefault();
+      if (draftUnlocked()) {
+        lockDrafts();
+        updateDraftLink();
+        renderAllPlaybooks();
+      } else {
+        promptDraftAccess(() => { updateDraftLink(); renderAllPlaybooks(); });
+      }
+    });
+  }
   loadData().catch(err => {
     document.getElementById('main').innerHTML =
       `<div class="container" style="padding:80px 0;text-align:center;color:#B83535">

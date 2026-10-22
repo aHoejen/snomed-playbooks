@@ -1111,6 +1111,30 @@ div:has(> .role-iq-link) { display: flex; flex-direction: column; align-items: f
   white-space: nowrap;
 }
 
+.pb-full-card--draft {
+  opacity: 0.55;
+  filter: grayscale(30%);
+  cursor: default;
+}
+.pb-full-card--draft:hover {
+  transform: none;
+  box-shadow: var(--card-shadow);
+}
+.draft-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--text-muted);
+  color: #fff;
+  border-radius: 3px;
+  padding: 1px 5px;
+  vertical-align: middle;
+  margin-left: 6px;
+  opacity: 0.8;
+}
+
 @media (max-width: 768px) {
   .pb-overview-hero-inner { grid-template-columns: 1fr; gap: 24px; }
   .pb-group-grid { grid-template-columns: 1fr; }
@@ -1609,3 +1633,49 @@ div:has(> .role-iq-link) { display: flex; flex-direction: column; align-items: f
 
 /* show articulate only in apprentice */
 .step-list[data-mode="apprentice"] .pedagogy-articulate { display: block; }
+
+/* ─── Draft PIN modal ────────────────────────────────────────────────────── */
+.draft-pin-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9000;
+}
+.draft-pin-overlay[hidden] { display: none; }
+.draft-pin-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 28px 22px;
+  width: 100%; max-width: 340px;
+  box-shadow: var(--shadow-md);
+}
+.draft-pin-title {
+  font-size: 16px; font-weight: 700;
+  color: var(--text-primary); margin-bottom: 6px;
+}
+.draft-pin-desc {
+  font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;
+}
+.draft-pin-input {
+  width: 100%; padding: 9px 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--bg-page); color: var(--text-primary);
+  font-size: 14px; font-family: inherit;
+  box-sizing: border-box; margin-bottom: 8px;
+  outline: none;
+}
+.draft-pin-input:focus { border-color: var(--cerulean); }
+.draft-pin-error { font-size: 12px; color: #CE0037; margin-bottom: 8px; }
+.draft-pin-error[hidden] { display: none; }
+.draft-pin-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+.draft-pin-btn {
+  padding: 7px 18px; border-radius: var(--radius-md);
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  cursor: pointer; border: 1px solid var(--border);
+  transition: var(--transition);
+}
+.draft-pin-btn-cancel { background: transparent; color: var(--text-secondary); }
+.draft-pin-btn-cancel:hover { border-color: var(--cerulean); color: var(--cerulean); }
+.draft-pin-btn-submit { background: var(--cerulean); border-color: var(--cerulean); color: #fff; }
+.draft-pin-btn-submit:hover { opacity: .88; }
