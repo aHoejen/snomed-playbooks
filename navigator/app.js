@@ -688,6 +688,11 @@ function renderQuestion(id) {
           </li>
         `).join('')}
       </ul>
+      ${ans.pitfall ? `
+      <div class="qa-pitfall">
+        ${icon('warning', 16)}
+        <span>${ans.pitfall}</span>
+      </div>` : ''}
     </div>
 
     <!-- Go deeper -->

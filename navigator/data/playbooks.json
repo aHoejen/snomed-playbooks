@@ -142,7 +142,7 @@
       "Clinician",
       "Information Manager"
     ],
-    "overview": "Structured clinical documentation using SNOMED CT supplements - and sometimes replaces - free text with computable, queryable data. Data entry fields are bound to SNOMED CT value sets, giving clinicians access to clinically appropriate concepts at the point of care. SNOMED International and national release centres publish domain-specific implementation guides that define patterns for recording specific types of clinical information, such as allergies and adverse reactions. The key challenge is balancing clinical expressiveness with usability: over-structuring creates friction, while under-structuring produces data that cannot be queried or exchanged.",
+    "overview": "Structured clinical documentation using SNOMED CT supplements - and sometimes replaces - free text with computable, queryable data. Data entry fields are bound to SNOMED CT value sets, giving clinicians access to clinically appropriate concepts at the point of care. SNOMED International and National Release Centres publish domain-specific implementation guides that define patterns for recording specific types of clinical information, such as allergies and adverse reactions. The key challenge is balancing clinical expressiveness with usability: over-structuring creates friction, while under-structuring produces data that cannot be queried or exchanged.",
     "decisions": [
       {
         "question": "Which clinical data elements need to be SNOMED CT coded, and which can remain as narrative?",
@@ -827,27 +827,31 @@
       "Information Manager",
       "Software provider"
     ],
-    "overview": "A value set is a uniquely identifiable set of valid concept identifiers selected from one or more code systems for use in a specific context. In SNOMED CT, value sets define which concepts are valid for a given data element such as a problem list, a diagnosis field, or a procedure picker. The recommended approach is to define value sets intensionally using Expression Constraint Language (ECL): an expression that captures the intended concept scope from the SNOMED CT hierarchy. ECL-based definitions are self-maintaining: new concepts that satisfy the constraint are automatically included on each release and can be evaluated at runtime against any SNOMED CT edition by a terminology service. Where ECL cannot fully capture the intended scope, explicit concept lists (extensional definitions) may be used, but require manual review on every SNOMED CT release.",
+    "overview": "A value set is a uniquely identifiable set of valid concept identifiers selected from one or more code systems for use in a specific context. In SNOMED CT, value sets define which concepts are valid for a given data element such as a problem list, a diagnosis field, or a procedure picker. The recommended approach is to define value sets intensionally using Expression Constraint Language (ECL): an expression that captures the intended concept scope from the SNOMED CT hierarchy. ECL-based definitions are self-maintaining: new concepts that satisfy the constraint are automatically included on each release and can be evaluated at runtime against any SNOMED CT edition by a terminology service. Where ECL cannot fully capture the intended scope, explicit concept lists (extensional definitions) may be used, but require manual review on every SNOMED CT release. A subset is the same idea under a different name: a set of SNOMED CT concepts selected for a purpose, built by query, by manual selection, or by a combination of both.",
     "decisions": [
       {
         "question": "What is the clinical purpose and context of this value set?",
-        "guidance": "Before defining any constraints, document exactly what the value set is for, who will use it, in which system or workflow, and what the consequences of including or excluding borderline concepts are. This clinical specification is the basis for all subsequent design decisions and is required before governance sign-off."
+        "guidance": "Before defining any constraints, document exactly what the value set is for (for example a picklist, decision support rule, analytics cohort, or messaging constraint), what must be in or out, and the consequences of including or excluding borderline concepts. Identify where it will be used: the information model element it binds to, the binding strength (required, extensible, preferred, or example), and the people or systems that consume it. This specification is the basis for all subsequent design decisions and is required before governance sign-off."
       },
       {
-        "question": "Should the value set be defined intensionally (ECL) or extensionally (explicit list)?",
-        "guidance": "Intensional ECL definitions are strongly preferred: they are self-maintaining, adapt to new SNOMED CT content, and are declarative. Explicit lists are appropriate only for small, highly curated sets where clinical judgement over individual concepts is required, or where the content cannot be expressed by ECL alone."
+        "question": "Should the value set be defined by query (ECL), manual list, or a hybrid?",
+        "guidance": "Query-based (intensional) ECL definitions are strongly preferred when members follow a logical pattern, such as <code>&lt;&lt; 73211009 |Diabetes mellitus|</code>: they are self-maintaining, because re-expansion against a new release picks up new members. A manual (extensional) list is appropriate only when there is no consistent pattern, such as a small, locally prioritised shortlist where clinical judgement over individual concepts is required; it gives precise control but takes more effort and drifts out of date as SNOMED CT changes. A hybrid approach is often practical: generate the core set with a query, then add or remove a few concepts explicitly."
       },
       {
         "question": "What SNOMED CT hierarchy, attribute constraint, or reference set membership best captures the clinical scope?",
         "guidance": "Explore the SNOMED CT Browser to find the most specific ancestor concept that covers the intended content. Consider whether attribute refinement (e.g. finding site, causative agent) is needed for precision. Check whether an existing reference set or FHIR ValueSet already covers your need before authoring a new one."
       },
       {
+        "question": "What does the value set depend on, and what depends on it?",
+        "guidance": "Record the SNOMED CT edition and version it is built against, any other code systems or value sets it draws on, and the terminology services or systems that will expand it. List the downstream consumers (forms, rules, reports, interfaces) that will be affected when it changes, so impact can be assessed on every release."
+      },
+      {
         "question": "How will the value set be delivered to and consumed by clinical systems?",
         "guidance": "Integrating a FHIR terminology service is best practice: it enables live ECL expansion, preferred term retrieval, and concept search at runtime. Where direct integration is not feasible, the value set must be exported as a static representation (FHIR ValueSet with explicit entries, CSV, or RF2 reference set) and refreshed on each SNOMED CT release. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for deployment options."
       },
       {
-        "question": "How should the value set be packaged and distributed: RF2 reference set or FHIR ValueSet?",
-        "guidance": "RF2 simple reference sets are the native SNOMED CT format and integrate directly with Snowstorm. FHIR ValueSet resources are required for FHIR-based systems and support ECL via the compose.include.filter. Agree the packaging format with consuming systems before authoring."
+        "question": "How should the value set be packaged and distributed?",
+        "guidance": "RF2 simple type reference sets are the native SNOMED CT format and are supported by terminology servers and RF2-aware authoring tools. FHIR ValueSet resources are required for FHIR-based systems and support ECL via compose.include.filter. A simple list (a spreadsheet or text file of SCTIDs with terms) can suit reviewers and systems with no terminology integration, but it is a snapshot that must be regenerated on each release. Agree the format with consuming systems before authoring."
       },
       {
         "question": "Who has clinical authority to approve content, and what is the review cadence?",
@@ -884,8 +888,8 @@
         ]
       },
       {
-        "title": "Write and test the ECL expression",
-        "description": "Write an ECL expression using subsumption (&lt;&lt;), attribute refinements, and set operators as needed. Test the expansion using the Browser's ECL search or the FHIR $expand endpoint against a terminology service. Verify the concept set boundary with clinical SMEs: both false inclusions and missing concepts.",
+        "title": "Build, test, and clinically review",
+        "description": "Write an ECL expression using subsumption (&lt;&lt;), attribute refinements, and set operators as needed, then expand it using the Browser's ECL search or the FHIR $expand endpoint. Check the expansion for unexpected inclusions and omissions. For manual or hybrid sets, confirm that every explicitly listed concept is active in the target release. Have clinical SMEs review the expanded concept list, not just the ECL, even when the query looks right, and record who approved it and why.",
         "examples": [
           {
             "label": "ECL expression",
@@ -937,7 +941,11 @@
       },
       {
         "title": "Establish governance and release management",
-        "description": "Review the value set on each relevant SNOMED CT release: the International Edition is released monthly, and national extensions follow their own release cycle. Check whether new concepts satisfy the ECL constraint and whether inactivated concepts have been handled. Define who reviews the value set, how inactivated concepts are handled in existing data, and how consumers are notified of changes. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance."
+        "description": "Review the value set on each relevant SNOMED CT release: the International Edition is released monthly, and national extensions follow their own release cycle. Check whether new concepts satisfy the ECL constraint and whether inactivated concepts have been handled. Define who reviews the value set, how inactivated concepts are handled in existing data, and how consumers are notified of changes. Keep each definition and its change history in a versioned store, such as your terminology or authoring tool, or version control alongside implementation code. Choose a review cadence that suits your edition's release schedule, and agree a route for urgent changes between scheduled reviews. Test changes against the systems that use the value set in a staging environment, and notify them before the change goes live. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance."
+      },
+      {
+        "title": "Document the value set",
+        "description": "Capture the purpose and rationale, selection criteria (ECL and any manual additions or removals), the information model element and binding strength, dependencies, the SNOMED CT edition and version, the clinical review outcome and approver, the owner, and the review schedule. This record lets others reuse, audit, and maintain the value set without reverse-engineering it."
       }
     ],
     "dependencies": [
@@ -960,7 +968,10 @@
       "No clinical review: value sets not validated by clinical SMEs may exclude concepts clinicians expect, or include concepts that are inappropriate in context",
       "Publishing without versioning: consuming systems cannot detect changes and continue using stale pre-expanded sets",
       "Not checking whether an existing value set meets the need: duplicating content that is already maintained creates unnecessary ongoing maintenance burden",
-      "No governance: value sets with no named clinical owner degrade in quality as the SNOMED CT release evolves"
+      "No governance: value sets with no named clinical owner degrade in quality as the SNOMED CT release evolves",
+      "Clinical review of the ECL only: reviewers should see the expanded concept list, because a correct-looking query can still include or miss concepts in practice",
+      "Manual lists not checked for inactive concepts: an explicitly listed concept can be inactivated in a new release and silently break the value set",
+      "Ad hoc changes between reviews without notification: downstream queries, CDS rules, and cohort definitions break silently"
     ],
     "resources": [
       {
@@ -1496,7 +1507,7 @@
       },
       {
         "title": "Establish map maintenance aligned to SNOMED CT releases",
-        "description": "Review the official map delta and any custom map entries on each SNOMED CT release, and check new concepts on either side for coverage. If SNOMED CT is the source (mapping out), resolve retired source concepts via the historical association reference sets before updating the map entry. If SNOMED CT is the target (mapping in, via Snap2SNOMED), check whether previously mapped target concepts have since been retired and update accordingly - Snap2SNOMED's versioning and review workflow supports this. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management guidance."
+        "description": "Review the official map delta and any custom map entries on each SNOMED CT release, and check new concepts on either side for coverage. If SNOMED CT is the source (mapping out), resolve retired source concepts via the historical association reference sets before updating the map entry. If SNOMED CT is the target (mapping in, via Snap2SNOMED), check whether previously mapped target concepts have since been retired and update accordingly - Snap2SNOMED's versioning and review workflow supports this. Version every map release and keep a change log of added, changed, and removed entries. Test map changes against the receiving workflows in a staging environment, and tell the systems and coding teams that use the map what is changing, and when, before the update goes live. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management guidance."
       }
     ],
     "dependencies": [
@@ -1529,7 +1540,8 @@
       "Ignoring history supplements for retired concepts - historical SNOMED CT concept IDs from older releases may be inactivated and must be resolved to current equivalents before mapping or maintaining a map",
       "No map maintenance process - the official map is updated on each SNOMED CT release and custom maps must be reviewed against the delta to remain valid",
       "Treating AI- or automation-assisted map suggestions (for example, from Snap2SNOMED) as reviewed output - AI should be used as an additional mapper, not a replacement for QA; check suggested concepts are genuine and apply risk-based human review",
-      "Assuming a technically well-formed map alone improves clinical utility or analytics - it only reproduces the source system's existing scope until expanded into a proper SNOMED CT value set, and mapped-data reports may not be comparable to reports built on native SNOMED CT data"
+      "Assuming a technically well-formed map alone improves clinical utility or analytics - it only reproduces the source system's existing scope until expanded into a proper SNOMED CT value set, and mapped-data reports may not be comparable to reports built on native SNOMED CT data",
+      "Changing a map without telling the systems and teams that use it - downstream reports, billing, and coding workflows can shift silently, and the cause is hard to trace afterwards"
     ],
     "resources": [
       {

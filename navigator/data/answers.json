@@ -143,48 +143,50 @@
     ]
   },
   "I001": {
-    "answer": "Start by defining the clinical purpose precisely, then identify the SNOMED CT hierarchy or attribute constraint that best captures it. Write an ECL expression and test its expansion in the Browser or via FHIR $expand. Prefer intensional (ECL) definitions over extensional (explicit) lists - ECL-defined value sets are self-maintaining across SNOMED CT releases.",
+    "answer": "Start from the purpose of the value set and where it will be used.",
     "keyPoints": [
-      "Define clinical scope before writing ECL - vague scope produces wrong content",
-      "Test expansion in the SNOMED CT Browser using the ECL search feature",
-      "Intensional ECL is preferred - explicit lists require manual update on every release",
-      "Conduct clinical review of the expansion before publishing"
+      "<strong>Define:</strong> use an ECL query wherever members follow a logical pattern, adding or removing individual concepts only where needed.",
+      "<strong>Test:</strong> expand the value set and check for unexpected inclusions and omissions.",
+      "<strong>Review:</strong> have clinicians review the expanded list, not just the query.",
+      "<strong>Maintain:</strong> assign an owner who re-reviews it on each SNOMED CT release."
     ],
     "playbooks": [
       "value-sets"
-    ]
+    ],
+    "pitfall": "Common mistakes include using manual lists where ECL would suffice, having clinicians review only the query rather than the expanded list, and leaving the value set without a named owner. Each one leads to value sets that miss or wrongly include concepts and quietly drift out of date."
   },
   "I002": {
-    "answer": "SNOMED CT subsets are implemented as simple reference sets - an RF2 file listing the SCTIDs of included concepts. For most subsets, define the content using ECL and expand it to generate the list. Use the Simplex tool for straightforward subset authoring and management - it handles ECL, clinical review workflow, and RF2 export without needing a full authoring platform.",
+    "answer": "A subset is a set of SNOMED CT concepts selected for a purpose, which in practice is the same thing as a value set.",
     "keyPoints": [
-      "Subsets are RF2 simple reference sets containing SCTIDs",
-      "Define content with ECL where possible - explicit lists require manual maintenance",
-      "Simplex is the recommended tool for subset authoring",
-      "Publish with version metadata aligned to SNOMED CT release dates"
+      "<strong>Define by query:</strong> use an ECL expression wherever members follow a logical pattern.",
+      "<strong>Select manually:</strong> pick individual concepts where there is no consistent pattern.",
+      "<strong>Combine:</strong> start from a query, then add or remove a few concepts explicitly.",
+      "<strong>Publish:</strong> use the format your users need, such as an RF2 reference set, a FHIR ValueSet, or a simple list."
     ],
     "playbooks": [
       "value-sets"
-    ]
+    ],
+    "pitfall": "One main mistake is not having a clear use case, or mixing concepts of various types (for example, combining findings, procedures, and body structures in one subset). Without a defined purpose and a consistent scope, the subset is hard to build, validate, and maintain, and users cannot tell what it is meant for."
   },
   "I003": {
-    "answer": "Deploy Snowstorm - SNOMED International's open-source SNOMED CT terminology server - or use a hosted service. Load the licensed RF2 release files (international release plus national edition), configure language reference sets for preferred term retrieval, and expose the FHIR Terminology Service endpoints. All SNOMED CT-enabled applications should query through this shared service.",
+    "answer": "The recommendation is to deploy a shared SNOMED CT and FHIR-enabled terminology server loaded with licensed RF2 release files for the international edition plus your national extension.",
     "keyPoints": [
-      "Snowstorm is the recommended open-source server (maintained by SNOMED International)",
-      "Load the national edition on top of the international release - do not use international only",
-      "Configure language reference sets so preferred terms are returned correctly",
-      "Expose FHIR endpoints: $expand, $lookup, $validate-code, $subsumes, $translate"
+      "Expose the FHIR Terminology Service endpoints ($lookup, $expand, $validate-code, $translate, $subsumes) so all clinical applications query through one service rather than embedding terminology locally.",
+      "Configure language reference sets for preferred term retrieval; without this, applications default to FSNs and clinicians see machine-readable labels instead of clinical terms.",
+      "All SNOMED CT-enabled applications should point at this shared service; maintaining local copies creates version drift, inconsistent preferred terms, and upgrade complexity.",
+      "Consider a hosted service from your national release centre or a commercial provider if self-hosting Snowstorm is beyond your infrastructure capacity."
     ],
     "playbooks": [
       "term-service"
     ]
   },
   "I004": {
-    "answer": "Systems should query the terminology service's concept search API with an ECL constraint per field. Results must display preferred terms from the configured language reference set - not FSNs. Rank by preferred term match and clinical frequency. Never maintain a local copy of SNOMED CT concept descriptions in an application database.",
+    "answer": "Every clinical field that accepts SNOMED CT codes should query the terminology service with a field-specific constraint, so search results are scoped to clinically appropriate concepts and irrelevant results are filtered out.",
     "keyPoints": [
-      "Always apply an ECL constraint to scope the search - unscoped search is not appropriate",
-      "Return preferred terms from the language reference set - never FSNs",
-      "Centralise all concept retrieval via the shared terminology service",
-      "Rank results by preferred term match quality and clinical frequency"
+      "Results must display preferred terms from the configured language reference set, never FSNs, which are not designed for clinical interface terminology.",
+      "Rank results by preferred term match first, then by clinical frequency in your setting, to surface the most likely selection at the top.",
+      "Never replicate SNOMED CT concept descriptions into an application database; this creates a stale local copy that diverges from the authoritative terminology service after each release.",
+      "Retrieve preferred terms at render time from the terminology service using the user's locale so display is always current and language-correct."
     ],
     "playbooks": [
       "term-service",
@@ -192,17 +194,19 @@
     ]
   },
   "I005": {
-    "answer": "Use the FHIR $validate-code operation on your terminology service to confirm that a submitted concept ID is active, from the correct SNOMED CT edition, and within the field's ECL constraint. This validation should happen in real time at the point of selection. Log validation failures as quality indicators and use patterns to identify value set gaps.",
+    "answer": "Before a selected code is saved, check that it is valid for the field.",
     "keyPoints": [
-      "Call $validate-code for every concept selection - not just at import time",
-      "Validate against the field's ECL constraint, not just concept existence",
-      "Confirm the concept is active in the correct SNOMED CT edition",
-      "Monitor validation failure patterns - they reveal value set gaps or UX problems"
+      "<strong>Check:</strong> confirm the concept exists in the SNOMED CT edition and version in use, is active, and falls within the field's value set (for example, its ECL constraint). With a FHIR terminology service this is the $validate-code operation; other terminology servers and embedded terminology components offer equivalent checks.",
+      "<strong>Prevent:</strong> where possible, restrict search and pick lists to the field's value set, so invalid codes cannot be selected in the first place.",
+      "<strong>Respond:</strong> reject invalid selections in real time with a clear message guiding the user to a valid alternative.",
+      "<strong>Log:</strong> record each validation failure with the concept ID, field, and context; patterns reveal value set gaps, scope mismatches, or usability problems.",
+      "<strong>Re-test:</strong> re-check validation after each SNOMED CT release, since inactivations can create new failure patterns."
     ],
     "playbooks": [
       "term-service",
       "search-ux"
-    ]
+    ],
+    "pitfall": "Common mistakes include silently accepting an invalid or inactive code, and validating only in the user interface while codes arriving through interfaces or data imports go unchecked."
   },
   "I006": {
     "answer": "Effective SNOMED CT search requires scoping each field with an ECL expression, returning preferred terms (never FSNs), enabling synonym matching, and ranking by clinical relevance. Usability is the most common reason for poor SNOMED CT adoption - test with clinicians in realistic scenarios before go-live. Design a clear no-match pathway rather than allowing silent free-text fallback.",
@@ -281,17 +285,18 @@
     ]
   },
   "I012": {
-    "answer": "SNOMED CT releases twice yearly. For each release: obtain release notes, load to a test environment, run automated ECL-based QA queries, assess impact on value sets and maps, test consuming applications, and deploy to production with a rollback plan. Never upgrade production without first completing a staged test environment validation.",
+    "answer": "The International Edition is released every month, while national editions and SNOMED CT derivatives (such as maps and reference sets) follow their own release cycles. Decide which releases you will adopt and how often, rather than trying to take every one.",
     "keyPoints": [
-      "Twice-yearly release cycle - plan for it in advance",
-      "Test environment validation before every production upgrade",
-      "Run ECL-based QA queries to detect impact on coded data",
-      "Notify consuming systems before upgrading and provide rollback details"
+      "<strong>Plan:</strong> agree an upgrade cadence based on the edition you use, which for most implementers is a national edition built on a specific International Edition release. Track the release schedules of any derivatives you depend on.",
+      "<strong>Prepare:</strong> for each release you adopt, review the release notes and load the release into a test environment configured like production.",
+      "<strong>Assess:</strong> check for inactivated concepts in use, value set changes, and map changes, and assess the impact on value sets, CDS rules, analytics queries, and maps. Document any required changes.",
+      "<strong>Deploy:</strong> go live with a defined rollback plan, and notify users of the upgrade date in advance."
     ],
     "playbooks": [
       "term-service",
       "governance"
-    ]
+    ],
+    "pitfall": "Common mistakes include upgrading production without first validating in a test environment, and applying a single delta file after skipping releases, which leaves earlier changes missing. Use the snapshot files when you are not upgrading from the immediately preceding release."
   },
   "I013": {
     "answer": "Extensions add concepts, descriptions, and reference sets for local needs not covered by the international release. Author using the SNOMED Authoring Platform, applying MRCM concept model constraints and running description logic classification. Always search the Browser thoroughly and submit a content request to SNOMED International before authoring - many apparent gaps are already covered.",
@@ -408,17 +413,17 @@
     ]
   },
   "I022": {
-    "answer": "Use Simplex for value set authoring and management, and Snap2SNOMED for mapping work. Store all value set definitions (ECL expressions) under version control. Both tools export to FHIR-compatible formats and integrate with Snowstorm for validation. Align all updates to the SNOMED CT release cycle and notify consuming systems of changes.",
+    "answer": "Treat value sets and maps as governed, versioned assets. Each one should have a named owner, a recorded definition (ECL where possible) tied to a specific SNOMED CT edition and version, and a change history.",
     "keyPoints": [
-      "Simplex for value sets - authored ECL, clinical review, RF2/FHIR export",
-      "Snap2SNOMED for mappings - structured workflow, audit trail, FHIR ConceptMap export",
-      "Version all published content - consumers need to know what changed",
-      "Align update timing to SNOMED CT release dates"
+      "Pick a review cadence that fits your edition's release schedule. At each review, re-expand value sets, handle inactivated concepts using their historical associations, and test changes with the systems that use them before going live.",
+      "Use the official maps distributed with SNOMED CT where they exist, such as ICD-10. Maintain any custom maps in a tool with versioning and a review workflow, such as Snap2SNOMED.",
+      "Notify users of upcoming changes, and when they take effect, before they go live."
     ],
     "playbooks": [
       "value-sets",
       "mapping"
-    ]
+    ],
+    "pitfall": "Common mistakes include making ad hoc changes between reviews without notifying users, relying on expanded value set lists that are never refreshed, and treating the official ICD-10 map as a simple lookup instead of applying its rules. Each one breaks downstream queries, reports, or coding silently."
   },
   "I023": {
     "answer": "Governance requires named individuals in four roles: a clinical informatics lead for strategic decisions, a terminology team for day-to-day curation, specialty clinical leads for domain content approval, and an IT owner for technical deployment. The terminology team coordinates change requests, manages releases, and monitors quality. Governance without named individuals fails.",
