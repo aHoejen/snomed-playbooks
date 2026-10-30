@@ -1059,7 +1059,7 @@
           {
             "label": "SERVICES BUILT INTO THE APPLICATION",
             "points": [
-              "Preferred approach: use a separate terminology service to author and publish the required terminology artifacts (value sets, concept lists, preferred terms) as pre-created RF2 or FHIR resources, then load them into the application's terminology storage",
+              "Preferred approach: use a separate terminology service to author and publish the required terminology artifacts (value sets, concept lists, preferred terms) as pre-created resources, then load them into the application's terminology storage",
               "Loading RF2 release files directly into the application's storage is also a valid option, provided the application implements the required service types in compliance with the SNOMED CT specification",
               "A relational database built from the release files is not a terminology server by itself: search, subsumption, and ECL expression constraints still need to be implemented correctly",
               "Each application carries its own upgrade burden and must stay consistent with other systems when release files change"
