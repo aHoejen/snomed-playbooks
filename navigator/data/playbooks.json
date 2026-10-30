@@ -1011,7 +1011,7 @@
       "Software provider",
       "Information Manager"
     ],
-    "overview": "A SNOMED CT terminology service is the software function that gives applications access to SNOMED CT content: finding concepts, retrieving terms in the right language, testing subtypes and reference set membership, applying expression constraints, and identifying changes between versions. SNOMED CT delivers its full value only when these services use its specific features (the hierarchy, concept definitions, reference sets, expression constraints, language reference sets, and history), not just generic code lookup. A shared, SNOMED CT-enabled terminology server with an HL7 FHIR interface is the recommended approach; some systems instead implement selected services directly from the release files. All other playbooks on this site depend on these services.",
+    "overview": "A SNOMED CT terminology service is the software function that gives applications access to SNOMED CT content: finding concepts, retrieving terms in the right language, testing subtypes and reference set membership, applying expression constraints, and identifying changes between versions. SNOMED CT delivers its full value only when these services use its specific features (the hierarchy, concept definitions, reference sets, expression constraints, language reference sets, and history), not just generic code lookup. A shared, SNOMED CT-enabled terminology server with an HL7 FHIR interface is the recommended approach; some systems instead implement selected services directly from the release files.",
     "decisions": [
       {
         "question": "Which use cases must the terminology service support?",
