@@ -143,7 +143,7 @@
     ]
   },
   "I001": {
-    "answer": "Start from the purpose of the value set and where it will be used.",
+    "answer": "Start by defining the clinical purpose precisely, then identify the SNOMED CT hierarchy or attribute constraint that best captures it. Write an ECL expression and test its expansion in the Browser or via FHIR $expand. Prefer intensional (ECL) definitions over extensional (explicit) lists  -  ECL-defined value sets are self-maintaining across SNOMED CT releases.",
     "keyPoints": [
       "<strong>Define:</strong> use an ECL query wherever members follow a logical pattern, adding or removing individual concepts only where needed.",
       "<strong>Test:</strong> expand the value set and check for unexpected inclusions and omissions.",
@@ -156,7 +156,7 @@
     "pitfall": "Common mistakes include using manual lists where ECL would suffice, having clinicians review only the query rather than the expanded list, and leaving the value set without a named owner. Each one leads to value sets that miss or wrongly include concepts and quietly drift out of date."
   },
   "I002": {
-    "answer": "A subset is a set of SNOMED CT concepts selected for a purpose, which in practice is the same thing as a value set.",
+    "answer": "SNOMED CT subsets are implemented as simple reference sets  -  an RF2 file listing the SCTIDs of included concepts. For most subsets, define the content using ECL and expand it to generate the list. Use the Simplex tool for straightforward subset authoring and management  -  it handles ECL, clinical review workflow, and RF2 export without needing a full authoring platform.",
     "keyPoints": [
       "<strong>Define by query:</strong> use an ECL expression wherever members follow a logical pattern.",
       "<strong>Select manually:</strong> pick individual concepts where there is no consistent pattern.",
@@ -169,7 +169,7 @@
     "pitfall": "One main mistake is not having a clear use case, or mixing concepts of various types (for example, combining findings, procedures, and body structures in one subset). Without a defined purpose and a consistent scope, the subset is hard to build, validate, and maintain, and users cannot tell what it is meant for."
   },
   "I003": {
-    "answer": "The recommendation is to deploy a shared SNOMED CT and FHIR-enabled terminology server loaded with licensed RF2 release files for the international edition plus your national extension.",
+    "answer": "Deploy a SNOMED CT terminology server - either self-hosted (for example, Snowstorm, SNOMED International's open-source server) or via a hosted service from your national release centre (NRC) or a commercial provider. Load the licensed RF2 (Release Format 2) release files for the international release plus your national edition, configure language reference sets for preferred term retrieval, and expose the FHIR Terminology Service endpoints. All SNOMED CT-enabled applications should query through this shared service rather than maintaining local copies of terminology content.",
     "keyPoints": [
       "Expose the FHIR Terminology Service endpoints ($lookup, $expand, $validate-code, $translate, $subsumes) so all clinical applications query through one service rather than embedding terminology locally.",
       "Configure language reference sets for preferred term retrieval; without this, applications default to FSNs and clinicians see machine-readable labels instead of clinical terms.",
@@ -181,7 +181,7 @@
     ]
   },
   "I004": {
-    "answer": "Every clinical field that accepts SNOMED CT codes should query the terminology service with a field-specific constraint, so search results are scoped to clinically appropriate concepts and irrelevant results are filtered out.",
+    "answer": "Systems should query the terminology service's concept search API with an ECL constraint per field. Results must display preferred terms from the configured language reference set  -  not FSNs. Rank by preferred term match and clinical frequency. Never maintain a local copy of SNOMED CT concept descriptions in an application database.",
     "keyPoints": [
       "Results must display preferred terms from the configured language reference set, never FSNs, which are not designed for clinical interface terminology.",
       "Rank results by preferred term match first, then by clinical frequency in your setting, to surface the most likely selection at the top.",
@@ -194,7 +194,7 @@
     ]
   },
   "I005": {
-    "answer": "Before a selected code is saved, check that it is valid for the field.",
+    "answer": "Use the FHIR $validate-code operation on your terminology service to confirm that a submitted concept ID is active, from the correct SNOMED CT edition, and within the field's ECL constraint. This validation should happen in real time at the point of selection. Log validation failures as quality indicators and use patterns to identify value set gaps.",
     "keyPoints": [
       "<strong>Check:</strong> confirm the concept exists in the SNOMED CT edition and version in use, is active, and falls within the field's value set (for example, its ECL constraint). With a FHIR terminology service this is the $validate-code operation; other terminology servers and embedded terminology components offer equivalent checks.",
       "<strong>Prevent:</strong> where possible, restrict search and pick lists to the field's value set, so invalid codes cannot be selected in the first place.",
@@ -209,7 +209,7 @@
     "pitfall": "Common mistakes include silently accepting an invalid or inactive code, and validating only in the user interface while codes arriving through interfaces or data imports go unchecked."
   },
   "I006": {
-    "answer": "Effective SNOMED CT search requires scoping each field with an ECL expression, returning preferred terms (never FSNs), enabling synonym matching, and ranking by clinical relevance. Usability is the most common reason for poor SNOMED CT adoption - test with clinicians in realistic scenarios before go-live. Design a clear no-match pathway rather than allowing silent free-text fallback.",
+    "answer": "Effective SNOMED CT search requires scoping each field with an ECL expression, returning preferred terms (never FSNs), enabling synonym matching, and ranking by clinical relevance. Usability is the most common reason for poor SNOMED CT adoption  -  test with clinicians in realistic scenarios before go-live. Design a clear no-match pathway rather than allowing silent free-text fallback.",
     "keyPoints": [
       "ECL scope per field is mandatory - unscoped search produces irrelevant results",
       "Preferred terms only - FSN display is the most common usability failure",
@@ -234,7 +234,7 @@
     ]
   },
   "I008": {
-    "answer": "Use the official SNOMED CT to ICD-10 extended map, included in SNOMED CT RF2 release files. Load it as a FHIR ConceptMap in your terminology service and use $translate to map SNOMED CT concept IDs to ICD-10 codes. Apply the full map algorithm including rule groups and advice fields - the map is not a simple one-to-one lookup and must not be treated as one.",
+    "answer": "Use the official SNOMED CT to ICD-10 extended map, included in SNOMED CT RF2 release files. Load it as a FHIR ConceptMap in your terminology service and use $translate to map SNOMED CT concept IDs to ICD-10 codes. Apply the full map algorithm including rule groups and advice fields  -  the map is not a simple one-to-one lookup and must not be treated as one.",
     "keyPoints": [
       "The official SNOMED CT to ICD-10 map is the authoritative source - use it",
       "Apply the full map algorithm via $translate, not a simple concept-to-code lookup",
@@ -247,7 +247,7 @@
     ]
   },
   "I009": {
-    "answer": "Review mappings on each SNOMED CT release - new concepts need mapping, retired concepts need handling, and the official ICD-10 map delta should be applied. Use Snap2SNOMED's versioning and review workflow for any custom maps. For the official map, load the delta from each SNOMED CT release file and re-test affected workflows with clinical coders.",
+    "answer": "Review mappings on each SNOMED CT release  -  new concepts need mapping, retired concepts need handling, and the official ICD-10 map delta should be applied. Use Snap2SNOMED's versioning and review workflow for any custom maps. For the official map, load the delta from each SNOMED CT release file and re-test affected workflows with clinical coders.",
     "keyPoints": [
       "Review on every SNOMED CT release - twice yearly",
       "Load the official map delta from each release file",
@@ -285,7 +285,7 @@
     ]
   },
   "I012": {
-    "answer": "The International Edition is released every month, while national editions and SNOMED CT derivatives (such as maps and reference sets) follow their own release cycles. Decide which releases you will adopt and how often, rather than trying to take every one.",
+    "answer": "SNOMED CT releases twice yearly. For each release: obtain release notes, load to a test environment, run automated ECL-based QA queries, assess impact on value sets and maps, test consuming applications, and deploy to production with a rollback plan. Never upgrade production without first completing a staged test environment validation.",
     "keyPoints": [
       "<strong>Plan:</strong> agree an upgrade cadence based on the edition you use, which for most implementers is a national edition built on a specific International Edition release. Track the release schedules of any derivatives you depend on.",
       "<strong>Prepare:</strong> for each release you adopt, review the release notes and load the release into a test environment configured like production.",
@@ -299,7 +299,7 @@
     "pitfall": "Common mistakes include upgrading production without first validating in a test environment, and applying a single delta file after skipping releases, which leaves earlier changes missing. Use the snapshot files when you are not upgrading from the immediately preceding release."
   },
   "I013": {
-    "answer": "Extensions add concepts, descriptions, and reference sets for local needs not covered by the international release. Author using the SNOMED Authoring Platform, applying MRCM concept model constraints and running description logic classification. Always search the Browser thoroughly and submit a content request to SNOMED International before authoring - many apparent gaps are already covered.",
+    "answer": "Extensions add concepts, descriptions, and reference sets for local needs not covered by the international release. Author using the SNOMED Authoring Platform, applying MRCM concept model constraints and running description logic classification. Always search the Browser thoroughly and submit a content request to SNOMED International before authoring  -  many apparent gaps are already covered.",
     "keyPoints": [
       "Search the Browser exhaustively before creating any extension concept",
       "Submit a content request to SNOMED International first for globally applicable concepts",
@@ -311,7 +311,7 @@
     ]
   },
   "I014": {
-    "answer": "For most clinicians, SNOMED CT is invisible - you see an autocomplete search field returning the clinical terms you already use. If implemented well, selecting a SNOMED CT concept should take no longer than entering free text. The structured code your selection generates then powers clinical alerts, audit reporting, and cross-system data exchange automatically.",
+    "answer": "For most clinicians, SNOMED CT is invisible  -  you see an autocomplete search field returning the clinical terms you already use. If implemented well, selecting a SNOMED CT concept should take no longer than entering free text. The structured code your selection generates then powers clinical alerts, audit reporting, and cross-system data exchange automatically.",
     "keyPoints": [
       "Good SNOMED CT search feels like fast, accurate autocomplete",
       "You select preferred terms you recognise from clinical practice",
@@ -324,7 +324,7 @@
     ]
   },
   "I015": {
-    "answer": "Type the clinical term you naturally use - the search should match against synonyms and preferred terms. If you cannot find a term, try alternative synonyms before concluding it is missing. If genuinely missing, use the no-match pathway to request the concept - do not default to free text, as this bypasses clinical data quality and may bypass safety checks.",
+    "answer": "Type the clinical term you naturally use  -  the search should match against synonyms and preferred terms. If you cannot find a term, try alternative synonyms before concluding it is missing. If genuinely missing, use the no-match pathway to request the concept  -  do not default to free text, as this bypasses clinical data quality and may bypass safety checks.",
     "keyPoints": [
       "Search matches synonyms and preferred terms - try multiple search terms",
       "A no-match pathway should be available - use it to report missing concepts",
@@ -336,7 +336,7 @@
     ]
   },
   "I016": {
-    "answer": "Consistency comes from good UX, appropriate value set scope, and monitoring. Mandatory fields with poor search drive workarounds - fix the search and value set before adding enforcement. Track free-text rates by department and field to identify where help is needed. Provide a feedback loop so clinicians can report search problems directly to the terminology team.",
+    "answer": "Consistency comes from good UX, appropriate value set scope, and monitoring. Mandatory fields with poor search drive workarounds  -  fix the search and value set before adding enforcement. Track free-text rates by department and field to identify where help is needed. Provide a feedback loop so clinicians can report search problems directly to the terminology team.",
     "keyPoints": [
       "Fix search UX before enforcing mandatory coding - enforcement without good UX increases workarounds",
       "Monitor free-text rates per field and department",
@@ -349,7 +349,7 @@
     ]
   },
   "I017": {
-    "answer": "The core pattern is a shared SNOMED CT terminology service (Snowstorm) accessed by all clinical applications via FHIR Terminology Service APIs. Applications do not embed SNOMED CT content locally - they query the shared service. This ensures all applications use the same edition, preferred terms, and value set definitions consistently.",
+    "answer": "The core pattern is a shared SNOMED CT terminology service accessed by all clinical applications via FHIR Terminology Service APIs. Applications do not embed SNOMED CT content locally - they query the shared service. This ensures all applications use the same edition, preferred terms, and value set definitions consistently, and that a single release upgrade updates terminology behaviour across all systems at once.",
     "keyPoints": [
       "Centralised shared terminology service is the foundational architectural pattern",
       "FHIR APIs for all SNOMED CT operations - not proprietary integrations",
@@ -361,7 +361,7 @@
     ]
   },
   "I018": {
-    "answer": "Integration is via the FHIR Terminology Service API. Applications add concept lookup, search, validation, and value set expansion by calling the shared terminology service endpoints. Many existing EHR systems have configurable terminology service endpoints - configure them to point at Snowstorm and configure the value sets per field.",
+    "answer": "Integration is via the FHIR Terminology Service API. Applications add concept lookup, search, validation, and value set expansion by calling the shared terminology service endpoints. Many existing EHR systems have configurable terminology service endpoints  -  configure them to point at Snowstorm and configure the value sets per field.",
     "keyPoints": [
       "FHIR API integration is the standard approach",
       "Configure the terminology service endpoint in existing EHR systems",
@@ -374,7 +374,7 @@
     ]
   },
   "I019": {
-    "answer": "The minimum core services are: a licensed SNOMED CT terminology service (Snowstorm with RF2 content), a value set management capability (Simplex), and a governance process with named ownership. For reporting, add a mapping service for ICD-10. For local content needs, add the SNOMED Authoring Platform for extension concept authoring.",
+    "answer": "The minimum core services are: a licensed SNOMED CT terminology service loaded with RF2 release content, a value set management capability, and a governance process with named ownership. For reporting, add a map translation service for ICD-10. For local content needs, add an authoring capability for extension concept creation. Many of these services can be combined - for example, Snowstorm (open source) covers terminology service, ECL (Expression Constraint Language) expansion, and map translation, while Simplex adds value set management.",
     "keyPoints": [
       "Terminology service (Snowstorm) is the mandatory foundation",
       "Value set management (Simplex) supports curation and authoring",
@@ -388,7 +388,7 @@
     ]
   },
   "I020": {
-    "answer": "Terminology curation means reviewing value sets, reference sets, and mappings on each SNOMED CT release, responding to clinical change requests, and monitoring quality metrics. Use ECL-based queries to automate detection of stale or invalid content. Plan for 2–4 weeks of terminology team effort per SNOMED CT release for a medium-scale implementation.",
+    "answer": "Terminology curation means reviewing value sets, reference sets, and mappings on each SNOMED CT release, responding to clinical change requests, and monitoring quality metrics. Use ECL-based queries to automate detection of stale or invalid content. Plan for 2-4 weeks of terminology team effort per SNOMED CT release for a medium-scale implementation.",
     "keyPoints": [
       "Twice-yearly release cycle drives the curation cadence",
       "Automate detection of invalid content using ECL queries",
@@ -401,7 +401,7 @@
     ]
   },
   "I021": {
-    "answer": "Quality is measured by coding completeness, preferred term adherence, and absence of invalid concept usage. Automate detection using ECL queries via the terminology service - for example, querying for records using inactivated concept IDs after each release. Review results with clinical governance and address root causes rather than symptoms.",
+    "answer": "Quality is measured by coding completeness, preferred term adherence, and absence of invalid concept usage. Automate detection using ECL queries via the terminology service  -  for example, querying for records using inactivated concept IDs after each release. Review results with clinical governance and address root causes rather than symptoms.",
     "keyPoints": [
       "Define quality KPIs before go-live - not after problems appear",
       "Automate ECL-based quality queries after each SNOMED CT release",
@@ -413,7 +413,7 @@
     ]
   },
   "I022": {
-    "answer": "Treat value sets and maps as governed, versioned assets. Each one should have a named owner, a recorded definition (ECL where possible) tied to a specific SNOMED CT edition and version, and a change history.",
+    "answer": "Store all value set definitions as ECL (Expression Constraint Language) expressions under version control, and maintain mappings in a dedicated mapping tool with audit trail and review workflow. Align all updates to the SNOMED CT release cycle, test against consuming systems, and notify them of changes before each release goes to production. Tools such as Simplex support value set authoring and RF2 or FHIR export; Snap2SNOMED supports structured mapping workflows with AI-assisted suggestions and reviewer approval.",
     "keyPoints": [
       "Pick a review cadence that fits your edition's release schedule. At each review, re-expand value sets, handle inactivated concepts using their historical associations, and test changes with the systems that use them before going live.",
       "Use the official maps distributed with SNOMED CT where they exist, such as ICD-10. Maintain any custom maps in a tool with versioning and a review workflow, such as Snap2SNOMED.",
@@ -515,7 +515,7 @@
     ]
   },
   "I025": {
-    "answer": "Use the SNOMED International Translation Tool for structured translation workflows with approval, audit trail, and RF2 export. Coordinate with your NRC first - many NRCs publish and maintain national language reference sets that you should use rather than maintain yourself. Align translation releases with SNOMED CT release dates.",
+    "answer": "Coordinate with your national release centre (NRC) first - many NRCs publish and maintain national language reference sets that you should adopt rather than duplicate. Where a national reference set does not exist or has gaps, manage translations using a structured workflow tool that supports assignment, review, consistency checking, and RF2 export (for example, the SNOMED International Translation Tool). Align translation releases with SNOMED CT release dates and define minimum coverage thresholds as release readiness criteria.",
     "keyPoints": [
       "Translation Tool provides structured workflow, review, and RF2 export",
       "Check with your NRC before commissioning translations - avoid duplicating national effort",
@@ -527,7 +527,7 @@
     ]
   },
   "I026": {
-    "answer": "Pass the user's language reference set preference to Snowstorm's search API. Snowstorm matches against preferred terms and synonyms from that language reference set and returns results ranked by match quality. Configure a fallback language reference set so searches degrade gracefully rather than returning no results for untranslated concepts.",
+    "answer": "Configure your terminology service to accept a language reference set parameter per user session and match search queries against preferred terms and synonyms from that reference set. Rank results by match quality against the configured language - preferred term matches rank above synonym matches. Configure a fallback language reference set (typically international English) so searches return a result for concepts not yet translated rather than returning nothing.",
     "keyPoints": [
       "Snowstorm search accepts a language reference set parameter",
       "Synonym matching must be enabled for each configured language",
@@ -540,7 +540,7 @@
     ]
   },
   "I027": {
-    "answer": "Review your language reference set on each SNOMED CT release: identify newly added concepts within your implementation scope, flag them for translation, and update the reference set before deploying the new release. Use the Translation Tool's version management. Set a minimum coverage threshold - concepts below it must be translated before the release goes to production.",
+    "answer": "Review your language reference set on each SNOMED CT release: identify newly added concepts within your implementation scope, flag them for translation, and update the reference set before deploying the new release. Use the Translation Tool's version management. Set a minimum coverage threshold  -  concepts below it must be translated before the release goes to production.",
     "keyPoints": [
       "Identify new concepts needing translation on every release",
       "Set a coverage threshold as a release readiness gate",
@@ -553,7 +553,7 @@
     ]
   },
   "I028": {
-    "answer": "Translation quality requires review by a clinical SME who is fluent in both the clinical domain and the target language - linguistic review alone is insufficient. Establish an approval workflow in the Translation Tool. Track consistency - the same source concept should always produce the same target preferred term. Audit quality on each release.",
+    "answer": "Translation quality requires review by a clinical SME who is fluent in both the clinical domain and the target language  -  linguistic review alone is insufficient. Establish an approval workflow in the Translation Tool. Track consistency  -  the same source concept should always produce the same target preferred term. Audit quality on each release.",
     "keyPoints": [
       "Clinical + linguistic review is mandatory for every translation",
       "Consistency checking - one source concept, one target preferred term",
@@ -566,7 +566,7 @@
     ]
   },
   "I029": {
-    "answer": "Each language reference set assigns acceptability - preferred or acceptable - to SNOMED CT descriptions for that language. The preferred term is used for display; acceptable synonyms support search matching. Configure Snowstorm to search both preferred terms and acceptable synonyms. Extension language reference sets can add local synonyms for concepts where the national terms are unfamiliar to local clinical users.",
+    "answer": "Each language reference set assigns acceptability - preferred or acceptable - to SNOMED CT descriptions for that language or dialect. The preferred term is used for display in clinical interfaces; acceptable synonyms are also matched during search. Configure your terminology service to search both preferred terms and acceptable synonyms from the active language reference set. Where local clinical users prefer terms not in the national reference set, add them as acceptable synonyms in a local extension language reference set - this improves search recall without displacing the nationally maintained preferred term.",
     "keyPoints": [
       "Preferred terms = primary display; acceptable synonyms = search matching",
       "Configure Snowstorm to search both - acceptable synonym matching is often disabled by default",
@@ -579,7 +579,7 @@
     ]
   },
   "I030": {
-    "answer": "Only after confirming via a thorough Browser search that the concept genuinely does not exist. If the concept has international applicability, submit a content request to SNOMED International instead - this is almost always preferable. Extension concepts are appropriate for national-level clinical coding needs or local administrative concepts that will not be needed outside your organisation.",
+    "answer": "Only after confirming via a thorough Browser search that the concept genuinely does not exist. If the concept has international applicability, submit a content request to SNOMED International instead  -  this is almost always preferable. Extension concepts are appropriate for national-level clinical coding needs or local administrative concepts that will not be needed outside your organisation.",
     "keyPoints": [
       "Search the Browser exhaustively - including inactive terms and all synonyms",
       "Submit a content request to SNOMED International for any concept with broader applicability",
@@ -592,7 +592,7 @@
     ]
   },
   "I031": {
-    "answer": "Apply the SNOMED CT concept model as defined in the MRCM - each concept must have IS-A relationships placing it correctly in the hierarchy, plus defining attribute-value pairs appropriate to the clinical domain. Use the SNOMED Authoring Platform, which enforces MRCM constraints in real time. Run classification after every authoring change to validate placement.",
+    "answer": "Apply the SNOMED CT concept model as defined in the MRCM  -  each concept must have IS-A relationships placing it correctly in the hierarchy, plus defining attribute-value pairs appropriate to the clinical domain. Use the SNOMED Authoring Platform, which enforces MRCM constraints in real time. Run classification after every authoring change to validate placement.",
     "keyPoints": [
       "MRCM defines permitted attribute-value pairs for each concept domain",
       "IS-A relationships must place the concept correctly in the hierarchy",
@@ -616,7 +616,7 @@
     ]
   },
   "I033": {
-    "answer": "On each international release, review the delta for new concepts that supersede extension content, changed parent concepts, and inactivated concepts used as attribute values. Retire extension concepts that have been promoted, update IS-A relationships for changed parents, and confirm attribute values still exist. Plan 1–2 weeks for this alignment per release.",
+    "answer": "On each international release, review the delta for new concepts that supersede extension content, changed parent concepts, and inactivated concepts used as attribute values. Retire extension concepts that have been promoted, update IS-A relationships for changed parents, and confirm attribute values still exist. Plan 1-2 weeks for this alignment per release.",
     "keyPoints": [
       "Release delta review is mandatory - plan it as a fixed activity",
       "Retire extension concepts promoted to the international release",
@@ -629,7 +629,7 @@
     ]
   },
   "I034": {
-    "answer": "Extension concept approval requires a formal workflow: clinical proposal, informaticist modelling review, classification and Drools validation pass, clinical sign-off, and release. The SNOMED Authoring Platform supports task-based review. No concept should be published without passing classification - concepts that fail classification produce incorrect subsumption results.",
+    "answer": "Extension concept approval requires a formal workflow: clinical proposal, informaticist modelling review, classification and Drools validation pass, clinical sign-off, and release. The SNOMED Authoring Platform supports task-based review. No concept should be published without passing classification  -  concepts that fail classification produce incorrect subsumption results.",
     "keyPoints": [
       "Formal approval workflow is mandatory - no informal additions to extension content",
       "Classification must pass before approval",
@@ -642,7 +642,7 @@
     ]
   },
   "I035": {
-    "answer": "Package extension content as RF2 release files aligned to SNOMED CT release dates, with a consistent version date and module SCTID. Document the full dependency chain for consuming systems - they must load the international release and national edition before the extension. Publish release notes for each version.",
+    "answer": "Package extension content as RF2 release files aligned to SNOMED CT release dates, with a consistent version date and module SCTID. Document the full dependency chain for consuming systems  -  they must load the international release and national edition before the extension. Publish release notes for each version.",
     "keyPoints": [
       "RF2 packaging aligned to SNOMED CT release dates",
       "Document the full dependency chain for consuming systems",
@@ -655,7 +655,7 @@
     ]
   },
   "I036": {
-    "answer": "If a national language reference set exists for your language, you will see preferred clinical terms in your own language throughout the system. If coverage is incomplete for some concepts, work with your NRC or terminology team. SNOMED CT's concept meaning is language-neutral - the same code works across all languages, only the display term differs.",
+    "answer": "If a national language reference set exists for your language, you will see preferred clinical terms in your own language throughout the system. If coverage is incomplete for some concepts, work with your NRC or terminology team. SNOMED CT's concept meaning is language-neutral  -  the same code works across all languages, only the display term differs.",
     "keyPoints": [
       "National language reference sets provide preferred terms in your language",
       "Coverage gaps should be flagged to your terminology team or NRC",
@@ -667,7 +667,7 @@
     ]
   },
   "I037": {
-    "answer": "Store the user's locale preference and pass it to the terminology service for all lookups and searches. Configure Snowstorm with multiple language reference sets in priority order. Design the UI to show a language indicator when falling back to a secondary language. Concept IDs are language-neutral - the same data model works across all locales.",
+    "answer": "Store the user's locale preference and pass it to the terminology service for all lookups and searches. Configure Snowstorm with multiple language reference sets in priority order. Design the UI to show a language indicator when falling back to a secondary language. Concept IDs are language-neutral  -  the same data model works across all locales.",
     "keyPoints": [
       "Locale preference drives all terminology service queries",
       "Snowstorm supports multi-language priority configuration",
@@ -680,7 +680,7 @@
     ]
   },
   "I038": {
-    "answer": "Use the SNOMED International Translation Tool as your primary workflow platform - it provides translation assignment, review, consistency checking, and RF2 export. Coordinate with your NRC to avoid duplicating translations already maintained nationally. Align all releases to SNOMED CT release dates and define coverage requirements as release readiness criteria.",
+    "answer": "Use a structured translation workflow platform that supports assignment, review, consistency checking, and RF2 export - the SNOMED International Translation Tool is one such option. Coordinate with your NRC (national release centre) to avoid duplicating translations already maintained nationally. Define coverage requirements (minimum percentage of in-scope concepts translated) as release readiness criteria, and align all translation releases to SNOMED CT release dates so consuming systems receive updated language reference sets before new content goes live.",
     "keyPoints": [
       "Translation Tool is the standard workflow platform",
       "NRC coordination avoids duplicating national translation effort",
@@ -692,7 +692,7 @@
     ]
   },
   "I039": {
-    "answer": "Use the SNOMED Authoring Platform for all extension concept authoring - it enforces MRCM constraints, runs classification, and provides task-based review workflows. Before creating any concept, perform a thorough Browser search. Apply the SNOMED CT Editorial Guide for naming conventions and modelling principles. Every authored concept is your ongoing maintenance responsibility.",
+    "answer": "Before creating any concept, perform a thorough search of the SNOMED CT Browser across all descriptions, synonyms, and inactive terms - many apparent gaps are already covered. Use an authoring tool that enforces MRCM (Machine Readable Concept Model) constraints and runs description logic classification automatically; the SNOMED Authoring Platform (available to NRCs and Managed Service members) does this, as do several commercial authoring products. Apply the SNOMED CT Editorial Guide for naming and modelling. Every concept you author becomes your ongoing maintenance responsibility - it must be reviewed on each SNOMED CT release for alignment with new or changed international content.",
     "keyPoints": [
       "Authoring Platform enforces MRCM and runs classification automatically",
       "Search the Browser before authoring - many apparent gaps already exist",
@@ -718,7 +718,7 @@
     ]
   },
   "I041": {
-    "answer": "Postcoordination should be the exception, not the rule. Always use precoordinated concepts where they exist - they are fully defined, classified, and supported throughout SNOMED CT tooling and the ECL query infrastructure. Postcoordination is appropriate only when no suitable precoordinated concept exists and one cannot be obtained via a content request within your timeline.",
+    "answer": "Postcoordination should be the exception, not the rule. Always use precoordinated concepts where they exist  -  they are fully defined, classified, and supported throughout SNOMED CT tooling and the ECL query infrastructure. Postcoordination is appropriate only when no suitable precoordinated concept exists and one cannot be obtained via a content request within your timeline.",
     "keyPoints": [
       "Always prefer precoordinated concepts - they work in standard ECL queries",
       "Submit a content request to SNOMED International before resorting to postcoordination",
@@ -730,7 +730,7 @@
     ]
   },
   "I042": {
-    "answer": "Store SNOMED CT concept IDs as character strings in patient records. Do not store display text alongside the SCTID in the coded field - retrieve preferred terms at render time from the terminology service using the user's language reference set. This ensures display is always current and correct regardless of language.",
+    "answer": "Store SNOMED CT concept IDs as character strings in patient records. Do not store display text alongside the SCTID in the coded field  -  retrieve preferred terms at render time from the terminology service using the user's language reference set. This ensures display is always current and correct regardless of language.",
     "keyPoints": [
       "Store SCTIDs as strings - e.g. '73211009' for Diabetes mellitus",
       "Retrieve preferred terms at render time - never hardcode display text with the code",
@@ -742,7 +742,7 @@
     ]
   },
   "I043": {
-    "answer": "Postcoordinated expressions must be validated against MRCM constraints using the Compositional Grammar specification. The SNOMED CT Expression Constraint Language can query some postcoordinated data. Most standard terminology service operations and EHR integrations work on precoordinated concepts only - postcoordination significantly increases implementation complexity.",
+    "answer": "Postcoordinated expressions must be validated against MRCM constraints using the Compositional Grammar specification. The SNOMED CT Expression Constraint Language can query some postcoordinated data. Most standard terminology service operations and EHR integrations work on precoordinated concepts only  -  postcoordination significantly increases implementation complexity.",
     "keyPoints": [
       "Validate expressions against MRCM using Compositional Grammar",
       "ECL can query some postcoordinated expressions but not all",
@@ -755,7 +755,7 @@
     ]
   },
   "I044": {
-    "answer": "SNOMED CT hierarchies define IS-A relationships (what a concept is a kind of), enabling subsumption queries via ECL's << operator. Defining relationships describe clinical attributes (finding site, causative agent, etc.), enabling attribute-level filtering in ECL. Understanding both for your clinical domain is essential before designing value sets, analytics queries, or CDS rules.",
+    "answer": "SNOMED CT hierarchies define IS-A relationships (what a concept is a kind of), enabling subsumption queries via ECL's &lt;&lt; operator. Defining relationships describe clinical attributes (finding site, causative agent, etc.), enabling attribute-level filtering in ECL. Understanding both for your clinical domain is essential before designing value sets, analytics queries, or CDS rules.",
     "keyPoints": [
       "IS-A hierarchy enables subsumption (<<) queries across all subtypes",
       "Defining relationships enable attribute-level filtering in ECL",
@@ -793,7 +793,7 @@
     ]
   },
   "I046": {
-    "answer": "Write ECL expressions using the << operator to query all descendants of a concept. Expand the expression via the FHIR $expand endpoint to get the full concept set as a list of SCTIDs, then use an IN clause in SQL to query patient data. Re-expand on each SNOMED CT release so new subtypes are automatically included in queries.",
+    "answer": "Write ECL expressions using the &lt;&lt; operator to query all descendants of a concept. Expand the expression via the FHIR $expand endpoint to get the full concept set as a list of SCTIDs, then use an IN clause in SQL to query patient data. Re-expand on each SNOMED CT release so new subtypes are automatically included in queries.",
     "keyPoints": [
       "<< retrieves all descendants - the most important ECL operator for analytics",
       "FHIR $expand returns the full concept set for use in SQL or application code",
@@ -932,7 +932,7 @@
     ]
   },
   "I051": {
-    "answer": "Distribute SNOMED CT content via the shared terminology service API - applications query the service rather than hosting local copies. If RF2 file distribution is necessary, distribute via your NRC's authorised channels with license verification. Use HTTPS for all terminology service endpoints. Never distribute RF2 files without confirming downstream systems hold valid licenses.",
+    "answer": "Distribute SNOMED CT content via the shared terminology service API  -  applications query the service rather than hosting local copies. If RF2 file distribution is necessary, distribute via your NRC's authorised channels with license verification. Use HTTPS for all terminology service endpoints. Never distribute RF2 files without confirming downstream systems hold valid licenses.",
     "keyPoints": [
       "Shared terminology service API is the standard distribution mechanism",
       "RF2 distribution requires downstream license verification",
@@ -945,7 +945,7 @@
     ]
   },
   "I063": {
-    "answer": "SNOMED CT edition and version are declared using the URI pattern defined in the SNOMED CT URI Specification (https://confluence.ihtsdotools.org/display/DOCURI). In FHIR, the code system URI is always http://snomed.info/sct. The edition module ID and release date are declared in the version URI: http://snomed.info/sct/{moduleId}/version/{YYYYMMDD}. For example, the January 2024 international release is declared as http://snomed.info/sct/900000000000207008/version/20240101. National editions use their own module ID - for example, the UK Clinical edition module is 999000041000000102. Sender and receiver must agree on the edition and version before exchange, and the declared version must be loaded in both parties' terminology services for validation and display to work correctly.",
+    "answer": "SNOMED CT edition and version are declared using the URI pattern defined in the SNOMED CT URI Specification. In FHIR, the code system URI is always http://snomed.info/sct. Version URI pattern: http://snomed.info/sct/{moduleId}/version/{YYYYMMDD}. The January 2024 international release is http://snomed.info/sct/900000000000207008/version/20240101. National editions use their own module ID. Both sender and receiver must agree on the edition and version before exchange.",
     "keyPoints": [
       "Code system URI is always http://snomed.info/sct regardless of edition",
       "Version URI pattern: http://snomed.info/sct/{moduleId}/version/{YYYYMMDD} - defined in the SNOMED CT URI Specification",
@@ -961,7 +961,7 @@
     ]
   },
   "I064": {
-    "answer": "The receiver always resolves display text using their own language reference set by calling $lookup with the displayLanguage parameter - the display text carried in the received resource reflects the sender's locale and must never be treated as authoritative. Good practice is to ensure the sender's original term remains accessible to the receiver, for example as a secondary display or tooltip, so clinicians can see exactly what the sending system recorded. This is particularly important where preferred terms differ significantly across locales for the same concept - a clinician reviewing a referral letter should be able to see both the locally preferred term and the term as the sender expressed it.",
+    "answer": "The receiver always resolves display text using their own language reference set by calling $lookup with the displayLanguage parameter  -  the display text in the received resource reflects the sender's locale and must never be treated as authoritative. Good practice is to ensure the sender's original term remains accessible to the receiver, for example as a secondary display or tooltip.",
     "keyPoints": [
       "Receiver always resolves display text using their own language reference set via $lookup - never rely on the sender's display text",
       "Good practice: preserve the sender's original display text as a secondary label or tooltip so clinicians can see what the sending system recorded",
@@ -974,5 +974,68 @@
       "multilingual",
       "search-ux"
     ]
+  },
+  "I058": {
+    "answer": "Define each CDS rule element as an intensional value set using ECL  -  for example, descendants of a specific disease concept. Package these as RF2 reference sets or FHIR ValueSet resources with explicit versioning so rule logic can be audited. Review value sets on each SNOMED CT release to confirm the concept set remains clinically complete."
+  },
+  "I054": {
+    "answer": "Scope each diagnosis field with an ECL (Expression Constraint Language) expression and configure search to match preferred terms and synonyms from the active language reference set. Apply frequency-based boosting so the most commonly recorded diagnoses in your clinical context appear first, reducing clicks for routine presentations. Provide a clear no-match pathway - a request route to the terminology team - rather than allowing silent free-text fallback, which bypasses structured coding and breaks downstream data quality."
+  },
+  "I056": {
+    "answer": "Consistency follows from appropriate value set scope, good search UX, and monitoring. Mandatory structured fields with poor search produce workarounds - fix the search and value set before adding enforcement. Track free-text rates by field and department as your primary quality indicator, and investigate root causes when they are high. Establish a feedback route so clinicians can report missing or unhelpful terms directly to the terminology team."
+  },
+  "I072": {
+    "answer": "Start by identifying which clinical workflows will use SNOMED CT - problem lists, clinical documentation, analytics, CDS, or data exchange - and prioritise by clinical value and feasibility. Agree the terminology architecture (shared terminology service, value set governance, release management) before individual use cases go live. Define named owners for terminology governance and set measurable quality targets before go-live so success can be assessed, not just declared."
+  },
+  "I073": {
+    "answer": "Start with a contained, high-value use case - problem lists or allergies are common first phases because the value is clear and the scope is bounded. Build the shared terminology service infrastructure in phase one so later phases inherit it. Avoid running multiple use cases in parallel in early phases - each one exercises the governance and release management process, which needs time to mature. Plan SNOMED CT release cycles into your project timeline from the start."
+  },
+  "I074": {
+    "answer": "The main clinical risks are: incorrect concept selection leading to wrong clinical meaning in the record, free-text fallback bypassing safety checks, and silent coding errors from inactivated concepts after a SNOMED CT release. Mitigate selection errors through well-scoped value sets and clinician training. Prevent free-text fallback with deliberate no-match pathways. Detect inactivated concept usage with automated ECL-based QA queries run after every SNOMED CT release. Name a clinical owner for each coded field who is accountable for value set accuracy."
+  },
+  "I052": {
+    "answer": "Define the clinical scope first - agree with clinical leads which conditions constitute a 'problem' in your context and whether the list is active conditions only or includes resolved history. Bind the problem entry field to a SNOMED CT value set using an ECL (Expression Constraint Language) expression scoped to the clinical finding and disorder hierarchies. Configure search to return preferred terms from your language reference set, apply frequency-based boosting, and provide a clear no-match pathway. Never allow silent free-text entry in a coded field."
+  },
+  "I053": {
+    "answer": "A problem list entry needs at minimum: a SNOMED CT concept ID representing the condition, clinical status (active or resolved), and the date of onset or recording. Agree governance for what qualifies as a 'problem' before implementation - whether to include findings, disorders, symptoms, and social circumstances varies by clinical context. Define the ECL constraint for the value set based on this scope. Structure the list to support both clinician workflow (active problems prominent) and analytics (full longitudinal history queryable)."
+  },
+  "I055": {
+    "answer": "Each structured field in a clinical template should be bound to a specific SNOMED CT ECL expression  -  for example, a procedure field bound to &lt;&lt;71388002. The terminology service validates selections at entry and returns preferred terms for display. Do not leave fields unscoped or allow search across all of SNOMED CT  -  this produces irrelevant results and poor data quality."
+  },
+  "I061": {
+    "answer": "Follow the SNOMED CT Allergy and Adverse Reaction Implementation Guide, which defines specific patterns for causative agent (Substance or Medicinal product), reaction (Clinical finding), severity, and certainty. This pattern aligns directly with the FHIR AllergyIntolerance resource. Do not design a local allergy model if the IG covers your needs  -  it creates interoperability problems."
+  },
+  "I070": {
+    "answer": "Map your existing codes to SNOMED CT using a structured mapping tool with reviewer approval and audit trail - Snap2SNOMED supports this workflow with AI-assisted suggestions. For free-text data, natural language processing can propose candidate SNOMED CT concepts but human clinical review of a statistically significant sample is mandatory before relying on the output. Preserve the original source value alongside the SNOMED CT code in the migrated record - do not discard legacy codes. Plan the migration timing aligned to a SNOMED CT release boundary to avoid immediate post-migration drift."
+  },
+  "I057": {
+    "answer": "CDS rules that reference SNOMED CT should use ECL subsumption expressions rather than explicit concept lists. For example, &lt;&lt;73211009 automatically covers all subtypes of diabetes mellitus, including any added in future SNOMED CT releases. The terminology service evaluates subsumption at runtime via the $subsumes operation or ECL endpoint  -  no manual list maintenance is needed."
+  },
+  "I059": {
+    "answer": "SNOMED CT's hierarchy enables subsumption-based queries using ECL that capture entire disease or procedure families with a single expression. Use the FHIR $expand endpoint or Snowstorm's ECL search to expand concept sets, then apply them against coded patient data. This is far more powerful and maintainable than exact-code matching."
+  },
+  "I060": {
+    "answer": "Aggregation is achieved by writing ECL expressions that group concepts under a common ancestor  -  for example, all respiratory diseases as &lt;&lt;50043002. The terminology service expands the ECL to a concept set used to aggregate patient records. Pre-expand frequently used groupings into reference sets for query performance."
+  },
+  "I068": {
+    "answer": "Use ECL attribute refinements to filter by defining relationships. For example, &lt;&lt;71388002 : 363704007 = &lt;&lt;80891009 selects cardiac procedures. This enables more specific analytics queries and CDS rules than hierarchy-only expressions."
+  },
+  "I069": {
+    "answer": "Define the cohort clinically first, then translate each criterion to an ECL expression. Use set operators (AND, OR, MINUS) to combine multiple criteria. Validate the resulting concept set with clinical SMEs before production use. Package validated queries as named reference sets so cohort definitions are versioned, auditable, and reusable across multiple reports."
+  },
+  "I062": {
+    "answer": "SNOMED CT and HL7 FHIR are designed to work together. Apply SNOMED CT terminology bindings (backed by ECL-defined value sets) to FHIR resources like Condition, Observation, and Procedure. A FHIR Terminology Service provides $expand, $validate-code, and $subsumes for both senders and receivers. Always declare the SNOMED CT edition URI in exchanged resources."
+  },
+  "I071": {
+    "answer": "Store legacy codes and SNOMED CT codes in parallel in the patient record during transition - do not delete legacy codes as they may be the authoritative source for existing data. Use the FHIR CodeableConcept structure, which supports multiple codings on a single clinical element, to carry both the legacy code and the SNOMED CT code in exchanged data. Define a sunset date for the legacy system and document it with all exchange partners so both sides plan the transition. After cutover, keep legacy codes in historical records for audit and longitudinal query purposes."
+  },
+  "I065": {
+    "answer": "SNOMED CT's concept meanings are language-neutral - the same concept ID represents the same clinical meaning regardless of which language reference set provides the display term. Ensure all systems use the concept ID as the primary data element, not the display text. Display terms should be resolved at render time from the active language reference set rather than stored in the clinical record. This means a concept recorded in one language is automatically displayed correctly when viewed in another, as long as a translation exists."
+  },
+  "I066": {
+    "answer": "Store the SNOMED CT concept ID in the clinical record, not the display text. When rendering a document, resolve the display term from the language reference set configured for the viewing user's locale. Where a concept has no translation in the target language, fall back to the international English preferred term and visually distinguish it (for example, with a language label) so clinicians know the term is not in their native language. Never hard-code display terms in document templates - always resolve them at render time from the terminology service."
+  },
+  "I067": {
+    "answer": "Load the language reference sets for all required languages into your terminology service and configure each user's session with their preferred language. Search and display resolve to each user's language automatically via the terminology service - the clinical data layer stores only concept IDs and is language-neutral throughout. For languages where national reference sets exist, adopt them rather than maintaining your own translations. For gaps, add local translations as extension language reference set members and plan to review them on each SNOMED CT release as new concepts are added."
   }
 }
