@@ -1004,111 +1004,122 @@
   },
   "term-service": {
     "title": "Terminology service implementation",
-    "subtitle": "Deploying and operating a SNOMED CT terminology service for runtime use",
+    "subtitle": "Providing SNOMED CT terminology services to clinical applications, from use cases to deployment and version upgrades",
     "icon": "server",
     "color": "blue",
     "audience": [
       "Software provider",
       "Information Manager"
     ],
-    "overview": "A SNOMED CT terminology service is the runtime foundation for all SNOMED CT-enabled applications. It provides concept lookup, preferred term retrieval by language reference set, ECL-based value set expansion, subsumption testing, code validation, and concept map translation. Snowstorm - developed by SNOMED International and released as open source - is the reference server. It implements both a native API and the HL7 FHIR Terminology Service operations ($expand, $lookup, $subsumes, $validate-code, $translate) required for interoperable deployment. All other playbooks on this site depend on a correctly configured terminology service.",
+    "overview": "A SNOMED CT terminology service is the software function that gives applications access to SNOMED CT content: finding concepts, retrieving terms in the right language, testing subtypes and reference set membership, applying expression constraints, and identifying changes between versions. SNOMED CT delivers its full value only when these services use its specific features (the hierarchy, concept definitions, reference sets, expression constraints, language reference sets, and history), not just generic code lookup. A shared, SNOMED CT-enabled terminology server with an HL7 FHIR interface is the recommended approach; some systems instead implement selected services directly from the release files.",
     "decisions": [
       {
-        "question": "Will you host your own terminology service or use a hosted or public service?",
-        "guidance": "Self-hosted Snowstorm gives full control over editions, versions, extension content, and language configuration, but requires infrastructure capacity and operational maturity. Hosted services from SNOMED International or your national release centre (NRC) reduce operational burden but may have latency, edition coverage, or customisation constraints. The SNOMED International public browser API is suitable for development and testing but not for production clinical applications. Assess your uptime, data sovereignty, customisation, and performance requirements before deciding."
+        "question": "Which use cases must the terminology service support?",
+        "guidance": "Start from what the consuming applications need to do, then derive the service types. The SNOMED CT Terminology Services Guide maps use cases to service types: data entry needs concept search, terms, subtype testing, reference set membership, and expression constraints; display needs terms for a concept; reporting and analytics need subsumption, reference set membership, and expression constraints; managing upgrades needs change identification and history data; and mapping needs map data. List the use cases for each consuming system before choosing or configuring a server."
       },
       {
-        "question": "Which SNOMED CT edition(s) and language reference sets are required?",
-        "guidance": "Most implementations require the national edition, which includes the international release plus national extension content. Check which edition your NRC publishes, whether it includes required local concepts, and the release schedule. If no national edition exists for your territory, load the international edition directly. Configure language reference set priority so that preferred terms are returned in the correct language for your users. See the <a href=\"#/playbook/multilingual\">Multilingual implementation playbook</a> for language reference set configuration guidance."
+        "question": "Should services come from a shared terminology server or be built into each application?",
+        "guidance": "A shared SNOMED CT-enabled terminology server is recommended: every application gets the same content, the same terms, and a single upgrade path. It can be self-hosted or provided by your National Release Centre (NRC) or a commercial provider. Applications can also implement selected services directly from the release files, which can suit simple needs such as display, but each application then carries its own upgrade and consistency burden. Public servers are for development and evaluation, not production clinical use."
       },
       {
-        "question": "Which FHIR Terminology Service operations must be supported?",
-        "guidance": "At a minimum, most implementations need: $expand (ECL-based value set expansion for search and validation), $lookup (concept details and preferred terms), $validate-code (code validation on receipt), and $subsumes (hierarchical relationship testing for CDS). Translation via $translate is required if ICD-10 or other map output is needed. List the operations required by each consuming system before selecting or configuring a server. See the <a href=\"#/playbook/interop\">Interoperability playbook</a> for how these operations are used in FHIR-based data exchange."
+        "question": "Which editions, versions, and language reference sets are required?",
+        "guidance": "Most implementations need their national edition, which combines the International Edition with national content such as local concepts, reference sets, and language reference sets. Agree which edition and version each consuming system uses, and make every service request identify them explicitly, because results differ between versions. Decide the language reference sets and their fallback order for each user group. See the <a href=\"#/playbook/multilingual\">Multilingual implementation playbook</a> for language configuration."
       },
       {
-        "question": "How will SNOMED CT release upgrades be tested and deployed?",
-        "guidance": "The International Edition is released monthly, and national extensions follow their own release cycle - track both. Upgrades must be tested against all consuming applications before production deployment: value sets may change, concepts may be inactivated, and preferred terms may be updated. Define a testing protocol, rollback procedure, and notification process for consuming systems. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance."
+        "question": "Which interfaces will consuming systems use?",
+        "guidance": "The HL7 FHIR terminology operations ($lookup, $expand, $validate-code, $subsumes, $translate) are the standard interface for clinical applications and support SNOMED CT through implicit value sets and ECL. Some SNOMED CT features, such as history data, change identification, concept model rules, and reference set data, may need the server's native API. Document which operations each consuming system calls and what it does when the service is unavailable. See the <a href=\"#/playbook/interop\">Interoperability playbook</a> for FHIR exchange patterns."
       },
       {
-        "question": "What access control, audit logging, and availability requirements apply?",
-        "guidance": "Clinical applications that depend on the terminology service for validation require high availability. Define SLAs, logging requirements, and access control (especially for write operations) before deployment. Consider caching strategies to reduce load on the terminology service for frequently used concept lookups. Snowstorm supports read replicas and can be deployed behind a load balancer for high-availability configurations."
+        "question": "How will you adopt new SNOMED CT versions?",
+        "guidance": "The International Edition is released monthly, and national editions and derivatives follow their own cycles. Agree an upgrade cadence, then for each upgrade identify additions, changes, and inactivations, and use the historical association reference sets to find replacements for inactive content used in templates, value sets, and queries. If you skip versions, a single set of delta files will not cover all changes, so load from snapshot or full files. See the <a href=\"#/playbook/governance\">Governance playbook</a> for change management."
+      },
+      {
+        "question": "What operational, performance, and licensing requirements apply?",
+        "guidance": "Clinical applications that rely on the service for search and validation need high availability. Define service levels, access control, audit logging, and capacity before go-live. Design for statelessness and paging so the service scales, and agree where caching is acceptable and how caches are refreshed after upgrades. Make sure only licensed users and systems receive SNOMED CT content."
       }
     ],
     "steps": [
       {
-        "title": "Select deployment model and provision infrastructure",
-        "description": "Choose between self-hosted Snowstorm, a hosted service from your NRC, or the SNOMED International public terminology server. Self-hosted is required if you need a national edition, extension content, or tight availability SLAs. For development and evaluation, the public SNOMED International server at https://snowstorm.ihtsdotools.org is available but must not be used for production clinical applications.",
+        "title": "Identify use cases and required service types",
+        "description": "For each consuming application, list the use cases it supports (for example data entry, display, reporting, mapping, or change management) and the service types each one needs. Use the use-case table in the Terminology Services Guide as a checklist. This list becomes the requirements for selecting, configuring, and testing the terminology service.",
+        "pedagogy": {
+          "mode": "support",
+          "scaffold": "Before choosing any technology, we will describe what the applications actually need to do with SNOMED CT. Each use case needs a specific set of service types, and missing one is usually discovered late, during integration. I will walk you through the use-case table and we will fill it in for your systems.",
+          "articulate": "You have listed the use cases for one application. Which service type does it depend on most, and what would a clinician notice if that service failed?",
+          "fade": "The learner can own this step when they can produce the use case and service type list for a new application without prompting."
+        }
+      },
+      {
+        "title": "Choose the deployment model",
+        "description": "Decide how the required services will be provided. A shared terminology server is the recommended approach for clinical applications; choose between self-hosting and a hosted service based on control, availability, data sovereignty, and operational capacity. Building services into an application from the release files is possible for limited needs, but plan for its upgrade and consistency burden.",
         "options": [
           {
-            "label": "SELF-HOSTED SNOWSTORM",
+            "label": "SHARED TERMINOLOGY SERVER",
             "points": [
-              "Deploy Snowstorm (open source, SNOMED International reference implementation) on your own infrastructure",
-              "Snowstorm requires Elasticsearch - provision adequate heap memory (minimum 4GB for Elasticsearch, more for production) and disk space for the RF2 content and search indexes",
-              "Full control over editions, versions, extension content, and language reference set configuration",
-              "Required if consuming systems need a national edition, local extension concepts, or strict availability SLAs"
+              "Self-host a SNOMED CT-enabled terminology server (open source or commercial) or use one hosted by your NRC or a commercial provider",
+              "Gives every application the same content, the same terms, and a single upgrade path",
+              "Supports the full set of service types, including expression constraints, subsumption, and history",
+              "Use public servers for development and evaluation only, not for production clinical applications"
             ]
           },
           {
-            "label": "HOSTED OR PUBLIC SERVICE",
+            "label": "SERVICES BUILT INTO THE APPLICATION",
             "points": [
-              "Use a hosted Snowstorm instance from your NRC or SNOMED International, or the public SNOMED International terminology server for development",
-              "Reduces infrastructure and operational burden - no Elasticsearch cluster to provision or maintain",
-              "Suitable when the international edition meets your needs and data sovereignty requirements allow external service use",
-              "The public SNOMED International server (https://snowstorm.ihtsdotools.org) is for development and testing only - not for production clinical applications"
+              "Load the release files directly and implement only the service types the application needs",
+              "Can suit simple needs, such as displaying terms for stored concepts",
+              "Each application must handle its own upgrades and stay consistent with other systems",
+              "A relational database built from the release files is not a terminology server by itself: search, subsumption, and expression constraints still need to be implemented"
             ]
           }
         ],
         "pedagogy": {
           "mode": "support",
-          "scaffold": "Before choosing, I will explain what is at stake: a self-hosted server gives you full control over editions, versions, and uptime, but requires infrastructure capacity and an operational release upgrade process. A hosted service reduces that burden but limits your control. For production clinical systems the self-hosted path is almost always right. Let me ask a few questions about your environment first.",
+          "scaffold": "Before choosing, I will explain what is at stake: a shared server gives every application the same content and one upgrade path, while building services into each application spreads that work across systems. Self-hosting gives control but needs operational capacity; a hosted service reduces that burden but limits control. Let me ask a few questions about your environment first.",
           "articulate": "You have chosen a deployment model. In your own words: what would need to change in your organisation for this choice to become a problem in two years?",
-          "fade": "The learner can own this step when they can state the deployment model, its rationale, and the conditions under which they would switch - without prompting."
+          "fade": "The learner can own this step when they can state the deployment model, its rationale, and the conditions under which they would switch, without prompting."
         }
       },
       {
-        "title": "Load the correct SNOMED CT RF2 release content",
-        "description": "Obtain licensed RF2 release files from SNOMED International (via the MLDS) or your NRC. Load order matters: the international edition must be loaded first, then the national edition on top. Verify content integrity and concept counts after loading. The correct edition determines which concepts are available for search, validation, and expansion.",
+        "title": "Load the editions and versions you need",
+        "description": "Obtain licensed release packages from SNOMED International (via MLDS) or your NRC, and load the edition each consuming system needs, typically your national edition. Load from snapshot or full files for a first load or when versions have been skipped. Check content integrity and concept counts after loading, and make sure each edition and version can be selected explicitly in service requests.",
         "options": [
           {
-            "label": "INTERNATIONAL PLUS NATIONAL EDITION",
+            "label": "NATIONAL EDITION",
             "points": [
-              "Load the SNOMED CT International Edition RF2 files first as the dependency",
-              "Load the national edition RF2 files on top - the national edition extends the international release with locally authored concepts, descriptions, and reference sets",
-              "Configure the national module ID as the primary module for concept authorship if local extension content will be added",
-              "Check with your NRC for the correct loading sequence and whether any interim releases are available between major releases",
-              "Confirm the national language reference set is included in the national edition and configure it as the highest-priority reference set for your locale"
+              "Combines the International Edition with national concepts, descriptions, and reference sets",
+              "Includes the national language reference set that clinicians need",
+              "Check with your NRC for the release schedule and how the edition is packaged"
             ]
           },
           {
             "label": "INTERNATIONAL EDITION ONLY",
             "points": [
-              "Load the SNOMED CT International Edition RF2 files - released by SNOMED International every month",
-              "Appropriate when no national edition exists for your territory, or when international content is sufficient for your use case",
-              "Configure the US English language reference set (or another international language reference set) for preferred term display",
-              "Note that national extension concepts from NRC releases will not be available - confirm this is acceptable before deployment"
+              "Appropriate when no national edition exists for your territory",
+              "Released monthly by SNOMED International",
+              "Add an international or local language reference set for display terms, and confirm that missing national content is acceptable"
             ]
           }
         ],
         "pedagogy": {
           "mode": "apprentice",
-          "scaffold": "Loading order is not arbitrary. The international edition must be loaded first because the national edition extends it - Snowstorm needs the parent concepts before it can attach the national descriptions and reference sets. I will show you the command, explain what each flag does, and wait for you to confirm the import completed before we move on.",
-          "articulate": "The import finished. What does the concept count tell you, and how would you verify that the national edition is actually layered on top of the international one?",
-          "fade": "The learner can own this step when they can perform the import independently, explain the loading order, and identify a failed import from the logs without assistance."
+          "scaffold": "An edition is the International Edition plus the extension modules that depend on it, so the dependencies must be in place before the extension content is usable. I will show you how the release package is structured, which files are loaded, and how to check that the edition and version are correctly identified before we move on.",
+          "articulate": "The load finished. What does the concept count tell you, and how would you verify that the national content is actually present and selectable?",
+          "fade": "The learner can own this step when they can load an edition independently, explain how editions and versions are identified, and spot a failed load without assistance."
         }
       },
       {
-        "title": "Configure language reference sets for preferred term retrieval",
-        "description": "Configure language reference set priority in Snowstorm so that $lookup, $expand, and concept search operations return preferred terms in the correct language for your users. Set a fallback reference set for concepts not covered by the primary reference set. Test explicitly that FSNs are not returned as display terms in any operation. See the <a href=\"#/playbook/search-ux\">Search and data entry playbook</a> for how language configuration affects clinician-facing search.",
+        "title": "Configure languages and terms",
+        "description": "Configure the language reference sets and fallback order for each user group so that search returns preferred terms and acceptable synonyms, and display returns the preferred term in the user's language. Every request that returns terms should state the language or language reference set. Test that fully specified names are never returned as display terms. See the <a href=\"#/playbook/search-ux\">Search and data entry playbook</a> for how this affects clinician-facing search.",
         "pedagogy": {
           "mode": "apprentice",
-          "scaffold": "Language reference sets are what turns a concept ID into the right display term for a given locale. Without correct configuration, your server returns FSNs - the long, parenthetical terms clinicians find unfamiliar. I will show you how Snowstorm resolves preferred terms, then we will configure the priority list together.",
-          "articulate": "Now run a $lookup for concept 73211009. What term did you get back, and why? What would change if you removed the national language reference set from the priority list?",
-          "fade": "The learner can own this step when they can configure language reference set priority, verify the result with $lookup, and explain the difference between preferred and acceptable synonyms."
+          "scaffold": "Language reference sets turn a concept into the right term for a given language or dialect. Without them, a service may return fully specified names, the long terms with a semantic tag that clinicians find unfamiliar. I will show you how the service resolves preferred terms, then we will configure the language order together.",
+          "articulate": "Look up concept 73211009 with your configuration. What term did you get back, and why? What would change if you removed the national language reference set from the order?",
+          "fade": "The learner can own this step when they can configure language order, verify the result, and explain the difference between preferred terms and acceptable synonyms."
         }
       },
       {
-        "title": "Expose and test FHIR Terminology Service endpoints",
-        "description": "Enable the FHIR R4 Terminology Service endpoints. Test each operation with realistic SNOMED CT content: $expand with ECL expressions, $validate-code for both valid and invalid concepts, $subsumes for parent-child relationships, and $translate for map-based operations. Confirm that preferred terms are returned correctly in all responses. Use the FHIR Validator or the SNOMED International test harness for conformance testing.",
+        "title": "Expose and test the service interfaces",
+        "description": "Enable the interfaces your consuming systems use, typically the HL7 FHIR terminology operations, plus native API calls for features FHIR does not cover. Test each required service type with realistic content: expansion with ECL, validation of valid, invalid, and inactive codes, subsumption, term lookup in each language, and map translation where needed. Confirm that every request identifies the edition and version.",
         "examples": [
           {
             "label": "$expand with ECL",
@@ -1129,78 +1140,79 @@
         ],
         "pedagogy": {
           "mode": "support",
-          "scaffold": "Testing is not just confirming the server responds - it is building confidence that the server will behave correctly when clinical applications depend on it. I will walk you through a test sequence: $expand with a simple ECL, $validate-code for an active concept, $validate-code for an inactive concept, and $lookup with a language parameter. Each result tells you something specific.",
-          "articulate": "The $validate-code call for the inactive concept returned false. What should a consuming application do when it receives that response?",
+          "scaffold": "Testing is not just confirming the service responds: it is building confidence that it will behave correctly when clinical applications depend on it. I will walk you through a test sequence covering each required service type, including an inactive concept and a request in another language. Each result tells you something specific.",
+          "articulate": "The validation call for the inactive concept returned false. What should a consuming application do when it receives that response?",
           "fade": "The learner can own this step when they can design a test sequence for a new consuming application and interpret unexpected responses without guidance."
         }
       },
       {
-        "title": "Integrate with clinical applications",
-        "description": "Provide the FHIR Terminology Service base URL to consuming applications. For each consuming system, document which operations are used, the ECL constraints applied per field, and the language reference set configured. Implement a caching layer for high-frequency lookups where appropriate. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for how consuming systems should define and reference value sets, and the <a href=\"#/playbook/interop\">Interoperability playbook</a> for FHIR exchange patterns that depend on the terminology service.",
+        "title": "Integrate with consuming applications",
+        "description": "For each consuming system, document the service endpoint, the operations it calls, the edition and version, the value sets or ECL constraints per field, and the language configuration. Agree behaviour when the service is unavailable, and where caching is used, how caches are refreshed after an upgrade. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for how consuming systems define and reference value sets.",
         "pedagogy": {
           "mode": "support",
-          "scaffold": "Integration is where most surprises happen. Each consuming system has different expectations about response format, latency, and error handling. Before handing over the base URL, we should document what each system actually calls, under what load, and what it does when the terminology service is unavailable.",
-          "articulate": "One of your consuming systems does not validate codes on receipt - it trusts the sender. What is the risk, and what would you recommend?",
-          "fade": "The learner can own this step when they can independently produce the integration agreement document and identify integration risks for a system they have not seen before."
+          "scaffold": "Integration is where most surprises happen. Each consuming system has different expectations about response format, latency, and error handling. Before handing over the endpoint, we should document what each system actually calls, under what load, and what it does when the service is unavailable.",
+          "articulate": "One of your consuming systems does not validate codes on receipt and trusts the sender. What is the risk, and what would you recommend?",
+          "fade": "The learner can own this step when they can produce the integration agreement for a system they have not seen before and identify its integration risks."
         }
       },
       {
-        "title": "Implement and test the release upgrade pipeline",
-        "description": "Create a documented pipeline to load new SNOMED CT releases into a staging environment, run regression tests against consuming applications, and promote to production. Test the full upgrade procedure before it is needed in production. Document the rollback procedure and the notification process for consuming systems. Align the upgrade schedule with the release cycles of both the international edition and the national edition. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance.",
+        "title": "Manage version upgrades and change",
+        "description": "Set up a repeatable upgrade process: load the new version into a test environment, identify additions, changes, and inactivations, use history data to find replacements for inactive content used in templates, value sets, and queries, run regression tests with consuming applications, and promote to production with a rollback plan. Notify users before the upgrade goes live. See the <a href=\"#/playbook/governance\">Governance playbook</a> for change management.",
         "pedagogy": {
           "mode": "apprentice",
-          "scaffold": "Every six months SNOMED International publishes a new release. Without a pipeline, upgrades are manual, risky, and inconsistent. The key insight is that the upgrade must be tested against consuming applications before promotion to production - a concept that was valid in the previous release may be inactive in the new one. I will show you the pipeline steps and we will run through a dry-run together.",
-          "articulate": "During the regression test you find that one consuming application is using a concept that has been inactivated in the new release. Walk me through what you would do next, and who you would involve.",
-          "fade": "The learner can own this step when they can execute the upgrade pipeline end to end, interpret regression test failures, and make the promotion decision independently."
+          "scaffold": "New SNOMED CT versions are published regularly: the International Edition every month, and national editions on their own cycle. Without a repeatable process, upgrades are manual, risky, and inconsistent. The key point is that an upgrade must be tested against consuming applications before it reaches production, because a concept that was valid in the previous version may be inactive in the new one. I will show you the process and we will run a dry run together.",
+          "articulate": "During regression testing you find that one consuming application uses a concept that has been inactivated in the new version. Walk me through what you would do next, and who you would involve.",
+          "fade": "The learner can own this step when they can run the upgrade process end to end, interpret regression test failures, and make the promotion decision independently."
         }
       }
     ],
     "dependencies": [
       {
-        "icon": "database",
-        "text": "Licensed SNOMED CT RF2 release files from SNOMED International or your NRC (via MLDS)"
-      },
-      {
         "icon": "key",
-        "text": "SNOMED CT license (via MLDS for SNOMED International member territories)"
+        "text": "SNOMED CT license and access to release packages (via MLDS or your NRC)"
       },
       {
-        "icon": "cloud",
-        "text": "Infrastructure: Elasticsearch cluster with sufficient heap and disk for Snowstorm (self-hosted path)"
+        "icon": "database",
+        "text": "The editions, versions, and language reference sets each consuming system needs"
+      },
+      {
+        "icon": "server",
+        "text": "A SNOMED CT-enabled terminology server, or application components that implement the required service types"
+      },
+      {
+        "icon": "users",
+        "text": "Technical staff to run the service and terminology staff to manage editions, languages, and upgrades"
       },
       {
         "icon": "lock",
-        "text": "Access control, audit logging, and high-availability configuration for production deployment"
+        "text": "Access control, audit logging, and availability arrangements for production use"
       }
     ],
     "pitfalls": [
-      "Loading only the international edition when a national edition exists for your territory - local concepts, national reference sets, and national language reference sets are absent from search and validation results",
-      "Not configuring language reference set priority - Snowstorm returns FSNs or wrong-language preferred terms to clinical applications when no language reference set is configured",
-      "Using the SNOMED International public server in production - it is intended for development and testing and does not carry the SLA required for clinical use",
-      "No release upgrade testing pipeline - a SNOMED CT release may inactivate concepts or update preferred terms in ways that silently break consuming applications",
-      "No caching strategy for high-frequency lookups - clinical applications experience latency or timeouts under realistic load without a caching layer",
-      "Allowing clinical applications to maintain their own local concept caches without a refresh process - cached content diverges from the terminology service after each SNOMED CT release"
+      "Treating SNOMED CT as a flat code list: services that ignore the hierarchy, reference sets, expression constraints, and history lose most of SNOMED CT's value",
+      "Requests that do not identify the edition and version: results change silently when the server is upgraded",
+      "Loading only the International Edition when a national edition exists: local concepts, national reference sets, and national language reference sets are missing",
+      "No language configuration: services return fully specified names or terms in the wrong language to clinical applications",
+      "Applying a single set of delta files after skipping versions: earlier changes are missed",
+      "Upgrading without using history data: inactive concepts remain in templates, value sets, and queries with no replacement",
+      "Using public servers in production: they are intended for development and evaluation, not clinical use",
+      "Caching terms or expansions in applications without a refresh process: cached content diverges from the service after each upgrade"
     ],
     "resources": [
-      {
-        "type": "Tool",
-        "title": "Snowstorm terminology server (open source)",
-        "url": "https://github.com/IHTSDO/snowstorm"
-      },
-      {
-        "type": "Tool",
-        "title": "SNOMED CT Browser",
-        "url": "https://browser.ihtsdotools.org/"
-      },
-      {
-        "type": "Tool",
-        "title": "MLDS - licensing and release file access",
-        "url": "https://mlds.ihtsdotools.org/"
-      },
       {
         "type": "Guide",
         "title": "Terminology services guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"
+      },
+      {
+        "type": "Guide",
+        "title": "Terminology service types",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/4-terminology-service-types"
+      },
+      {
+        "type": "Guide",
+        "title": "Summary of service types and use cases",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/appendixes/appendix-a-summary-of-types-and-use-cases"
       },
       {
         "type": "Spec",
@@ -1216,6 +1228,26 @@
         "type": "Spec",
         "title": "SNOMED CT URI standard",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-uri-standard/"
+      },
+      {
+        "type": "Spec",
+        "title": "Using SNOMED CT with HL7 FHIR",
+        "url": "https://hl7.org/fhir/snomedct.html"
+      },
+      {
+        "type": "Tool",
+        "title": "MLDS - licensing and release package access",
+        "url": "https://mlds.ihtsdotools.org/"
+      },
+      {
+        "type": "Tool",
+        "title": "Snowstorm - open source terminology server (example)",
+        "url": "https://github.com/IHTSDO/snowstorm"
+      },
+      {
+        "type": "Tool",
+        "title": "SNOMED CT Browser",
+        "url": "https://browser.ihtsdotools.org/"
       }
     ],
     "status": "draft"
