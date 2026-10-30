@@ -25,7 +25,7 @@
       },
       {
         "question": "How will preferred terms be displayed to clinicians?",
-        "guidance": "SNOMED CT fully specified names (FSNs) is not intended for direct data entry and display in the clinical user interface. Preferred terms from the appropriate language reference set must should be the default display term for data entry. If your system is multilingual, agree on the language priority order."
+        "guidance": "SNOMED CT fully specified names (FSNs) is not intended for direct data entry and display in the clinical user interface. Preferred terms from the appropriate language reference set should be the default display term for data entry. If your system is multilingual, agree on the language priority order."
       },
       {
         "question": "What is the architecture of the implementation and how is the problem list integrated into the clinical system?",
@@ -142,7 +142,7 @@
       "Clinician",
       "Information Manager"
     ],
-    "overview": "Structured clinical documentation using SNOMED CT supplements - and sometimes replaces - free text with computable, queryable data. Data entry fields are bound to SNOMED CT value sets, giving clinicians access to clinically appropriate concepts at the point of care. SNOMED International and National Release Centres publish domain-specific implementation guides that define patterns for recording specific types of clinical information, such as allergies and adverse reactions. The key challenge is balancing clinical expressiveness with usability: over-structuring creates friction, while under-structuring produces data that cannot be queried or exchanged.",
+    "overview": "Structured clinical documentation using SNOMED CT supplements - and sometimes replaces - free text with computable, queryable data. Data entry fields are bound to SNOMED CT value sets, giving clinicians access to clinically appropriate concepts at the point of care. SNOMED International and national release centres publish domain-specific implementation guides that define patterns for recording specific types of clinical information, such as allergies and adverse reactions. The key challenge is balancing clinical expressiveness with usability: over-structuring creates friction, while under-structuring produces data that cannot be queried or exchanged.",
     "decisions": [
       {
         "question": "Which clinical data elements need to be SNOMED CT coded, and which can remain as narrative?",
@@ -333,7 +333,7 @@
       },
       {
         "title": "Map rule elements to SNOMED CT concepts using the Browser",
-        "description": "Use the SNOMED CT Browser to find the most appropriate concept for each clinical entity in the rule. Prefer finding a single parent concept whose descendants cover all intended cases, enabling a clean ECL subsumption expression. Use the Browser's hierarchy view to verify that the descendant set is clinically appropriate before writing ECL."
+        "description": "Find the most appropriate concept for each clinical entity in the rule using an available browser or authoring tool. Prefer finding a single parent concept whose descendants cover all intended cases, enabling a clean ECL subsumption expression. Use the Browser's hierarchy view to verify that the descendant set is clinically appropriate before writing ECL."
       },
       {
         "title": "Write ECL expressions for each rule element",
@@ -865,7 +865,7 @@
       },
       {
         "title": "Explore the SNOMED CT hierarchy and define the concept scope",
-        "description": "Use the SNOMED CT Browser to navigate the hierarchy and identify the most appropriate ancestor concept and any necessary attribute refinements. Review whether existing reference sets or value sets already meet your need before creating a new one. Two definition approaches are available - choose based on whether clinical intent can be fully expressed as an ECL expression.",
+        "description": "Navigate the SNOMED CT hierarchy using an available browser or authoring tool to identify the most appropriate ancestor concept and any necessary attribute refinements. Review whether existing reference sets or value sets already meet your need before creating a new one. Two definition approaches are available - choose based on whether clinical intent can be fully expressed as an ECL expression.",
         "options": [
           {
             "label": "INTENSIONAL DEFINITION",
@@ -937,7 +937,7 @@
       },
       {
         "title": "Author and publish with versioning",
-        "description": "Use Simplex for straightforward value set authoring and management, or the SNOMED Authoring Platform for complex reference sets that need to be released as part of a SNOMED CT edition. Assign a canonical URI (for FHIR ValueSet) or a SCTID (for RF2 reference sets). Publish with version metadata aligned to the SNOMED CT release cycle, and define a change notification process for all consuming systems."
+        "description": "Choose an authoring tool suited to the value set's complexity. For straightforward value sets and reference sets, lightweight tooling (such as Simplex, a free tool from SNOMED International) provides a streamlined workflow. For reference sets that need to be released as part of a SNOMED CT edition, a full authoring platform (such as the SNOMED Authoring Platform, available to national release centres and members) supports classification and validation. Commercial authoring tools are also available. Assign a canonical URI (for FHIR ValueSet) or a SCTID (for RF2 reference sets). Publish with version metadata aligned to the SNOMED CT release cycle, and define a change notification process for all consuming systems."
       },
       {
         "title": "Establish governance and release management",
