@@ -535,6 +535,13 @@ div:has(> .role-iq-link) { display: flex; flex-direction: column; align-items: f
 .overview-text p + p { margin-top: 14px; }
 .overview-lead { font-size: 17px; line-height: 1.65; color: var(--text-primary); }
 .overview-para { font-size: 15px; line-height: 1.75; color: var(--text-secondary); }
+.overview-text p + .overview-list { margin-top: 8px; }
+.overview-list + p { margin-top: 14px; }
+.overview-list { margin: 0; padding-left: 20px; }
+.overview-list li { font-size: 15px; line-height: 1.65; color: var(--text-secondary); padding-left: 2px; }
+.overview-list li + li { margin-top: 6px; }
+.overview-list li::marker { color: var(--text-muted, var(--text-secondary)); }
+.overview-list strong { color: var(--text-primary); font-weight: 600; }
 
 .playbook-sections { display: grid; gap: 16px; }
 .pb-card {

@@ -603,10 +603,21 @@ function renderPlaybook(id) {
 function overviewParas(text) {
   return String(text || '').split(/\n\s*\n/).map(t => t.trim()).filter(Boolean);
 }
+// Within a paragraph, lines starting with "- " render as a bullet list;
+// any lines before the first bullet render as the paragraph's intro text.
+function renderOverviewBlock(t, cls) {
+  const lines = t.split('\n').map(l => l.trim()).filter(Boolean);
+  const first = lines.findIndex(l => l.startsWith('- '));
+  if (first === -1) return `<p class="${cls}">${t}</p>`;
+  const intro = lines.slice(0, first).join(' ');
+  const items = lines.slice(first).map(l => l.replace(/^- /, ''));
+  return (intro ? `<p class="${cls}">${intro}</p>` : '') +
+    `<ul class="overview-list">${items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+}
 function renderOverview(text) {
   const paras = overviewParas(text);
   return `<div class="overview-text">${paras.map((t, i) =>
-    `<p class="${i === 0 ? 'overview-lead' : 'overview-para'}">${t}</p>`).join('')}</div>`;
+    renderOverviewBlock(t, i === 0 ? 'overview-lead' : 'overview-para')).join('')}</div>`;
 }
 
 // ── All playbooks overview ────────────────────────────────────────────────
