@@ -437,7 +437,7 @@ function renderPlaybook(id) {
       </div>
     </div>
 
-    <p class="overview-text">${pb.overview}</p>
+    ${renderOverview(pb.overview)}
 
     <div class="playbook-sections">
 
@@ -599,6 +599,16 @@ function renderPlaybook(id) {
   `;
 }
 
+// Overview: split on blank lines; first paragraph is styled as a lead
+function overviewParas(text) {
+  return String(text || '').split(/\n\s*\n/).map(t => t.trim()).filter(Boolean);
+}
+function renderOverview(text) {
+  const paras = overviewParas(text);
+  return `<div class="overview-text">${paras.map((t, i) =>
+    `<p class="${i === 0 ? 'overview-lead' : 'overview-para'}">${t}</p>`).join('')}</div>`;
+}
+
 // ── All playbooks overview ────────────────────────────────────────────────
 function renderAllPlaybooks(activeRole) {
   setView('view-all-playbooks');
@@ -628,7 +638,7 @@ function renderAllPlaybooks(activeRole) {
         <div class="pb-full-card-body">
           <div class="pb-full-card-title">${pb.title}${isDraft ? ' <span class="draft-badge">In review</span>' : ''}</div>
           <div class="pb-full-card-subtitle">${pb.subtitle}</div>
-          <div class="pb-full-card-overview">${pb.overview}</div>
+          <div class="pb-full-card-overview">${overviewParas(pb.overview)[0] || ''}</div>
           <div class="pb-full-card-footer">
             <div class="pb-full-card-audience">
               ${pb.audience.map(a => `<span class="audience-pill c-${pb.color}" style="color:var(--c-text);border-color:var(--c-border);background:var(--c-bg)">${a}</span>`).join('')}
