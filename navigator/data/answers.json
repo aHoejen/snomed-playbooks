@@ -169,12 +169,12 @@
     "pitfall": "One main mistake is not having a clear use case, or mixing concepts of various types (for example, combining findings, procedures, and body structures in one subset). Without a defined purpose and a consistent scope, the subset is hard to build, validate, and maintain, and users cannot tell what it is meant for."
   },
   "I003": {
-    "answer": "Deploy a SNOMED CT terminology server - either self-hosted (for example, Snowstorm, SNOMED International's open-source server) or via a hosted service from your national release centre (NRC) or a commercial provider. Load the licensed RF2 (Release Format 2) release files for the international release plus your national edition, configure language reference sets for preferred term retrieval, and expose the FHIR Terminology Service endpoints. All SNOMED CT-enabled applications should query through this shared service rather than maintaining local copies of terminology content.",
+    "answer": "Deploy a SNOMED CT terminology server - either self-hosted (for example, Snowstorm, SNOMED International's open-source server) or via a hosted service from your national release centre (NRC) or a commercial provider. Load the licensed release files for the edition each consuming system needs (typically your national edition), configure language reference sets for preferred term retrieval, and expose the FHIR Terminology Service endpoints. All SNOMED CT-enabled applications should query through this shared service. Public and demonstration terminology servers are for development and evaluation only, not for production clinical use.",
     "keyPoints": [
       "Expose the FHIR Terminology Service endpoints ($lookup, $expand, $validate-code, $translate, $subsumes) so all clinical applications query through one service rather than embedding terminology locally.",
       "Configure language reference sets for preferred term retrieval; without this, applications default to FSNs and clinicians see machine-readable labels instead of clinical terms.",
       "All SNOMED CT-enabled applications should point at this shared service; maintaining local copies creates version drift, inconsistent preferred terms, and upgrade complexity.",
-      "Consider a hosted service from your national release centre or a commercial provider if self-hosting Snowstorm is beyond your infrastructure capacity."
+      "Consider a hosted service from your national release centre or a commercial provider if self-hosting is beyond your infrastructure capacity. Use public or demonstration terminology servers for development and evaluation only — not for production clinical applications."
     ],
     "playbooks": [
       "term-service"
@@ -285,11 +285,11 @@
     ]
   },
   "I012": {
-    "answer": "SNOMED CT releases twice yearly. For each release: obtain release notes, load to a test environment, run automated ECL-based QA queries, assess impact on value sets and maps, test consuming applications, and deploy to production with a rollback plan. Never upgrade production without first completing a staged test environment validation.",
+    "answer": "The International Edition is released monthly; national editions and derivatives follow their own release cycles. For each version you adopt: obtain release notes, load to a test environment configured like production, identify additions, changes, and inactivations, use historical association reference sets to find replacements for any inactive content in templates, value sets, and queries, run regression tests with consuming applications, and deploy to production with a rollback plan. Notify users before the upgrade goes live.",
     "keyPoints": [
-      "<strong>Plan:</strong> agree an upgrade cadence based on the edition you use, which for most implementers is a national edition built on a specific International Edition release. Track the release schedules of any derivatives you depend on.",
+      "<strong>Plan:</strong> agree an upgrade cadence based on the edition you use. The International Edition is released monthly; national editions and derivatives follow their own schedules. Track release schedules for all editions and derivatives you depend on.",
       "<strong>Prepare:</strong> for each release you adopt, review the release notes and load the release into a test environment configured like production.",
-      "<strong>Assess:</strong> check for inactivated concepts in use, value set changes, and map changes, and assess the impact on value sets, CDS rules, analytics queries, and maps. Document any required changes.",
+      "<strong>Assess:</strong> check for inactivated concepts in use and use historical association reference sets to find replacements; assess the impact on value sets, CDS rules, analytics queries, and maps. Document any required changes.",
       "<strong>Deploy:</strong> go live with a defined rollback plan, and notify users of the upgrade date in advance."
     ],
     "playbooks": [
@@ -349,11 +349,11 @@
     ]
   },
   "I017": {
-    "answer": "The core pattern is a shared SNOMED CT terminology service accessed by all clinical applications via FHIR Terminology Service APIs. Applications do not embed SNOMED CT content locally - they query the shared service. This ensures all applications use the same edition, preferred terms, and value set definitions consistently, and that a single release upgrade updates terminology behaviour across all systems at once.",
+    "answer": "The recommended pattern is a shared SNOMED CT terminology service accessed by all clinical applications via FHIR Terminology Service APIs. Applications query the shared service rather than maintaining live local copies of SNOMED CT content, ensuring every application uses the same edition, preferred terms, and value set definitions, and that a single release upgrade updates terminology behaviour across all systems at once. Applications may also implement selected services directly from release files, but each then carries its own upgrade and consistency burden.",
     "keyPoints": [
       "Centralised shared terminology service is the foundational architectural pattern",
       "FHIR APIs for all SNOMED CT operations - not proprietary integrations",
-      "No local SNOMED CT content in application databases",
+      "Shared service means one edition, one source of preferred terms, one upgrade path — applications query the service rather than maintaining live local copies of SNOMED CT content",
       "One service, one edition, one source of truth for all applications"
     ],
     "playbooks": [
@@ -361,7 +361,7 @@
     ]
   },
   "I018": {
-    "answer": "Integration is via the FHIR Terminology Service API. Applications add concept lookup, search, validation, and value set expansion by calling the shared terminology service endpoints. Many existing EHR systems have configurable terminology service endpoints  -  configure them to point at Snowstorm and configure the value sets per field.",
+    "answer": "Integration is via the FHIR Terminology Service API. Applications add concept lookup, search, validation, and value set expansion by calling the shared terminology service endpoints. Many existing EHR systems have configurable terminology service endpoints — configure them to point at your shared terminology service and configure the value set or ECL constraint per field.",
     "keyPoints": [
       "FHIR API integration is the standard approach",
       "Configure the terminology service endpoint in existing EHR systems",
