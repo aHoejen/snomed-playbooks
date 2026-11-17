@@ -528,137 +528,241 @@
   },
   "analytics": {
     "title": "Analytics and reporting",
-    "subtitle": "Using SNOMED CT hierarchies and ECL for cohort definition and reporting",
+    "subtitle": "Using SNOMED CT subsumption, defining relationships, reference sets and maps to retrieve, aggregate and report clinical data",
     "icon": "chart-bar",
     "color": "orange",
     "audience": [
       "Software provider",
       "Information Manager"
     ],
-    "overview": "SNOMED CT's hierarchical concept model, queried using Expression Constraint Language (ECL), enables dramatically more powerful cohort queries than flat code matching. ECL expressions using subsumption automatically cover all subtypes of a concept - including types added in future releases - without list maintenance. ECL queries are executed against a terminology service and the resulting concept sets are applied against coded clinical data. If ICD-10 output is required for statutory reporting, see the Mapping playbook for applying the official SNOMED CT to ICD-10 extended map.",
+    "overview": "The main benefit of recording clinical data with SNOMED CT comes when that data is retrieved, analysed and reused - for point of care summaries and reporting, for population-based analysis such as trend analysis, clinical audit and pharmacovigilance, and for clinical research such as identifying trial candidates. SNOMED CT supports this in ways a flat code list cannot: subsumption groups detailed concepts into broader categories at any level of detail, defining relationships let queries select concepts by their meaning (finding site, morphology, causative agent), reference sets capture curated groupings that the hierarchy does not express, and maps bring data coded in other code systems into SNOMED CT, or take SNOMED CT data out to classifications such as ICD-10 for statistical reporting. Expression Constraint Language (ECL) is the standard way to express the terminology part of a query, but SNOMED CT does not dictate a query language or data architecture: the terminology logic is embedded in, or joined to, the query over the patient records.\n\nReliable results depend on more than the terminology. A SNOMED CT code alone does not say whether a condition is confirmed, suspected, or a family history - that context may sit in the information model. Longitudinal data contains concepts that have since been inactivated, and SNOMED CT's polyhierarchy means one concept can be counted in more than one category. This playbook covers how to define analytic categories, execute them against patient data, and handle context, versioning and aggregation correctly.",
     "decisions": [
       {
-        "question": "What clinical questions need to be answered from SNOMED CT-coded data?",
-        "guidance": "Define the analytic use cases precisely before designing queries - cohort identification, quality indicators, epidemiological surveillance, and operational reporting have different requirements. Clarify the population, time period, data source, and required output before writing ECL."
+        "question": "What analytic task needs to be supported, and what does it require of the data?",
+        "guidance": "Point of care analytics (historical summaries, patient-level reporting), population-based analytics (trend analysis, surveillance, clinical audit, service planning) and clinical research (trial candidate identification, predictive medicine) have different requirements for precision, recall, timeliness and output format. Agree the clinical question, the population, the time period, the data sources and the required output before writing any query. A question that needs exact counts in mutually exclusive categories leads to different design choices than one that needs every potentially relevant patient for manual review."
       },
       {
-        "question": "Will queries use ECL via a live terminology service, or pre-expanded concept sets?",
-        "guidance": "ECL via a live terminology service is most accurate and always reflects the current SNOMED CT release. Pre-expanded concept sets (stored in a database or reference set) are faster for high-volume queries but must be refreshed on each SNOMED CT release and versioned explicitly. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for deployment and integration options. Choose based on your performance and currency requirements."
+        "question": "Is all the source data coded with SNOMED CT?",
+        "guidance": "Records often combine native SNOMED CT data with legacy or local codes, other code systems, and free text. Data coded in another code system can be brought into SNOMED CT analytics through a map, but the direction and correlation of the map matter: the map must go <em>from</em> the source codes <em>to</em> SNOMED CT, and use cases where safety or accuracy matters need exact-match maps. Free text can be encoded using natural language processing. Decide which sources are in scope and how each will be prepared - see the <a href=\"#/playbook/mapping\">Mapping playbook</a> and the <a href=\"#/playbook/migration\">Migration playbook</a>."
       },
       {
-        "question": "How will historical data coded in older SNOMED CT versions be handled?",
-        "guidance": "Patient data coded before a SNOMED CT release may use concept IDs that have since been inactivated or split. Use SNOMED CT history supplement reference sets to map historical concept IDs to their current equivalents. Ignoring this produces systematically incomplete cohorts."
+        "question": "Where is the clinical context of each code recorded?",
+        "guidance": "A diagnosis of 56265001 |Heart disease| does not mean the patient has heart disease: it may be suspected, refuted, or a family history. Context can be carried by the information model (a section heading, a status or verification element), precoordinated in the concept (394886001 |Heart disease suspected|), or recorded in a separate coded element. Find out how each source system records context before designing queries, and agree rules for combining it - especially for negation, where the information model and the terminology can both say 'absent'."
       },
       {
-        "question": "Is ICD-10 or other classification output required for external submissions?",
-        "guidance": "If SNOMED CT data must be reported as ICD-10, plan for map application early. The official SNOMED CT to ICD-10 extended map handles the translation via the FHIR $translate operation, but map rules have conditions and priorities that must be applied correctly - it is not a simple lookup. See the <a href=\"#/playbook/mapping\">Mapping playbook</a>."
+        "question": "How will each analytic category be defined?",
+        "guidance": "Use subsumption (&lt;&lt;) where a single concept and its subtypes match the category, defining relationships (attribute refinements) where the category is defined by a characteristic such as finding site or causative agent, and a reference set where the category is a curated grouping the hierarchy does not express (for example, rare diseases). These techniques can be combined in one ECL expression. Avoid lexical (text-matching) queries for defining categories - use them only to find candidates for review. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for authoring guidance."
       },
       {
-        "question": "How will query results be validated for clinical completeness?",
-        "guidance": "Before using ECL queries in production, validate the resulting concept set with clinical SMEs. Check that clinically relevant subtypes are included and that the set boundary is correct. Document validation decisions so queries can be audited. See the <a href=\"#/playbook/governance\">Governance playbook</a> for query versioning and review processes."
+        "question": "How will the terminology part of the query be executed against patient data?",
+        "guidance": "Record queries (SQL, AQL, SPARQL, or an analytics tool) must be combined with terminology queries. The main options are calling a <a href=\"#/playbook/term-service\">terminology service</a> that evaluates ECL at query time, joining to a transitive closure table loaded into the data platform, or using concept sets or reference sets expanded in advance. Choose based on the data architecture (querying operational records, a data warehouse, or distributed storage), query volume, and whether results must reflect the latest release or a fixed version. See step 5 for a comparison."
+      },
+      {
+        "question": "How will data recorded against older SNOMED CT releases be included?",
+        "guidance": "Longitudinal records keep the concepts that were active when the data was recorded, so their share of inactive concepts grows over time. A standard ECL query returns only active concepts and silently misses these records. Decide, per use case, how much historical content to include using historical association reference sets: high precision for decision support, a balance of precision and recall for research and audit, and maximum recall for identifying records for manual review."
+      },
+      {
+        "question": "Are mutually exclusive categories or classification codes required in the output?",
+        "guidance": "SNOMED CT is a polyhierarchy: 154283005 |Pulmonary tuberculosis| is both a respiratory disorder and an infectious disease, so subsumption-based categories can overlap. That suits clinical questions, but statistical returns, epidemiological counts and reimbursement need each case counted once. Where that is needed, or where the output must be in ICD-10 or another classification, use a published map such as the SNOMED CT to ICD-10 extended map - see the <a href=\"#/playbook/mapping\">Mapping playbook</a>."
       }
     ],
     "steps": [
       {
-        "title": "Define the clinical question and cohort precisely",
-        "description": "Document the clinical question, the target population, the time period, the data source, and the required output. Vague questions produce wrong answers - specificity at this stage prevents expensive rework."
+        "title": "Define the analytic question and decompose it into categories",
+        "description": "Write the question in plain clinical language - who is counted, over what period, from which data sources, and what output is needed. Then separate the clinical categories that SNOMED CT will define (conditions, procedures, medications, findings) from the record logic that the query language handles (dates, counts, demographics, status, care setting). Each clinical category becomes a terminology definition in step 4; the record logic stays in the record query. Keeping the two apart lets terminology definitions be reused, reviewed and versioned independently of the reports that use them.",
+        "examples": [
+          {
+            "label": "Question decomposition",
+            "code": "# Analytic question in plain clinical language\n# \"Number of adults with diabetes mellitus and a recorded kidney\n#  disease, per year, 2020-2025, from primary care records\"\n\n# Clinical categories -> SNOMED CT definitions (step 4)\nDiabetes mellitus   << 73211009 |Diabetes mellitus (disorder)|\nKidney disease      << 90708001 |Kidney disease (disorder)|\n\n# Record context -> information model (step 3)\nCondition is about the patient, confirmed, not refuted\n\n# Record logic -> record query language (step 5)\nage >= 18 at date of record\nrecorded between 2020-01-01 and 2025-12-31\ncount distinct patients, grouped by year"
+          }
+        ]
       },
       {
-        "title": "Write ECL expressions for each concept group",
-        "description": "Use subsumption (&lt;&lt;) to capture disease or procedure families. Attribute refinements narrow the expression to a specific clinical meaning - for example, procedures by finding site, or clinical findings by associated morphology. Decide whether queries will run live against the terminology service or use pre-expanded concept sets stored in your data platform.",
+        "title": "Prepare the data for SNOMED CT analytics",
+        "description": "Assess which data is natively coded with SNOMED CT and which is not. Bring data from other code systems into SNOMED CT using maps that go from the source code system to SNOMED CT; maps built for the opposite direction serve poorly in reverse unless every link is an exact match. Where accuracy matters (data integration, decision support), use exact-match maps; for epidemiology or service planning, mapping to a broader SNOMED CT concept may be acceptable but should be documented. In a data warehouse, this preparation happens in the staging layer of the extract, transform and load process. Keep the original source code alongside the mapped concept so that the transformation can be audited, and check that no meaning is lost along the way. See the <a href=\"#/playbook/mapping\">Mapping playbook</a> for map design and the <a href=\"#/playbook/migration\">Migration playbook</a> for moving legacy data."
+      },
+      {
+        "title": "Resolve record context alongside the code",
+        "description": "Identify every way the source systems record context for the categories in scope - section headings such as 'Family history', status and verification elements (for example FHIR Condition.clinicalStatus and Condition.verificationStatus), separate coded elements such as 'diagnosis type', and context precoordinated in SNOMED CT concepts below 413350009 |Finding with explicit context|. The same meaning may be recorded differently across systems, or even across users of the same system. Write the query so that it reads both the code and its context, and harmonise the representations when integrating data from several sources. Without this step, family history, suspected and refuted entries are counted as confirmed patient conditions.",
+        "examples": [
+          {
+            "label": "Two ways of recording family history",
+            "code": "# System A: context in the information model\nSection: \"Family history\"\nProblem: 56265001 |Heart disease (disorder)|\n\n# System B: context precoordinated in the concept\nProblem: 275120007 |Family history of cardiac disorder (situation)|\n\n# A query for patients' own heart disease must exclude both.\n# A query for family history of heart disease must find both:\n#   - entries in the family history section with code in << 56265001\n#   - entries with code in\n<< 416471007 |Family history of clinical finding (situation)| :\n  246090004 |Associated finding| = << 56265001 |Heart disease (disorder)|"
+          }
+        ]
+      },
+      {
+        "title": "Define each category using SNOMED CT techniques",
+        "description": "Express each clinical category from step 1 as a terminology definition, preferably in ECL. Choose the technique that matches how the category is defined, and combine techniques where needed. Validate each definition by expanding it with a <a href=\"#/playbook/term-service\">terminology service</a>: check the count and review the members with clinical experts before running it against patient data. Package definitions that will be reused as versioned value sets or reference sets - see the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a>.",
+        "options": [
+          {
+            "label": "SUBSUMPTION",
+            "points": [
+              "Selects a concept and all its subtypes using &lt;&lt; (descendant or self) or &lt; (descendant)",
+              "The fundamental SNOMED CT analytic technique: 'any kind of infectious disease' finds viral pneumonia, tuberculosis and every other subtype",
+              "New subtypes added in future releases are included automatically",
+              "Use when one concept in the hierarchy matches the meaning of the category"
+            ],
+            "example": {
+              "label": "ECL: subsumption",
+              "code": "# Any kind of infectious disease\n<< 40733004 |Infectious disease (disorder)|\n\n# Any kind of diabetes mellitus\n<< 73211009 |Diabetes mellitus (disorder)|"
+            }
+          },
+          {
+            "label": "DEFINING RELATIONSHIPS",
+            "points": [
+              "Selects concepts by the value of their defining attributes, such as finding site, associated morphology or causative agent",
+              "Answers questions the hierarchy alone does not, such as 'all benign neoplasms of the kidney'",
+              "Use subsumption on the attribute value (&lt;&lt;) so that more specific values are also matched",
+              "Also matches postcoordinated data that is not a subtype of any single precoordinated concept"
+            ],
+            "example": {
+              "label": "ECL: attribute refinement",
+              "code": "# Benign neoplasms of the kidney\n< 404684003 |Clinical finding (finding)| :\n  116676008 |Associated morphology| = << 3898006 |Neoplasm, benign (morphologic abnormality)| ,\n  363698007 |Finding site| = << 64033007 |Kidney structure (body structure)|\n\n# Disorders caused by Mycobacterium tuberculosis complex in the lung\n< 64572001 |Disease (disorder)| :\n  246075003 |Causative agent| = << 113858008 |Mycobacterium tuberculosis complex (organism)| ,\n  363698007 |Finding site| = << 39607008 |Lung structure (body structure)|"
+            }
+          },
+          {
+            "label": "SUBSETS AND REFERENCE SETS",
+            "points": [
+              "Selects concepts by membership of a curated subset, distributed and versioned as a reference set",
+              "Use for groupings the hierarchy does not express, such as rare diseases or a national reporting list",
+              "Referenced in ECL with ^ (memberOf); combine with subsumption to include subtypes of members",
+              "Extensional subsets need manual review on each release; prefer an ECL definition where the category can be expressed that way"
+            ],
+            "example": {
+              "label": "ECL: reference set membership",
+              "code": "# Members of a reference set (example identifier)\n^ 649999999104 |Example rare disease simple reference set|\n\n# Members of the reference set and all their subtypes\n<< (^ 649999999104 |Example rare disease simple reference set|)"
+            }
+          }
+        ]
+      },
+      {
+        "title": "Execute the terminology logic within the record query",
+        "description": "Combine each terminology definition with the record logic from step 1. Avoid pasting long lists of concept identifiers into queries - they are hard to validate and maintain, and can exceed query engine limits. Choose an execution approach that fits the data architecture: analytics directly over operational records, over a data warehouse, or over distributed storage. Whichever approach is used, pin the SNOMED CT edition and version so that results can be reproduced.",
         "options": [
           {
             "label": "LIVE ECL VIA TERMINOLOGY SERVICE",
             "points": [
-              "Pass the ECL expression directly to the $expand endpoint at query time",
-              "Always reflects the current SNOMED CT release - new subtypes are automatically included",
-              "Requires a low-latency terminology service connection from the analytics environment",
-              "Best for interactive dashboards and ad-hoc queries"
+              "The analytics platform passes ECL to the <a href=\"#/playbook/term-service\">terminology service</a> ($expand) at query time, or the query language supports ECL directly",
+              "Supports the full range of ECL, including attribute refinements, reference set membership and history supplements",
+              "Always reflects the configured release; pin the version when results must be reproducible",
+              "Best for interactive and ad hoc analysis; requires a reliable connection from the analytics environment"
             ],
             "example": {
-              "label": "ECL cohort queries",
-              "code": "# All diabetes mellitus subtypes\n<<73211009 |Diabetes mellitus (disorder)|\n\n# Acute myocardial infarction subtypes\n<<57054005 |Acute myocardial infarction (disorder)|\n\n# Cardiac procedures (procedure with finding site = heart structure)\n<<71388002 |Procedure (procedure)| : 363704007 |Procedure site - Direct (attribute)| = <<80891009 |Heart structure (body structure)|\n\n# Hypertensive disorders, excluding secondary hypertension\n<<38341003 |Hypertensive disorder (disorder)| MINUS <<31992008 |Secondary hypertension (disorder)|"
+              "label": "FHIR $expand with version pinned",
+              "code": "GET /fhir/ValueSet/$expand\n  ?url=http://snomed.info/sct?fhir_vs=ecl/<< 73211009\n  &system-version=http://snomed.info/sct|http://snomed.info/sct/900000000000207008/version/20251101\n  &count=100\n\n# Use expansion.total to sense-check scope before running against patient data"
+            }
+          },
+          {
+            "label": "TRANSITIVE CLOSURE TABLE",
+            "points": [
+              "A table holding every subtype-supertype pair, generated from the snapshot relationships file and loaded into the data platform",
+              "Subsumption becomes a simple, fast join - well suited to a data warehouse and large batch queries",
+              "Covers subsumption only; attribute refinements and reference set membership need the relationship and reference set tables as well",
+              "Must be regenerated on each SNOMED CT release"
+            ],
+            "example": {
+              "label": "SQL with a transitive closure table",
+              "code": "-- Patients with any kind of respiratory system disorder\nSELECT DISTINCT pl.patient_id\nFROM problem_list pl\nJOIN snomed_transitive_closure tc\n  ON tc.subtype_id = pl.concept_id\nWHERE tc.supertype_id = 50043002  -- |Disorder of respiratory system|\n  AND pl.verification_status = 'confirmed'\n\nUNION\n\n-- include the category concept itself (<< is descendant OR self)\nSELECT DISTINCT patient_id FROM problem_list\nWHERE concept_id = 50043002 AND verification_status = 'confirmed'"
             }
           },
           {
             "label": "PRE-EXPANDED CONCEPT SETS",
             "points": [
-              "Expand ECL expressions in advance using $expand and store the resulting concept ID list in the data platform",
-              "Faster for high-volume batch queries - no runtime terminology service call needed",
-              "Must be refreshed on each SNOMED CT release to include new subtypes",
-              "Package as FHIR ValueSet resources or RF2 reference sets with explicit version metadata",
-              "Version and date-stamp each expansion so queries are auditable - see the <a href=\"#/playbook/governance\">Governance playbook</a>"
-            ]
+              "Each ECL definition is expanded in advance and stored as a table or reference set that queries join to",
+              "Fast, with no runtime terminology dependency, and supports any ECL the expansion tool supports",
+              "Must be re-expanded on each SNOMED CT release - new subtypes are silently excluded until then",
+              "Record the ECL, edition, version and expansion date with each set so that results can be audited"
+            ],
+            "example": {
+              "label": "SQL with a pre-expanded concept set",
+              "code": "-- concept_set_member is populated by expanding\n-- << 73211009 |Diabetes mellitus| against edition 20251101\nSELECT DISTINCT c.patient_id\nFROM condition c\nJOIN concept_set_member m\n  ON m.concept_id = c.concept_id\nWHERE m.set_id = 'diabetes-mellitus'\n  AND m.set_version = '20251101'\n  AND c.clinical_status = 'active'"
+            }
           }
         ]
       },
       {
-        "title": "Validate ECL expressions using the terminology service",
-        "description": "Expand your ECL expressions using the SNOMED CT Browser's ECL search or the FHIR $expand endpoint. Review the resulting concept set with clinical SMEs to confirm it is clinically complete and correctly bounded. Use the count from $expand to sense-check the scope before running against patient data. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for $expand configuration.",
+        "title": "Include inactive concepts using historical associations",
+        "description": "Clinical records keep the concepts that were active when the data was recorded, so a query run against the current release misses records coded with concepts that have since been inactivated. Rather than running the query against an old release, run it against the most recent release - whose definitions are generally the most accurate - and supplement the results with inactive concepts linked to the result set through historical association reference sets. ECL history supplements do this directly, with three profiles that trade precision against recall. Where the terminology service or data platform does not support history supplements, join to the historical association reference sets in the same way. See the <a href=\"#/playbook/governance\">Governance playbook</a> for managing the impact of each new release.",
         "examples": [
           {
-            "label": "FHIR $expand for cohort validation",
-            "code": "# Expand all diabetes mellitus subtypes - check count and sample\nGET /fhir/ValueSet/$expand\n  ?url=http://snomed.info/sct?fhir_vs=ecl/<<73211009\n  &count=20\n  &offset=0\n\n# Response (abbreviated)\n{\n  \"resourceType\": \"ValueSet\",\n  \"expansion\": {\n    \"total\": 247,\n    \"timestamp\": \"2025-03-01T00:00:00Z\",\n    \"contains\": [\n      { \"system\": \"http://snomed.info/sct\", \"code\": \"73211009\", \"display\": \"Diabetes mellitus\" },\n      { \"system\": \"http://snomed.info/sct\", \"code\": \"44054006\", \"display\": \"Diabetes mellitus type 2\" },\n      { \"system\": \"http://snomed.info/sct\", \"code\": \"46635009\", \"display\": \"Diabetes mellitus type 1\" },\n      { \"system\": \"http://snomed.info/sct\", \"code\": \"11530004\", \"display\": \"Brittle diabetes mellitus\" }\n    ]\n  }\n}\n\n# With edition and version pinned for reproducibility\nGET /fhir/ValueSet/$expand\n  ?url=http://snomed.info/sct?fhir_vs=ecl/<<73211009\n  &system-version=http://snomed.info/sct|http://snomed.info/sct/900000000000207008/version/20250301\n  &count=20"
+            "label": "ECL history supplements",
+            "code": "# HISTORY-MIN: high precision - SAME AS associations only\n# e.g. clinical decision support\n<< 195967001 |Asthma (disorder)| {{ + HISTORY-MIN }}\n\n# HISTORY-MOD: balances precision and recall\n# SAME AS, REPLACED BY, WAS A, PARTIALLY EQUIVALENT TO\n# e.g. clinical research, clinical audit\n<< 195967001 |Asthma (disorder)| {{ + HISTORY-MOD }}\n\n# HISTORY-MAX: highest recall - all historical associations\n# e.g. identifying patients for manual review\n<< 195967001 |Asthma (disorder)| {{ + HISTORY-MAX }}"
           }
         ]
       },
       {
-        "title": "Handle historical and inactivated concepts",
-        "description": "Apply SNOMED CT history supplement reference sets to identify historical concept IDs in legacy data and map them to current equivalents. This is essential for any query spanning data collected across multiple SNOMED CT release cycles. Without this step, records coded with now-inactivated concept IDs are silently excluded from cohort results."
-      },
-      {
-        "title": "Build reusable reference sets for repeated queries",
-        "description": "Package commonly used ECL expressions as named FHIR ValueSet resources or RF2 simple reference sets. This provides a stable, versioned, auditable concept set that analytics queries and reports can reference by name rather than embedding ECL strings inline. Version each reference set explicitly aligned to the SNOMED CT release used to produce it. See the <a href=\"#/playbook/governance\">Governance playbook</a> for versioning and change management processes.",
+        "title": "Aggregate results and produce classification output where required",
+        "description": "When results are grouped into categories using subsumption, remember that SNOMED CT is a polyhierarchy: a patient with pulmonary tuberculosis is correctly counted under both respiratory disorders and infectious diseases. Make this explicit in reports, and do not add up overlapping categories as if they were exclusive. Where mutually exclusive categories, statistical returns or reimbursement codes are required, record the data in SNOMED CT and map it to the classification using a published map. The SNOMED CT to ICD-10 extended map is not a simple lookup: map groups, priorities, rules (which may test age, sex or other recorded conditions) and advice must be applied, and some concepts cannot be classified without further information. See the <a href=\"#/playbook/mapping\">Mapping playbook</a> for map application.",
         "examples": [
           {
-            "label": "FHIR ValueSet for a reusable cohort definition",
-            "code": "{\n  \"resourceType\": \"ValueSet\",\n  \"id\": \"diabetes-mellitus-cohort\",\n  \"url\": \"https://example.org/ValueSet/diabetes-mellitus-cohort\",\n  \"version\": \"20250301\",\n  \"name\": \"DiabetesMellitusCohort\",\n  \"title\": \"Diabetes Mellitus Cohort\",\n  \"status\": \"active\",\n  \"description\": \"All subtypes of diabetes mellitus for cohort identification and analytics\",\n  \"compose\": {\n    \"include\": [\n      {\n        \"system\": \"http://snomed.info/sct\",\n        \"filter\": [\n          {\n            \"property\": \"constraint\",\n            \"op\": \"=\",\n            \"value\": \"<<73211009 |Diabetes mellitus (disorder)|\"\n          }\n        ]\n      }\n    ]\n  }\n}"
+            "label": "Overlapping categories in a polyhierarchy",
+            "code": "# 154283005 |Pulmonary tuberculosis| is a member of all three:\n<< 50043002 |Disorder of respiratory system (disorder)|\n<< 56717001 |Tuberculosis (disorder)|\n<< 40733004 |Infectious disease (disorder)|\n\n# Counts per category are correct individually,\n# but the categories overlap and must not be summed."
+          },
+          {
+            "label": "SNOMED CT to ICD-10 extended map rules",
+            "code": "# 447562003 |SNOMED CT to ICD-10 extended map|\n# Source concept: 15296000 |Sterility (finding)|\n\nGroup Priority Rule                                     Target\n1     1        IFA 10114008 |Female sterility (finding)|  N97.9\n1     2        IFA 49408009 |Male sterility (finding)|    N46\n1     3        OTHERWISE TRUE                            (none)\n               advice: MAP SOURCE CONCEPT CANNOT BE CLASSIFIED\n                       WITH AVAILABLE DATA\n\n# Evaluate rules in priority order within each group and take the\n# first rule that is true. Each group contributes at most one target."
           }
         ]
       },
       {
-        "title": "Apply ICD-10 map for external reporting where required",
-        "description": "Load the SNOMED CT to ICD-10 extended map in your terminology service as a ConceptMap resource and use the FHIR $translate operation to generate ICD-10 codes for statutory reporting. Apply the full map algorithm including rule groups, priorities, and advice fields - the map is not a simple lookup and incorrect application produces wrong ICD-10 codes. See the <a href=\"#/playbook/mapping\">Mapping playbook</a> for the full map application process.",
-        "examples": [
-          {
-            "label": "FHIR $translate for ICD-10 output",
-            "code": "# Translate a SNOMED CT concept to ICD-10 using the official map\nPOST /fhir/ConceptMap/$translate\nContent-Type: application/fhir+json\n\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    {\n      \"name\": \"url\",\n      \"valueUri\": \"http://snomed.info/sct/900000000000207008?fhir_cm=447562003\"\n    },\n    {\n      \"name\": \"system\",\n      \"valueUri\": \"http://snomed.info/sct\"\n    },\n    {\n      \"name\": \"code\",\n      \"valueCode\": \"44054006\"\n    },\n    {\n      \"name\": \"targetsystem\",\n      \"valueUri\": \"http://hl7.org/fhir/sid/icd-10\"\n    }\n  ]\n}\n\n# Response\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    { \"name\": \"result\", \"valueBoolean\": true },\n    {\n      \"name\": \"match\",\n      \"part\": [\n        { \"name\": \"equivalence\", \"valueCode\": \"equivalent\" },\n        {\n          \"name\": \"concept\",\n          \"valueCoding\": {\n            \"system\": \"http://hl7.org/fhir/sid/icd-10\",\n            \"code\": \"E11\",\n            \"display\": \"Type 2 diabetes mellitus\"\n          }\n        }\n      ]\n    }\n  ]\n}"
-          }
-        ]
+        "title": "Validate, version and govern queries and reports",
+        "description": "Review each terminology definition and its expansion with clinical experts before use, and test the full query against known patient records. Look out for results that are logically correct but clinically unexpected - SNOMED CT hierarchies follow formal definitions, so, for example, an insect bite of the nose is a kind of head injury. Where data may contain postcoordinated expressions, prefer attribute-based definitions, which also match expressions that are not subtypes of a single precoordinated concept. Record the ECL or reference set, the SNOMED CT edition and version, the history profile and any map used for each published result, and re-run validation on each new release. See the <a href=\"#/playbook/governance\">Governance playbook</a> for review and change management."
       }
     ],
     "dependencies": [
       {
         "icon": "server",
-        "text": "Terminology service with ECL support and FHIR $expand endpoint - see the <a href=\"#/playbook/term-service\">Terminology service playbook</a>"
+        "text": "Terminology service with ECL support, reference set membership and a selectable edition and version - see the <a href=\"#/playbook/term-service\">Terminology service playbook</a>"
       },
       {
         "icon": "database",
-        "text": "Clinical data store with SNOMED CT concept IDs persisted at the point of care"
+        "text": "Clinical data store holding SNOMED CT concept identifiers together with their record context (status, verification, section)"
       },
       {
         "icon": "filter",
-        "text": "Validated ECL expressions or reference sets for each cohort definition"
+        "text": "Validated, versioned ECL definitions, value sets or reference sets for each analytic category"
+      },
+      {
+        "icon": "arrows-exchange",
+        "text": "Maps from source code systems to SNOMED CT, and from SNOMED CT to classifications where required"
+      },
+      {
+        "icon": "shield-check",
+        "text": "Governance process for query review, versioning and release management"
       }
     ],
     "pitfalls": [
-      "Querying only exact concept IDs - misses all subtypes and equivalent concepts, producing systematically incomplete cohorts",
-      "Ignoring history supplements - legacy data coded with inactivated concept IDs is silently excluded from query results",
-      "Treating the SNOMED CT to ICD-10 map as a simple lookup - map rules have conditions and priorities that must be applied correctly",
-      "Not validating ECL expressions with clinical SMEs - the concept set boundary may be incorrect in ways a technical reviewer cannot detect",
-      "Pre-expanding concept sets without a refresh process - after a SNOMED CT release, new subtypes are silently excluded",
-      "Embedding ECL strings inline in queries without versioning - makes it impossible to audit which concept set was used when a cohort was defined"
+      "Querying exact concept identifiers only - misses every subtype and produces systematically incomplete results",
+      "Ignoring record context - family history, suspected and refuted entries are counted as confirmed patient conditions",
+      "Querying the current release without historical associations - records coded with now-inactive concepts are silently excluded",
+      "Defining categories with text matching - lexical queries both miss relevant concepts and include irrelevant ones",
+      "Summing overlapping subsumption-based categories - SNOMED CT's polyhierarchy places one concept in several categories, so totals are double counted",
+      "Treating the ICD-10 map as a simple lookup - map rules, priorities and advice must be applied, or the wrong classification codes are produced",
+      "Using a map in the reverse direction to the one it was built for, or treating narrow-to-broad maps as exact - meaning shifts silently during data preparation",
+      "Pre-expanded concept sets or transitive closure tables without a refresh process - after each release, new subtypes are silently excluded",
+      "Not recording the edition, version and definition used - results cannot be reproduced or audited"
     ],
     "resources": [
       {
-        "type": "Tool",
-        "title": "SNOMED CT Browser - ECL search",
-        "url": "https://browser.ihtsdotools.org/"
+        "type": "Guide",
+        "title": "Data analytics with SNOMED CT",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-data-analytics-guide/"
       },
       {
         "type": "Guide",
-        "title": "Data analytics guide",
-        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-data-analytics-guide/"
+        "title": "Reference set guide - reporting and analytics",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-reference-set-guide/3-requirements-and-use-cases/3.2-use-cases/3.2.3-reporting-and-analytics"
+      },
+      {
+        "type": "Spec",
+        "title": "Expression constraint language specification",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      },
+      {
+        "type": "Spec",
+        "title": "ECL history supplements",
+        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/behaviour-specification-with-examples/6.11-history-supplements"
       },
       {
         "type": "Guide",
@@ -666,9 +770,9 @@
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-sql-practical-guide/"
       },
       {
-        "type": "Spec",
-        "title": "Expression constraint language specification",
-        "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+        "type": "Guide",
+        "title": "Terminology services guide - EHR reporting and analytics",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/3-terminology-service-use-cases/ehr-reporting-and-analytics"
       },
       {
         "type": "Guide",
