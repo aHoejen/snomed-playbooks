@@ -303,11 +303,15 @@
       "Clinician",
       "Information Manager"
     ],
-    "overview": "SNOMED CT enables computable clinical logic through its hierarchical concept model and Expression Constraint Language (ECL). Rules built on SNOMED CT subsumption - using ECL expressions such as <<73211009 for all descendants of Diabetes mellitus - automatically cover all clinically relevant child concepts, including those added in future SNOMED CT releases. This makes CDS rules significantly more durable and clinically complete than rules based on explicit flat code lists.",
+    "overview": "SNOMED CT enables computable clinical logic through its hierarchical concept model and Expression Constraint Language (ECL). Rules built on SNOMED CT subsumption - using ECL expressions such as <<73211009 for all descendants of Diabetes mellitus - automatically cover all clinically relevant child concepts, including those added in future SNOMED CT releases. This makes CDS rules significantly more durable and clinically complete than rules based on explicit flat code lists. Effective CDS keeps two layers apart: references to clinical entities (conditions, findings, procedures, medications), which are represented with SNOMED CT, and the decision logic that combines them (conditions, thresholds, timing, actions), which is expressed in the formalism of the CDS engine. The two layers meet where the logic references SNOMED CT value sets or ECL expressions.",
     "decisions": [
       {
         "question": "What clinical logic needs to be expressed as computable rules?",
         "guidance": "Document each rule in plain clinical language before attempting SNOMED CT representation. Alerts, reminders, order sets, contraindication checks, and care pathway triggers all have different implementation patterns. Clarify which rules are mandatory vs. advisory, and what evidence base supports them."
+      },
+      {
+        "question": "What formalism will express the decision logic?",
+        "guidance": "The formalism is usually dictated by the CDS engine: decision tables (e.g., DMN) for rules maintained by clinical or business analysts, simple logical expressions (JSON rules, FHIRPath) for lightweight engines, CQL with FHIR Clinical Reasoning resources (Library, PlanDefinition) for shareable, standards-based knowledge artifacts, or a general-purpose programming language when logic lives in application code. Consider who will author and maintain the rules, portability across systems, and testability. Whatever the choice, the formalism must reference SNOMED CT through value sets or ECL rather than embedding code lists. See step 6 for a comparison of the options."
       },
       {
         "question": "Will rule elements use ECL subsumption queries or explicit concept lists?",
@@ -315,7 +319,7 @@
       },
       {
         "question": "How will SNOMED CT-coded data be queried at runtime?",
-        "guidance": "Clarify whether your CDS engine will call the terminology service API at the point of firing (real-time subsumption check) or use pre-expanded concept sets stored locally. Real-time calls via the <a href=\"#/playbook/term-service\">terminology service</a> are accurate and always reflect the current SNOMED CT release; pre-expanded sets are faster but require refresh on each release. See step 3 for a detailed comparison of both approaches."
+        "guidance": "Clarify whether your CDS engine will call the terminology service API at the point of firing (real-time subsumption check) or use pre-expanded concept sets stored locally. Real-time calls via the <a href=\"#/playbook/term-service\">terminology service</a> are accurate and always reflect the current SNOMED CT release; pre-expanded sets are faster but require refresh on each release. See step 7 for a detailed comparison of both approaches."
       },
       {
         "question": "What data quality requirements must be met before CDS is reliable?",
@@ -332,32 +336,22 @@
         "description": "Write each rule as a clinical statement - who it applies to, what it checks, and what action it triggers. This is the source of truth that the SNOMED CT representation must faithfully express. Include the clinical evidence base and the intended alert or action so that both clinical and technical reviewers can validate the final implementation."
       },
       {
-        "title": "Map rule elements to SNOMED CT concepts using the Browser",
-        "description": "Find the most appropriate concept for each clinical entity in the rule using an available browser or authoring tool. Prefer finding a single parent concept whose descendants cover all intended cases, enabling a clean ECL subsumption expression. Use the Browser's hierarchy view to verify that the descendant set is clinically appropriate before writing ECL."
+        "title": "Separate clinical entity references from decision logic",
+        "description": "Decompose each rule into two kinds of element. Clinical entity references - diagnoses, findings, signs and symptoms, risk factors, procedures, medications, allergies - are what SNOMED CT represents; each becomes a rule element for steps 3 to 5. Decision logic - boolean combinations (AND, OR, NOT), numeric thresholds, age and demographic criteria, temporal windows, counts, and the resulting action - belongs to the formalism of the CDS engine (step 6). Some elements need another code system (laboratory tests are commonly LOINC-coded), and some depend on the information model rather than the terminology: whether a condition is active, confirmed, or recorded as family history is carried by the record structure (e.g., FHIR Condition.clinicalStatus, Condition.verificationStatus, FamilyMemberHistory), not by the SNOMED CT code. Keeping the layers separate lets terminology and logic be authored, versioned, and maintained independently.",
+        "examples": [
+          {
+            "label": "Rule decomposition",
+            "code": "# Rule in plain clinical language (from step 1)\n# \"Alert when an adult with diabetes mellitus has an active NSAID\n#  prescription and a most recent eGFR below 60 mL/min/1.73m2\"\n\n# Clinical entity references -> SNOMED CT (steps 3-5)\nDiabetes mellitus    <<73211009 |Diabetes mellitus (disorder)|\nNSAID products       < 763158003 |Medicinal product (product)| :\n                         127489000 |Has active ingredient (attribute)| =\n                         <<372665008 |Non-steroidal anti-inflammatory agent (substance)|\n\n# Other code systems\neGFR test            LOINC value set (laboratory observation)\n\n# Information model (record context, not terminology)\nCondition active     Condition.clinicalStatus = active\nPrescription active  MedicationRequest.status = active\n\n# Decision logic -> CDS engine formalism (step 6)\nage >= 18\nAND has diabetes AND on NSAID\nAND most recent eGFR < 60 mL/min/1.73m2\nTHEN alert \"Review NSAID use - diabetes with reduced eGFR\""
+          }
+        ]
+      },
+      {
+        "title": "Map clinical entity references to SNOMED CT concepts",
+        "description": "For each clinical entity reference identified in step 2, find the most appropriate concept using an available browser or authoring tool. Prefer finding a single parent concept whose descendants cover all intended cases, enabling a clean ECL subsumption expression. Use the Browser's hierarchy view to verify that the descendant set is clinically appropriate before writing ECL."
       },
       {
         "title": "Write ECL expressions for each rule element",
         "description": "Express each rule element as an ECL constraint. Use subsumption (&lt;&lt;) to capture entire disease or drug families. Combine constraints using set operators (AND, OR, MINUS) and attribute refinements for precision. Test expressions using the terminology service $expand operation to confirm the concept set is clinically complete. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for ECL authoring guidance.",
-        "options": [
-          {
-            "label": "REAL-TIME SUBSUMPTION CHECK",
-            "points": [
-              "CDS engine calls the terminology service $subsumes or ECL $expand endpoint at the point of rule firing",
-              "Always reflects the current SNOMED CT release - new subtypes are automatically included",
-              "Adds latency to each rule evaluation - acceptable for most clinical workflows",
-              "Requires a reliable, low-latency connection to the <a href=\"#/playbook/term-service\">terminology service</a>"
-            ]
-          },
-          {
-            "label": "PRE-EXPANDED CONCEPT SETS",
-            "points": [
-              "ECL expressions are expanded at load time and stored as flat concept ID sets in the CDS engine's local store",
-              "Fast evaluation with no runtime terminology service dependency",
-              "Must be refreshed on each SNOMED CT release - new subtypes are silently excluded until the next refresh",
-              "Suitable for high-frequency rules where latency is critical and a scheduled refresh process is in place"
-            ]
-          }
-        ],
         "examples": [
           {
             "label": "ECL: condition subsumption",
@@ -384,6 +378,62 @@
         ]
       },
       {
+        "title": "Express the decision logic in the engine's formalism",
+        "description": "Implement the decision logic identified in step 2 in the formalism chosen for the CDS engine. Whatever the formalism, the logic never contains enumerated code lists: it references SNOMED CT through a value set canonical URL (preferred - versioned and governed, see step 5) or an ECL expression, and delegates membership checks to the terminology service (step 7). The examples below express the same rule from step 2 in each formalism, so the only thing that changes is the logic syntax - the SNOMED CT references stay the same.",
+        "options": [
+          {
+            "label": "DECISION TABLES (DMN)",
+            "points": [
+              "Rules expressed as rows of input conditions and outcomes - readable and maintainable by clinical and business analysts",
+              "Input columns test value set membership (by canonical URL) or an ECL constraint; the table itself holds only thresholds, combinations, and actions",
+              "Well suited to families of similar rules that vary by a few parameters; less suited to complex temporal logic"
+            ]
+          },
+          {
+            "label": "SIMPLE LOGICAL EXPRESSIONS",
+            "points": [
+              "Boolean conditions written as JSON rules, FHIRPath, or an engine-specific expression syntax",
+              "Lightweight and easy to embed; membership operators (in value set, in ECL) delegate SNOMED CT checks to the <a href=\"#/playbook/term-service\">terminology service</a>",
+              "Limited expressiveness and portability - each engine has its own syntax"
+            ]
+          },
+          {
+            "label": "CQL + FHIR CLINICAL REASONING",
+            "points": [
+              "HL7 Clinical Quality Language packaged in FHIR Library and PlanDefinition resources, typically delivered via CDS Hooks",
+              "Declares value sets by canonical URL, including implicit ECL value sets (http://snomed.info/sct?fhir_vs=ecl/...)",
+              "Shareable, standards-based, and testable across systems; steeper learning curve and requires a CQL engine"
+            ]
+          },
+          {
+            "label": "GENERAL-PURPOSE LANGUAGE",
+            "points": [
+              "Logic written directly in application code (Python, Java, etc.) or in a rules engine",
+              "Maximum flexibility and performance; call the terminology service for membership checks instead of hard-coding code lists",
+              "Logic is opaque to clinical reviewers and hard to share - trace each implementation back to its plain-language rule from step 1"
+            ]
+          }
+        ],
+        "examples": [
+          {
+            "label": "Decision table referencing SNOMED CT",
+            "code": "# Each input tests membership in a SNOMED CT value set (canonical URL)\n# or an ECL constraint; the table holds only the decision logic\n\nInputs:\n  Diabetes = condition.code in VS https://example.org/ValueSet/diabetes-mellitus-cds\n               (<<73211009 |Diabetes mellitus (disorder)|)\n  NSAID    = medication.code in ECL\n               < 763158003 |Medicinal product| : 127489000 |Has active ingredient| = << 372665008 |Non-steroidal anti-inflammatory agent|\n  eGFR     = latest Observation in VS https://example.org/ValueSet/egfr-loinc\n\n| Age  | Diabetes | NSAID | eGFR  | -> Action                     |\n|------|----------|-------|-------|-------------------------------|\n| >=18 | true     | true  | < 60  | ALERT: review NSAID use       |\n| >=18 | true     | true  | >= 60 | INFO: monitor renal function  |\n| -    | -        | -     | -     | no action                     |"
+          },
+          {
+            "label": "JSON rule referencing SNOMED CT",
+            "code": "{\n  \"rule\": \"diabetes-nsaid-renal-alert\",\n  \"when\": {\n    \"all\": [\n      {\n        \"fact\": \"patient.age\",\n        \"op\": \">=\",\n        \"value\": 18\n      },\n      {\n        \"fact\": \"condition.code\",\n        \"op\": \"inValueSet\",\n        \"value\": \"https://example.org/ValueSet/diabetes-mellitus-cds\"\n      },\n      {\n        \"fact\": \"medication.code\",\n        \"op\": \"inECL\",\n        \"value\": \"< 763158003 |Medicinal product| : 127489000 |Has active ingredient| = << 372665008 |Non-steroidal anti-inflammatory agent|\"\n      },\n      {\n        \"fact\": \"observation[egfr].value\",\n        \"op\": \"<\",\n        \"value\": 60\n      }\n    ]\n  },\n  \"then\": {\n    \"action\": \"alert\",\n    \"message\": \"Review NSAID use - diabetes with reduced eGFR\"\n  }\n}"
+          },
+          {
+            "label": "CQL referencing SNOMED CT",
+            "code": "library DiabetesNsaidRenal version '1.0.0'\nusing FHIR version '4.0.1'\ninclude FHIRHelpers version '4.0.1'\n\ncodesystem \"ConditionClinical\": 'http://terminology.hl7.org/CodeSystem/condition-clinical'\ncode \"active\": 'active' from \"ConditionClinical\"\n\n// Versioned, governed value set (recommended)\nvalueset \"Diabetes mellitus\": 'https://example.org/ValueSet/diabetes-mellitus-cds'\n// Implicit ECL value set (useful for prototyping); decoded ECL:\n// < 763158003 : 127489000 = << 372665008\nvalueset \"NSAID products\": 'http://snomed.info/sct?fhir_vs=ecl/%3C%20763158003%20%3A%20127489000%20%3D%20%3C%3C%20372665008'\nvalueset \"eGFR tests\": 'https://example.org/ValueSet/egfr-loinc'\n\ncontext Patient\n\ndefine \"Has diabetes\":\n  exists [Condition: \"Diabetes mellitus\"] C\n    where C.clinicalStatus ~ \"active\"\n\ndefine \"On NSAID\":\n  exists [MedicationRequest: \"NSAID products\"] M\n    where M.status = 'active'\n\ndefine \"Low eGFR\":\n  (Last([Observation: \"eGFR tests\"] O sort by (effective as FHIR.dateTime)).value as Quantity)\n    < 60 'mL/min/{1.73_m2}'\n\ndefine \"Fire alert\":\n  AgeInYears() >= 18 and \"Has diabetes\" and \"On NSAID\" and \"Low eGFR\""
+          },
+          {
+            "label": "Python referencing SNOMED CT",
+            "code": "DIABETES_VS = \"https://example.org/ValueSet/diabetes-mellitus-cds\"\nNSAID_ECL = (\"< 763158003 |Medicinal product| : 127489000 |Has active ingredient| = \"\n             \"<< 372665008 |Non-steroidal anti-inflammatory agent|\")\n\ndef fire_alert(patient, ts):  # ts = terminology service client\n    # SNOMED CT: membership resolved by the terminology service, never hard-coded lists\n    has_diabetes = any(ts.validate_code(DIABETES_VS, c.code)\n                       for c in patient.active_conditions)\n    on_nsaid = any(ts.in_ecl(NSAID_ECL, m.code)\n                   for m in patient.active_medications)\n    # Decision logic: demographics, thresholds, combination\n    return (patient.age >= 18 and has_diabetes and on_nsaid\n            and patient.latest_egfr < 60)"
+          }
+        ]
+      },
+      {
         "title": "Implement subsumption-based queries via the terminology service",
         "description": "Configure the CDS engine to check whether a patient's coded data falls within a rule's SNOMED CT constraint. Use the FHIR $subsumes operation for concept-to-concept hierarchical checks, or $validate-code to confirm a patient concept is within a named value set. This is the standard FHIR Terminology Service pattern. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for deployment and the <a href=\"#/playbook/analytics\">Analytics playbook</a> for subsumption-based query patterns against clinical data stores.",
         "examples": [
@@ -394,6 +444,28 @@
           {
             "label": "FHIR $validate-code: value set membership",
             "code": "# Check whether a patient's concept is within the CDS rule's value set\nGET /fhir/ValueSet/$validate-code\n  ?url=https://example.org/ValueSet/diabetes-mellitus-cds\n  &system=http://snomed.info/sct\n  &code=44054006\n\n# Response: result=true means the patient concept is within the rule's value set\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    { \"name\": \"result\", \"valueBoolean\": true },\n    { \"name\": \"display\", \"valueString\": \"Type 2 diabetes mellitus\" }\n  ]\n}"
+          }
+        ],
+        "options": [
+          {
+            "label": "REAL-TIME SUBSUMPTION CHECK",
+            "points": [
+              "CDS engine calls the terminology service $subsumes or ECL $expand endpoint at the point of rule firing",
+              "Always reflects the current SNOMED CT release - new subtypes are automatically included",
+              "Adds latency to each rule evaluation - acceptable for most clinical workflows",
+              "Requires a reliable, low-latency connection to the <a href=\"#/playbook/term-service\">terminology service</a>"
+            ],
+            "example": null
+          },
+          {
+            "label": "PRE-EXPANDED CONCEPT SETS",
+            "points": [
+              "ECL expressions are expanded at load time and stored as flat concept ID sets in the CDS engine's local store",
+              "Fast evaluation with no runtime terminology service dependency",
+              "Must be refreshed on each SNOMED CT release - new subtypes are silently excluded until the next refresh",
+              "Suitable for high-frequency rules where latency is critical and a scheduled refresh process is in place"
+            ],
+            "example": null
           }
         ]
       },
@@ -426,7 +498,9 @@
       "No rule governance - outdated alerts that contradict current evidence persist in production and create clinical risk",
       "Testing only against current SNOMED CT content - historical patient data may use older, now-inactivated concept IDs that fall outside the ECL constraint",
       "Skipping value set versioning - it becomes impossible to audit which concept set a historical rule used when fired",
-      "Pre-expanded concept sets without a refresh process - after each SNOMED CT release, new subtypes are silently excluded from rule evaluation"
+      "Pre-expanded concept sets without a refresh process - after each SNOMED CT release, new subtypes are silently excluded from rule evaluation",
+      "Mixing the terminology and logic layers - hard-coding SNOMED CT code lists inside rule logic (which then silently misses new subtypes), or pushing logic into the terminology layer (value sets that encode thresholds, timing, or combinations of conditions) - makes rules opaque to review and impossible to maintain independently",
+      "Relying on the SNOMED CT code alone for record context - a diabetes code recorded as family history, or as a refuted or resolved condition, fires the rule unless the information model's status and context fields are also checked"
     ],
     "resources": [
       {
@@ -450,7 +524,7 @@
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"
       }
     ],
-    "status": "draft"
+    "status": "published"
   },
   "analytics": {
     "title": "Analytics and reporting",
@@ -606,66 +680,43 @@
   },
   "interop": {
     "title": "Interoperability and data exchange",
-    "subtitle": "Exchanging SNOMED CT-coded data between systems using HL7 FHIR",
+    "subtitle": "Exchanging SNOMED CT-coded data between systems, with examples in HL7 FHIR",
     "icon": "arrows-exchange",
     "color": "green",
     "audience": [
       "Software provider"
     ],
-    "overview": "SNOMED CT combined with HL7 FHIR provides a globally interoperable foundation for clinical data exchange. FHIR resources such as Condition, Observation, Procedure, and AllergyIntolerance carry SNOMED CT codes, and FHIR terminology bindings define which value sets (expressed as ECL constraints) are valid for each coded element. A FHIR Terminology Service - implementing operations including $expand, $validate-code, $lookup, $subsumes, and $translate - is the runtime component that validates, expands, and translates SNOMED CT content. See the Terminology service playbook for deployment guidance.",
+    "overview": "Interoperability depends on systems agreeing not only on how data is structured, but on what it means. SNOMED CT provides that shared meaning: a single, precise identifier for each clinical idea - a diagnosis, finding, procedure, substance, or allergy - independent of the language, display term, or system in which it was recorded. Because every concept sits within a hierarchy and a formal concept model, a receiving system can do more than display the data: it can validate it against agreed value sets, aggregate it by subsumption, present it in the user's language, and use it directly in decision support and analytics. Realising this requires sender and receiver to agree on which concepts are valid for each data element, how coded data is validated, and how terms are displayed.\n\nSNOMED CT is independent of any particular exchange standard and is used with HL7 CDA, HL7 v2, openEHR, IHE profiles, and others. HL7 FHIR is today the most widely adopted standard for health data exchange, so this playbook uses it for its examples. In FHIR, resources such as Condition, Observation, Procedure, and AllergyIntolerance carry SNOMED CT codes; terminology bindings define which value sets - typically expressed as ECL constraints - are valid for each coded element; and a FHIR Terminology Service, implementing operations such as $expand, $validate-code, $lookup, $subsumes, and $translate, validates, expands, and translates SNOMED CT content at runtime. The same principles apply to other exchange standards. See the Terminology service playbook for deployment guidance.",
     "decisions": [
       {
-        "question": "Which FHIR resources and elements will carry SNOMED CT codes, and with what binding strength?",
-        "guidance": "Identify each coded element in your exchange, the FHIR resource and path it maps to, and whether the terminology binding is required, extensible, or preferred. Required bindings enforce conformance; extensible bindings allow extension. The binding strength has significant implications for receiver systems - a required binding means validation failures block processing, while extensible bindings allow locally-defined alternatives."
+        "question": "Which data elements will carry SNOMED CT codes, and how strictly will each binding be enforced?",
+        "guidance": "Identify each coded element in your exchange, where it sits in the exchange structure, and how strictly its value set is enforced. In FHIR, this is the resource and element path and the binding strength: required bindings enforce conformance, while extensible and preferred bindings allow alternatives. Binding strictness has significant implications for receiver systems - a strict binding means validation failures block processing, while looser bindings allow locally-defined alternatives."
       },
       {
-        "question": "Which SNOMED CT edition and version will be declared in exchanged resources?",
-        "guidance": "Senders must declare the SNOMED CT system URI (http://snomed.info/sct) and, where precision matters, the edition and version (e.g., http://snomed.info/sct/32506021000036107 for the Australian edition). Receivers need this to validate codes correctly. Agree version declaration policy with all exchange partners before go-live."
+        "question": "Which SNOMED CT edition and version will be declared in exchanged data?",
+        "guidance": "Senders must declare the code system and, where precision matters, the SNOMED CT edition and version. In FHIR, this is the system URI (http://snomed.info/sct) and the version URI (e.g., http://snomed.info/sct/32506021000036107 for the Australian edition); other standards carry the same information in their own code system and version fields. Receivers need this to validate codes correctly. Agree version declaration policy with all exchange partners before go-live."
       },
       {
         "question": "How will receiving systems validate incoming SNOMED CT codes?",
-        "guidance": "Receivers should call $validate-code against their terminology service to confirm that incoming concept IDs are active, valid for the declared SNOMED CT edition/version, and within the expected value set. Accepting codes without validation allows invalid or out-of-scope data into clinical systems."
+        "guidance": "Receivers should validate incoming concept IDs against their terminology service (in FHIR, with the $validate-code operation) to confirm that they are active, valid for the declared SNOMED CT edition/version, and within the expected value set. Accepting codes without validation allows invalid or out-of-scope data into clinical systems."
       },
       {
         "question": "What display text strategy will be used for different locales?",
-        "guidance": "The SNOMED CT display text in a FHIR resource must be the preferred term from the receiver's language reference set - not the sender's preferred term, not the FSN. Call $lookup at the receiver with the target language reference set to obtain the correct display term. Coordinate display text handling with exchange partners, particularly in multilingual or cross-national exchanges."
+        "guidance": "The display text shown to users must be the preferred term from the receiver's language reference set - not the sender's preferred term, not the FSN. Retrieve it from the terminology service using the target language reference set (in FHIR, with the $lookup operation). Coordinate display text handling with exchange partners, particularly in multilingual or cross-national exchanges."
       },
       {
         "question": "How will SNOMED CT releases be coordinated across exchange partners?",
-        "guidance": "When a sender updates to a new SNOMED CT release before receivers do, concept IDs may temporarily be unresolvable on receiver systems. Agree a release coordination policy - including a transition window - with all exchange partners before upgrading. Ensure all stakeholders have access to the version of SNOMED CT declared in exchanged messages, or have access to a public terminology server that can resolve version mismatches."
+        "guidance": "When a sender updates to a new SNOMED CT release before receivers do, concept IDs may temporarily be unresolvable on receiver systems. Agree a release coordination policy - including a transition window - with all exchange partners before upgrading. Ensure all stakeholders have access to the version of SNOMED CT declared in exchanged messages, or have access to a terminology server that holds the required versions, such as one hosted by the national release centre or a multi-edition server, to resolve version mismatches."
       },
       {
         "question": "What is the resolution strategy when a received concept cannot be validated due to a version or edition mismatch?",
-        "guidance": "Two failure modes require different resolution strategies. (1) Concept not found: the sender may be using a newer release or a different national edition - in both cases $validate-code returns 'not found'. Check the national terminology server first for a newer version of the national edition; if still unresolved, query a multi-edition server for the closest international ancestor. (2) Concept inactive: the sender used an older release - apply the proposed replacement from SNOMED CT's historical association reference sets. Define and document these strategies for each exchange partner relationship before go-live."
+        "guidance": "Two failure modes require different resolution strategies. (1) Concept not found: the sender may be using a newer release or a different national edition - in both cases validation returns 'not found'. Check the national terminology server first for a newer version of the national edition; if still unresolved, query a multi-edition server for the closest international ancestor. (2) Concept inactive: the sender used an older release - apply the proposed replacement from SNOMED CT's historical association reference sets. Define and document these strategies for each exchange partner relationship before go-live."
       }
     ],
-    "errorHandling": {
-      "intro": "When $validate-code fails, the response indicates why. Each failure mode has a distinct cause and resolution - do not treat them as equivalent.",
-      "scenarios": [
-        {
-          "trigger": "Concept not found",
-          "cause": "The sender is using a newer SNOMED CT release or a different national edition. In both cases $validate-code returns 'not found' locally - the detection is the same but the resolution is sequential.",
-          "resolutionSteps": [
-            "Check the relevant national terminology server first - the concept may exist in a newer version of the national edition and resolve to a valid national code.",
-            "If still not found, query a shared multi-edition terminology server to find the concept's closest ancestor in the international edition, which is available to both parties."
-          ],
-          "icon": "search"
-        },
-        {
-          "trigger": "Concept inactive",
-          "cause": "The sender used an older SNOMED CT release. The concept has since been inactivated and a replacement is available in the receiver's version.",
-          "resolutionSteps": [
-            "Look up the inactivated concept in SNOMED CT's historical association reference sets. These identify the proposed replacement concept. Apply that replacement for processing."
-          ],
-          "icon": "clock"
-        }
-      ],
-      "note": "In all cases, preserve both the original received code and the locally resolved code in the record so the substitution is auditable."
-    },
     "steps": [
       {
-        "title": "Map each exchange element to a FHIR resource, path, and terminology binding",
-        "description": "Create a data mapping document that identifies every SNOMED CT-coded element, the FHIR resource and element path, the value set (expressed as an ECL constraint or reference set URL), and the binding strength. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for guidance on defining ECL-based value sets.",
+        "title": "Map each exchanged data element to its structure and terminology binding",
+        "description": "Create a data mapping document that identifies every SNOMED CT-coded element in the exchange, where it sits in the exchange structure, the value set that constrains it (expressed as an ECL constraint or reference set), and how strictly that binding is enforced. In FHIR, this means the resource and element path (e.g., Condition.code) and the binding strength (required, extensible, preferred); other standards express the same information through their own structures, such as CDA templates or openEHR archetype nodes. If the exchange is governed by a formal, computable implementation guide - such as a FHIR Implementation Guide, whose profiles declare the element paths, value set bindings, and binding strengths, or the equivalent CDA templates or openEHR templates - most of this mapping is already defined and should be reused rather than recreated. What remains is mapping your own system's data to those profiles, and checking that the guide's value sets use SNOMED CT with an appropriate ECL constraint and a declared edition and version. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for guidance on defining ECL-based value sets.",
         "examples": [
           {
             "label": "FHIR Condition with SNOMED CT coding",
@@ -674,8 +725,8 @@
         ]
       },
       {
-        "title": "Define value sets for each terminology binding using ECL",
-        "description": "Write ECL expressions for each FHIR terminology binding (e.g., &lt;&lt;404684003 for a condition code field). Package these as FHIR ValueSet resources with canonical URLs and an explicit SNOMED CT edition and version in the compose. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for ECL authoring and packaging guidance.",
+        "title": "Define a value set for each terminology binding using ECL",
+        "description": "Write an ECL expression for each coded element (e.g., &lt;&lt;404684003 |Clinical finding| for a condition or problem code). Publish each value set with a stable identifier and an explicit SNOMED CT edition and version, so that sender and receiver validate against the same content. In FHIR, value sets are packaged as ValueSet resources with canonical URLs, with the edition and version declared in the compose. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for ECL authoring and packaging guidance.",
         "examples": [
           {
             "label": "FHIR ValueSet with ECL binding (intensional)",
@@ -684,8 +735,8 @@
         ]
       },
       {
-        "title": "Deploy or configure a FHIR Terminology Service",
-        "description": "Ensure a FHIR R4-compliant terminology service is available to both sender and receiver systems. It must support $expand with ECL, $validate-code, $lookup, $subsumes, and $translate (for map-based translation via the <a href=\"#/playbook/mapping\">Mapping playbook</a>). Implementers must deploy or license their own terminology service for production use - the public terminology server operated by SNOMED International is intended for evaluation and testing only, not for production clinical systems. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for full deployment guidance.",
+        "title": "Deploy or configure a terminology service",
+        "description": "Ensure a terminology service is available to both sender and receiver systems. It must support the SNOMED CT services that exchange relies on: expanding value sets from ECL, validating codes, looking up terms and properties, testing subsumption, and translating through maps (see the <a href=\"#/playbook/mapping\">Mapping playbook</a>). The FHIR Terminology Service API is the most widely implemented interface for these services ($expand, $validate-code, $lookup, $subsumes, $translate), and a FHIR R4-compliant server can support exchanges built on other standards as well. Implementers must deploy or license their own terminology service for production use - the public terminology server operated by SNOMED International is intended for evaluation and testing only, not for production clinical systems. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for full deployment guidance.",
         "options": [
           {
             "label": "SELF-HOSTED TERMINOLOGY SERVICE",
@@ -709,13 +760,36 @@
               "Reduces operational burden - no infrastructure to provision or upgrade pipeline to manage",
               "Multi-edition servers can resolve concepts from editions not available locally",
               "Assess latency, uptime SLA, and data sovereignty requirements before selecting a hosted provider"
-            ]
+            ],
+            "example": null
           }
         ]
       },
       {
-        "title": "Implement code validation on receipt",
-        "description": "On receiving a FHIR resource, call $validate-code for each SNOMED CT-coded element against the declared edition/version and the expected value set. If validation succeeds, the concept is active and within scope - proceed normally. If $validate-code fails, identify the failure mode and apply the corresponding resolution strategy. Define and document these strategies for each exchange partner relationship before go-live.",
+        "title": "Validate coded data on receipt",
+        "description": "When data is received, validate each SNOMED CT-coded element against the declared edition/version and the expected value set (in FHIR, with the $validate-code operation). If validation succeeds, the concept is active and within scope - proceed normally. If validation fails, identify the failure mode and apply the corresponding resolution strategy. In all cases, preserve both the original received code and the locally resolved code in the record so the substitution is auditable. Define and document these strategies for each exchange partner relationship before go-live.",
+        "options": [
+          {
+            "label": "CONCEPT NOT FOUND",
+            "points": [
+              "The sender may be using a newer release or a different national edition",
+              "Check the national terminology server first for a newer version of the national edition",
+              "If still unresolved, query a multi-edition server for the closest international ancestor",
+              "Log unresolved cases for review with the exchange partner"
+            ],
+            "example": null
+          },
+          {
+            "label": "CONCEPT INACTIVE",
+            "points": [
+              "The sender used an older release in which the concept was still active",
+              "Apply the proposed replacement from SNOMED CT's historical association reference sets",
+              "Historical association types: SAME AS, REPLACED BY, POSSIBLY EQUIVALENT TO - use in order of confidence",
+              "Where no unambiguous replacement exists, flag for clinical review before processing"
+            ],
+            "example": null
+          }
+        ],
         "examples": [
           {
             "label": "$validate-code - success response",
@@ -725,31 +799,11 @@
             "label": "$validate-code - failure responses",
             "code": "# Failure: concept not found in declared version/edition\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    { \"name\": \"result\", \"valueBoolean\": false },\n    { \"name\": \"message\", \"valueString\": \"Unknown code '99999999' in system 'http://snomed.info/sct'\" }\n  ]\n}\n\n# Failure: concept inactive (inactivated in this version)\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    { \"name\": \"result\", \"valueBoolean\": false },\n    { \"name\": \"message\", \"valueString\": \"Code '154283005' is not active in version 'http://snomed.info/sct/900000000000207008/version/20250301'\" }\n  ]\n}\n\n# Failure: concept valid but outside the declared value set scope\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    { \"name\": \"result\", \"valueBoolean\": false },\n    { \"name\": \"message\", \"valueString\": \"Code is valid but not in the specified value set\" }\n  ]\n}"
           }
-        ],
-        "options": [
-          {
-            "label": "CONCEPT NOT FOUND",
-            "points": [
-              "The sender may be using a newer release or a different national edition",
-              "Check the national terminology server first for a newer version of the national edition",
-              "If still unresolved, query a multi-edition server for the closest international ancestor",
-              "Log unresolved cases for review with the exchange partner"
-            ]
-          },
-          {
-            "label": "CONCEPT INACTIVE",
-            "points": [
-              "The sender used an older release in which the concept was still active",
-              "Apply the proposed replacement from SNOMED CT's historical association reference sets",
-              "Historical association types: SAME AS, REPLACED BY, POSSIBLY EQUIVALENT TO - use in order of confidence",
-              "Where no unambiguous replacement exists, flag for clinical review before processing"
-            ]
-          }
         ]
       },
       {
-        "title": "Handle display text using the receiver's language reference set",
-        "description": "When rendering received SNOMED CT codes, call $lookup against the terminology service with the displayLanguage parameter set to the receiver's language reference set. Display the resulting preferred term - do not use the display text from the received resource as authoritative, as it reflects the sender's locale. Good practice is to preserve the sender's original display text as a secondary label or tooltip so clinicians can see what the sending system recorded - this matters when preferred terms differ significantly across locales for the same concept. When a concept has been resolved via a mismatch strategy, indicate the original received concept to the user if clinically relevant.",
+        "title": "Display received concepts using the receiver's language reference set",
+        "description": "When rendering received SNOMED CT codes, retrieve the preferred term from the receiver's language reference set through the terminology service (in FHIR, $lookup with the displayLanguage parameter). Display the resulting preferred term - do not treat the display text in the received data as authoritative, as it reflects the sender's locale. Good practice is to preserve the sender's original display text as a secondary label or tooltip so clinicians can see what the sending system recorded - this matters when preferred terms differ significantly across locales for the same concept. When a concept has been resolved via a mismatch strategy, indicate the original received concept to the user if clinically relevant.",
         "examples": [
           {
             "label": "$lookup with language reference set parameter",
@@ -759,7 +813,7 @@
       },
       {
         "title": "Test end-to-end with conformance tooling",
-        "description": "Validate exchanges using FHIR validation tooling and, where applicable, IHE or HL7 connectathon test scripts. Confirm that coded data round-trips correctly - codes sent are correctly validated and displayed at the receiver. Specifically test version and edition mismatch scenarios: send concepts from a newer version and from an older version, and verify the resolution strategies produce the expected outcomes. Use the FHIR Validator (validator.fhir.org) to confirm resource conformance against published profiles."
+        "description": "Validate exchanges with the conformance tooling of the exchange standard in use and, where applicable, IHE or HL7 connectathon test scripts. Confirm that coded data round-trips correctly - codes sent are correctly validated and displayed at the receiver. Specifically test version and edition mismatch scenarios: send concepts from a newer version and from an older version, and verify the resolution strategies produce the expected outcomes. For FHIR, use the FHIR Validator (validator.fhir.org) to confirm resource conformance against published profiles."
       }
     ],
     "dependencies": [
@@ -781,13 +835,14 @@
       }
     ],
     "pitfalls": [
-      "Sending the FSN as the FHIR display text - receivers will display a technical label to clinicians rather than the appropriate preferred term",
-      "Not declaring the SNOMED CT edition and version URI in exchanged resources - receivers cannot validate codes without knowing which edition and version was used",
-      "Accepting incoming codes without $validate-code validation - invalid or retired concept IDs silently enter clinical systems",
-      "Treating all validation failures as equivalent - a concept from a newer version, an inactivated concept, and a concept from a different edition each require a different resolution strategy; conflating them leads to incorrect handling",
-      "No resolution strategy for version mismatches - logging and escalating is not sufficient; receivers must be able to resolve concepts from newer or older versions using a public terminology server and SNOMED CT history supplements",
+      "Sending the FSN as the display text - receivers will display a technical label to clinicians rather than the appropriate preferred term",
+      "Not declaring the SNOMED CT edition and version in exchanged data - receivers cannot validate codes without knowing which edition and version was used",
+      "Accepting incoming codes without validation - invalid or retired concept IDs silently enter clinical systems",
+      "Treating all validation failures as equivalent, or having no resolution strategy for them - a concept from a newer version, an inactivated concept, and a concept from a different edition each require a different resolution; logging and escalating is not sufficient - receivers must be able to resolve concepts from newer or older versions using a terminology server that holds the required versions and SNOMED CT history supplements",
       "Using extension concepts not available in receiver systems without providing the nearest international ancestor - receivers in a different edition cannot resolve or validate locally created extension concepts",
-      "No release coordination policy across exchange partners - a SNOMED CT upgrade on one side causes validation failures on the other without an agreed resolution pathway"
+      "No release coordination policy across exchange partners - a SNOMED CT upgrade on one side causes validation failures on the other without an agreed resolution pathway",
+      "Recreating bindings that a formal implementation guide already defines - local re-mapping diverges from the guide and from other implementers",
+      "Treating the display text in received data as authoritative - it reflects the sender's language and locale, not the receiver's"
     ],
     "resources": [
       {
@@ -816,7 +871,7 @@
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-uri-standard/"
       }
     ],
-    "status": "draft"
+    "status": "published"
   },
   "value-sets": {
     "title": "Value set design and management",
