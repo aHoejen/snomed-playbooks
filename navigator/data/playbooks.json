@@ -535,7 +535,7 @@
       "Software provider",
       "Information Manager"
     ],
-    "overview": "The main benefit of recording clinical data with SNOMED CT comes when that data is retrieved, analysed and reused - for point of care summaries and reporting, for population-based analysis such as trend analysis, clinical audit and pharmacovigilance, and for clinical research such as identifying trial candidates.\n\nSNOMED CT supports this in ways a flat code list cannot: subsumption groups detailed concepts into broader categories at any level of detail, defining relationships let queries select concepts by their meaning (finding site, morphology, causative agent), reference sets capture curated groupings that the hierarchy does not express, and maps bring data coded in other code systems into SNOMED CT, or take SNOMED CT data out to classifications such as ICD-10 for statistical reporting.\n\nExpression Constraint Language (ECL) is the standard way to express the terminology part of a query, but SNOMED CT does not dictate a query language or data architecture: the terminology logic is embedded in, or joined to, the query over the patient records.\n\nReliable results depend on more than the terminology. A SNOMED CT code alone does not say whether a condition is confirmed, suspected, or a family history - that context may sit in the information model. Longitudinal data contains concepts that have since been inactivated, and SNOMED CT's polyhierarchy means one concept can be counted in more than one category. This playbook covers how to define analytic categories, execute them against patient data, and handle context, versioning and aggregation correctly.",
+    "overview": "The main benefit of recording clinical data with SNOMED CT comes when that data is retrieved, analysed and reused - for point of care summaries and reporting, for population-based analysis such as trend analysis, clinical audit and pharmacovigilance, and for clinical research such as identifying trial candidates.\n\nSNOMED CT supports this in ways a flat code list cannot:\n- <strong>Subsumption</strong> groups detailed concepts into broader categories at any level of detail\n- <strong>Defining relationships</strong> let queries select concepts by their meaning (finding site, morphology, causative agent)\n- <strong>Reference sets</strong> capture curated groupings that the hierarchy does not express\n- <strong>Maps</strong> bring data coded in other code systems into SNOMED CT, or take SNOMED CT data out to classifications such as ICD-10 for statistical reporting\n\nExpression Constraint Language (ECL) is the standard way to express the terminology part of a query, but SNOMED CT does not dictate a query language or data architecture: the terminology logic is embedded in, or joined to, the query over the patient records.\n\nReliable results depend on more than the terminology. A SNOMED CT code alone does not say whether a condition is confirmed, suspected, or a family history - that context may sit in the information model. Longitudinal data contains concepts that have since been inactivated, and SNOMED CT's polyhierarchy means one concept can be counted in more than one category. This playbook covers how to define analytic categories, execute them against patient data, and handle context, versioning and aggregation correctly.",
     "decisions": [
       {
         "question": "What analytic task needs to be supported, and what does it require of the data?",
@@ -551,7 +551,7 @@
       },
       {
         "question": "How will each analytic category be defined?",
-        "guidance": "Use subsumption (&lt;&lt;) where a single concept and its subtypes match the category, defining relationships (attribute refinements) where the category is defined by a characteristic such as finding site or causative agent, and a reference set where the category is a curated grouping the hierarchy does not express (for example, rare diseases). These techniques can be combined in one ECL expression. Avoid lexical (text-matching) queries for defining categories - use them only to find candidates for review. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for authoring guidance."
+        "guidance": "Subsumption (&lt;&lt;) - a concept and all its subtypes - is usually sufficient. Use a reference set where the category is a curated grouping the hierarchy does not express (for example, rare diseases). Where neither is enough, more complex ECL can be formulated, for example refining by attributes such as finding site or causative agent, and techniques can be combined in one expression. Avoid lexical (text-matching) queries for defining categories - use them only to find candidates for review. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for authoring guidance."
       },
       {
         "question": "How will the terminology part of the query be executed against patient data?",
@@ -601,24 +601,12 @@
               "Selects a concept and all its subtypes using &lt;&lt; (descendant or self) or &lt; (descendant)",
               "The fundamental SNOMED CT analytic technique: 'any kind of infectious disease' finds viral pneumonia, tuberculosis and every other subtype",
               "New subtypes added in future releases are included automatically",
-              "Use when one concept in the hierarchy matches the meaning of the category"
+              "Usually sufficient on its own - use when one concept in the hierarchy matches the meaning of the category",
+              "Where it is not, more complex ECL can be formulated, for example refining by defining attributes such as finding site, associated morphology or causative agent"
             ],
             "example": {
               "label": "ECL: subsumption",
-              "code": "# Any kind of infectious disease\n<< 40733004 |Infectious disease (disorder)|\n\n# Any kind of diabetes mellitus\n<< 73211009 |Diabetes mellitus (disorder)|"
-            }
-          },
-          {
-            "label": "DEFINING RELATIONSHIPS",
-            "points": [
-              "Selects concepts by the value of their defining attributes, such as finding site, associated morphology or causative agent",
-              "Answers questions the hierarchy alone does not, such as 'all benign neoplasms of the kidney'",
-              "Use subsumption on the attribute value (&lt;&lt;) so that more specific values are also matched",
-              "Also matches postcoordinated data that is not a subtype of any single precoordinated concept"
-            ],
-            "example": {
-              "label": "ECL: attribute refinement",
-              "code": "# Benign neoplasms of the kidney\n< 404684003 |Clinical finding (finding)| :\n  116676008 |Associated morphology| = << 3898006 |Neoplasm, benign (morphologic abnormality)| ,\n  363698007 |Finding site| = << 64033007 |Kidney structure (body structure)|\n\n# Disorders caused by Mycobacterium tuberculosis complex in the lung\n< 64572001 |Disease (disorder)| :\n  246075003 |Causative agent| = << 113858008 |Mycobacterium tuberculosis complex (organism)| ,\n  363698007 |Finding site| = << 39607008 |Lung structure (body structure)|"
+              "code": "# Any kind of infectious disease\n<< 40733004 |Infectious disease (disorder)|\n\n# Any kind of diabetes mellitus\n<< 73211009 |Diabetes mellitus (disorder)|\n\n# More complex ECL where subsumption alone is not enough:\n# benign neoplasms of the kidney\n< 404684003 |Clinical finding (finding)| :\n  116676008 |Associated morphology| = << 3898006 |Neoplasm, benign (morphologic abnormality)| ,\n  363698007 |Finding site| = << 64033007 |Kidney structure (body structure)|"
             }
           },
           {
@@ -780,7 +768,7 @@
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
       }
     ],
-    "status": "draft"
+    "status": "published"
   },
   "interop": {
     "title": "Interoperability and data exchange",
