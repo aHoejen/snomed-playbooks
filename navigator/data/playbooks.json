@@ -1564,133 +1564,139 @@
       "Information Manager",
       "Software provider"
     ],
-    "overview": "SNOMED CT mapping translates SNOMED CT to other code systems - such as ICD-10, OPCS-4, or CPT - for reporting and billing, and translates other code systems into SNOMED CT for interoperability, search, or analytics. Where an official map exists, such as the SNOMED CT to ICD-10 extended map, start there before building anything custom; for mapping into SNOMED CT, Snap2SNOMED is the recommended tool. Mapping to a less granular target always loses some clinical meaning, which cannot be recovered in reverse. This playbook covers building the map itself; if your goal is to migrate your own system of record onto SNOMED CT, see the Migrating to SNOMED CT playbook instead.",
+    "overview": "Maps connect SNOMED CT with other code systems so that data recorded once can be reused for other purposes. Each map works in one direction: some take SNOMED CT data out to classifications such as ICD-10, others bring data coded in local, legacy or other code systems into SNOMED CT.\n\nUsed well, maps are essential:\n- <strong>Reuse without re-coding</strong> - SNOMED CT-coded records can feed statistical returns, registries and funding with less manual coding\n- <strong>Bridging systems</strong> - systems using different code systems can exchange and compare data while they move to a common terminology\n- <strong>Unlocking existing data</strong> - legacy and external data can be analysed alongside native SNOMED CT data\n\nBut a map is not always the right answer:\n- <strong>Meaning shifts</strong> wherever source and target are not equivalent, and a map cannot simply be reversed\n- <strong>Maintenance never ends</strong> - the map must be updated whenever the source, the target, or the use case changes\n- <strong>Existing maps</strong>, such as SNOMED International's SNOMED CT to ICD-10 map, are almost always better than building a new one\n\nThis playbook covers deciding whether to map, building or adopting a map, applying it correctly, and keeping it current. Moving a system of record onto SNOMED CT is covered in the Migrating to SNOMED CT playbook.",
     "decisions": [
       {
-        "question": "Is mapping the right solution, given the ongoing maintenance burden it creates?",
-        "guidance": "Building and maintaining a map is not always the best option - especially where the source and target systems update on very different cycles (for example, a monthly-updated medication terminology against an annually revised classification). If the goal is SNOMED CT-coded data, weigh a map against capturing SNOMED CT directly at the point of documentation instead: native capture avoids the maintenance burden and is often more accurate long-term. Only commit to mapping once it is clearly the better option. If this map is part of a wider migration, see the <a href=\"#/playbook/migration\">Migrating to SNOMED CT playbook</a> for how this decision fits into that strategy."
+        "question": "Is a map the right solution?",
+        "guidance": "Before building a map, ask whether the requirement can be met another way, and whether the cost of maintaining the map is justified. If the goal is SNOMED CT-coded data, capturing SNOMED CT directly at the point of documentation is usually more accurate long-term. If the goal is ICD-10 or another classification, trained clinical coders working from the SNOMED CT record may produce more accurate, comparable data than a map. Where a map is part of retiring a legacy system, see the <a href=\"#/playbook/migration\">Migrating to SNOMED CT playbook</a>."
       },
       {
-        "question": "What is the purpose and direction of mapping?",
-        "guidance": "Clarify whether you need SNOMED CT to a classification or billing system (such as ICD-10, OPCS-4, or CPT), another code system into SNOMED CT, or both - each direction needs different tools and quality requirements, and a unidirectional tool cannot be forced into a bidirectional map. Also confirm the source and target systems have compatible semantic domains before committing; incompatible domains undermine any map regardless of tooling. See the <a href=\"#/playbook/analytics\">Analytics and reporting playbook</a> for how SNOMED CT to ICD-10 output feeds downstream reporting."
+        "question": "What is the map for, and what does that require of it?",
+        "guidance": "The use case determines the map's direction, the patterns it allows, and how close each match must be. A map is unidirectional unless every link is an exact equivalent. Funding and statistical grouping need each source code in exactly one category (one-to-one or many-to-one) and usually accept broader targets; data integration and decision support need equivalence. Agree the allowed patterns and relationship types (equivalent, broader, narrower, inexact, no match) before mapping starts, and document them as mapping rules."
       },
       {
-        "question": "Does an existing map to your target system already exist and can it be adopted or adapted?",
-        "guidance": "Check whether SNOMED International, a national release centre, or another organization already maintains a map to your target system - for example, the official SNOMED CT to ICD-10 extended map. Load and test it first: an actively maintained existing map is almost always preferable to a custom one, which needs its own upkeep on every SNOMED CT release."
+        "question": "Does a suitable map already exist?",
+        "guidance": "Check whether SNOMED International, your national release centre, or another organisation already maintains a map for this purpose - for example, the SNOMED CT to ICD-10 map, distributed with the International Edition. An actively maintained existing map is almost always preferable to a custom one, which needs its own upkeep on every release of both code systems."
       },
       {
-        "question": "Has a clinical risk assessment been performed and documented for this map?",
-        "guidance": "Mapping errors can propagate into clinical decisions, billing, and reporting, so quality assurance needs more than technical validation. Perform and document a formal risk assessment - risks, mitigations, and an ongoing review process - as part of the map's documentation, not as an afterthought."
+        "question": "How will the map be represented and distributed?",
+        "guidance": "Choose the representation by who will use the map and how it must be maintained, not by the tool that produced it:<ul class=\"guidance-list\"><li><strong>Map reference set in an extension</strong> - when the map is shared beyond one system (for example a national or organisation-wide map, or a map supporting a messaging specification) and must be versioned and released with SNOMED CT. It is uniquely identified, carries the same versioning and module dependencies as SNOMED CT components, is distributed with the edition, and can still be served as a FHIR ConceptMap by a terminology server. It requires an extension namespace and release process - see the <a href=\"#/playbook/extensions\">Extensions playbook</a>.</li><li><strong>FHIR ConceptMap</strong> - when the map supports a specific integration, project or FHIR-based exchange and does not need to be released with SNOMED CT. Give it a canonical URL and version, and record the SNOMED CT edition and version it was built against.</li><li><strong>Proprietary or internal structure</strong> - only for a map used inside a single system and never shared. It is hard to share, audit and maintain, so it still needs documented source and target versions and a change history.</li></ul>Whichever form is chosen, the map must be uniquely identified, versioned, and documented."
       },
       {
-        "question": "How will ambiguous or unmappable concepts be handled?",
-        "guidance": "Some source concepts have no direct target equivalent, or map to multiple targets depending on context (for example, laterality or episode of care). Record this using standard relationship types - equivalent, broader, narrower, inexact, or no match - rather than forcing an approximate one-to-one link, and define a handling policy for genuine no-match cases (expert escalation, a post-coordinated expression, or a new content request) rather than leaving it to the algorithm alone."
+        "question": "How will source codes with no suitable target be handled?",
+        "guidance": "Some source codes have no adequate target. Agree the options in advance: request new content from the code system owner, add a concept in an extension, use a postcoordinated expression (only if every system downstream can consume it), or record the code as having no target. Do not force an approximate match to improve coverage figures."
       },
       {
-        "question": "How will mapping quality be validated and maintained over time?",
-        "guidance": "Map quality needs review by clinical and terminology experts, not just technical validation - dual independent mapping with an adjudicator is the gold standard; single-author mapping carries a higher risk of undetected errors. Define who samples, audits, and approves map entries, and how the map is updated on each SNOMED CT release, since unmaintained maps degrade over time. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management guidance."
+        "question": "What level of review does the clinical risk require?",
+        "guidance": "Match the review approach to the risk and the resources available. A single author with no reviewer is only suitable for small, low-risk maps not used clinically. Single author with a reviewer is common; dual independent authoring with an adjudicator is the gold standard where errors could affect care. Treat automated and AI-assisted suggestions as one more mapper, not as reviewed output. Document the risk assessment and the chosen approach as part of the map documentation."
       }
     ],
     "steps": [
       {
-        "title": "Assess the full scope of mapping required",
-        "description": "Inventory all systems, workflows, and reporting destinations that need mapping output, documenting the source and target code systems, concept volume, and whether mapping needs to be real-time or batch. Identify whether an official map (such as the SNOMED CT to ICD-10 extended map) covers the scope, or whether custom mapping is also needed."
-      },
-      {
-        "title": "Assess and prepare source data quality",
-        "description": "Mapping cannot fix poor-quality source data. Review source codes and terms for ambiguous abbreviations, symbols, or free-text artifacts (for example \"#\", \"/\", \"?\", or shorthand comorbidity strings) before mapping begins. Agree and document interpretation rules for ambiguous entries so mappers apply them consistently, and flag entries that cannot be reliably mapped without clinical input rather than forcing a guess."
-      },
-      {
-        "title": "Apply the map for your mapping direction",
-        "description": "Choose the path that matches the mapping direction decided above - or follow both if your project needs mapping in both directions.",
-        "options": [
-          {
-            "label": "PATH A - SNOMED CT TO A TARGET SYSTEM",
-            "points": [
-              "Where an official map exists - such as the SNOMED CT to ICD-10 extended map, included in the international release as a complex map reference set - load it into your terminology service as a ConceptMap",
-              "Implement the full map application algorithm (rule groups, priorities, advice, correlation codes), not a simple lookup, and invoke it at runtime via FHIR $translate",
-              "Where no official map exists, author a custom one instead: use the relationship types agreed above, choose a simple or rule-based structure depending on target complexity, and apply the agreed QA process",
-              "Publish a custom map as an RF2 map reference set or FHIR ConceptMap so it works the same way as an official map",
-              "See the <a href=\"#/playbook/analytics\">Analytics and reporting playbook</a> for integrating map output into reporting"
-            ]
-          },
-          {
-            "label": "PATH B - ANOTHER CODE SYSTEM TO SNOMED CT",
-            "points": [
-              "Follow this path if you're mapping a source code system into SNOMED CT on an ongoing basis - for example, translating incoming data from a partner system, or supporting search and analytics - without retiring the source system",
-              "Snap2SNOMED is the tool for this direction: structured workflows with automation-assisted suggestions, human review, audit trail, and FHIR ConceptMap export",
-              "If you're instead migrating your own system of record onto SNOMED CT - retiring a legacy system, running a dual-coding transition - see the <a href=\"#/playbook/migration\">Migrating to SNOMED CT playbook</a> for the full process; it uses the map built here as one input"
-            ]
-          }
-        ],
+        "title": "Define the purpose, scope and mapping rules",
+        "description": "Document what the map is for, who will use it, and the source and target scope. When mapping into SNOMED CT, constrain the target to the relevant hierarchy, subhierarchy or subset - for example, Clinical finding for conditions, Body structure for body sites - which improves both automated suggestions and human consistency. Record the mapping rules from the decisions above (direction, allowed patterns, relationship types, how to handle no-match codes) and editorial guidelines for recurring cases, and keep them up to date as the work progresses.",
         "examples": [
           {
-            "label": "FHIR $translate call",
-            "code": "# Translate a SNOMED CT concept to ICD-10 using the official extended map\nGET /fhir/ConceptMap/$translate\n  ?system=http://snomed.info/sct\n  &code=44054006\n  &source=http://snomed.info/sct\n  &target=http://hl7.org/fhir/sid/icd-10\n  &url=http://snomed.info/sct/900000000000207008?fhir_cm=447562003\n\n# Response - ConceptMap $translate result\n{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    {\n      \"name\": \"result\",\n      \"valueBoolean\": true\n    },\n    {\n      \"name\": \"match\",\n      \"part\": [\n        {\n          \"name\": \"equivalence\",\n          \"valueCode\": \"narrower\"\n        },\n        {\n          \"name\": \"concept\",\n          \"valueCoding\": {\n            \"system\": \"http://hl7.org/fhir/sid/icd-10\",\n            \"code\": \"E11\",\n            \"display\": \"Type 2 diabetes mellitus\"\n          }\n        },\n        {\n          \"name\": \"source\",\n          \"valueString\": \"http://snomed.info/sct/900000000000207008?fhir_cm=447562003\"\n        }\n      ]\n    }\n  ]\n}"
-          },
-          {
-            "label": "Map rule algorithm pseudocode",
-            "code": "# The SNOMED CT to ICD-10 extended map uses rule groups and priorities.\n# A simple lookup is incorrect - the full algorithm must be applied.\n\n# For a given SNOMED CT concept:\n# 1. Retrieve all map entries for the concept, ordered by mapGroup then mapPriority\n# 2. For each mapGroup (each group produces one ICD-10 code):\n#    a. Evaluate each entry's mapRule in priority order\n#    b. Select the FIRST entry whose mapRule evaluates to TRUE\n#       - mapRule \"TRUE\" always matches (catch-all)\n#       - mapRule may reference clinical context (e.g. age, episode of care)\n#    c. Use the selected entry's mapTarget as the ICD-10 code for this group\n#    d. If mapAdvice contains \"ALWAYS\" codes, include them as additional codes\n# 3. The complete ICD-10 output is the set of codes, one per mapGroup\n\n# Example: concept 44054006 |Type 2 diabetes mellitus|\n# mapGroup 1, mapPriority 1: mapRule TRUE -> mapTarget E11 (Type 2 diabetes mellitus)\n# mapGroup 1 resolves to: E11\n\n# Example with multiple groups: concept 73211009 |Diabetes mellitus|\n# mapGroup 1: resolves to primary diabetes code (e.g. E14 - Unspecified diabetes)\n# mapGroup 2: may resolve to a complication code if context supports it\n# Final output: [E14, <complication code if applicable>]"
+            "label": "Mapping rules by use case",
+            "code": "Use case                                   Patterns       Relationship types\n------------------------------------------ -------------- ------------------------------\nSNOMED CT to classification for funding    1:1, N:1       Broader allowed\nLegacy code set in a clinical system to    1:1, 1:N, N:1  Equivalent, narrower, broader\n  SNOMED CT (migration)\nPartner system codes to SNOMED CT for      1:1, N:1       Equivalent only\n  decision support\n\n# Also record: map direction (unidirectional), target scope\n# (e.g. << 404684003 |Clinical finding|), no-match policy,\n# and whether postcoordinated targets are allowed"
           }
         ]
       },
       {
-        "title": "Validate map results against a defined QA process",
-        "description": "Sample mapped records and review with personnel experienced in both code systems - dual independent mapping with an adjudicator is the gold standard where risk warrants it. Check the algorithm produces expected output and that ambiguous, multi-target, or no-match cases follow the agreed policy, covering edge cases specifically. Treat AI or automation-assisted suggestions (for example, from Snap2SNOMED) as an additional mapper's input, not a substitute for this review - verify they are genuine and apply risk-based human review before accepting them."
+        "title": "Prepare the source data",
+        "description": "A map cannot fix poor-quality source data. Review source codes and terms for ambiguous abbreviations, symbols and free-text artefacts, agree interpretation rules for them, and flag entries that need clinical input rather than forcing a guess. Group similar terms (all fractures, all diabetes terms) and identify duplicates to make mapping faster and more consistent. Where usage data is available, consider whether codes that have never been used need mapping at all."
       },
       {
-        "title": "Implement and test in the receiving workflow",
-        "description": "Integrate mapped codes into the target workflow and test the end-to-end pipeline with realistic data, including edge cases such as unmapped or multi-target concepts. For reporting to a classification or billing system, confirm the output meets statutory or contractual requirements. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for ConceptMap and $translate configuration."
+        "title": "Adopt or build the map",
+        "description": "Choose the path that matches the decisions above. Whichever path is taken, publish the map in the form chosen above - a map reference set in an extension, or a FHIR ConceptMap - so that terminology services and downstream systems can use it the same way. Building a map of any size needs dedicated mapping tooling: working in spreadsheets is slow and error-prone, and gives no review workflow or audit trail. SNOMED International provides Snap2SNOMED, a freely available tool for mapping to SNOMED CT, and commercial mapping tools are also available - see the <a href=\"https://www.implementation.snomed.org/mapping-tools\" target=\"_blank\" rel=\"noopener\">list of mapping tools</a>.",
+        "options": [
+          {
+            "label": "ADOPT AN EXISTING MAP",
+            "points": [
+              "Load the map into your <a href=\"#/playbook/term-service\">terminology service</a> from the release files - the SNOMED CT to ICD-10 map is an extended map reference set (447562003)",
+              "Check that its scope, target version and documented assumptions fit your use case",
+              "Use the map with the SNOMED CT release it was published for where possible; if your release differs, identify concepts that are new, inactivated or changed since then and resolve them - new concepts will have no map rows, and inactivated ones can be traced through historical associations",
+              "Rule-based maps must be applied with their full algorithm - see step 4"
+            ]
+          },
+          {
+            "label": "MAP OUT OF SNOMED CT",
+            "points": [
+              "Author each source concept's target and relationship type within the agreed rules",
+              "Use a simple map reference set where targets are one-to-one; a complex or extended map reference set where a concept needs several targets or a choice between them",
+              "Where the choice depends on patient context (age, sex, other conditions), express it as map rules with readable advice"
+            ]
+          },
+          {
+            "label": "MAP INTO SNOMED CT",
+            "points": [
+              "Search within the agreed target scope, and confirm each candidate's meaning from its fully specified name and defining relationships, not its preferred term alone",
+              "Where the rules allow, choose the most general concept that fully matches the source meaning",
+              "Use a mapping tool such as Snap2SNOMED (free from SNOMED International): automated suggestions, author and reviewer roles, audit trail, and export as a FHIR ConceptMap",
+              "For codes with no suitable concept, follow the agreed no-match policy"
+            ]
+          }
+        ]
       },
       {
-        "title": "Establish map maintenance aligned to SNOMED CT releases",
-        "description": "Review the official map delta and any custom map entries on each SNOMED CT release, and check new concepts on either side for coverage. If SNOMED CT is the source (mapping out), resolve retired source concepts via the historical association reference sets before updating the map entry. If SNOMED CT is the target (mapping in, via Snap2SNOMED), check whether previously mapped target concepts have since been retired and update accordingly - Snap2SNOMED's versioning and review workflow supports this. Version every map release and keep a change log of added, changed, and removed entries. Test map changes against the receiving workflows in a staging environment, and tell the systems and coding teams that use the map what is changing, and when, before the update goes live. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management guidance."
+        "title": "Apply rule-based maps correctly",
+        "description": "Maps such as the SNOMED CT to ICD-10 map are not a lookup table. Each source concept can have several map groups, each producing at most one target code. Within a group, rules are evaluated in priority order and the first rule that is true selects the target; rules can test the patient's age, sex or other recorded conditions, and advice explains each choice to a human. Some concepts cannot be classified without information the record does not hold. The map supports semi-automated coding: it is not designed to fully automate ICD-10 coding, so plan for coder review of the output. Systems that cannot evaluate the rules can present the map advice to the user instead.",
+        "examples": [
+          {
+            "label": "Extended map rows for one concept",
+            "code": "# 447562003 |SNOMED CT to ICD-10 extended map|\n# Source: 15296000 |Sterility (finding)|\n\nGroup Priority Rule                                     Target\n1     1        IFA 10114008 |Female sterility (finding)|  N97.9\n1     2        IFA 49408009 |Male sterility (finding)|    N46\n1     3        OTHERWISE TRUE                            (none)\n               advice: MAP SOURCE CONCEPT CANNOT BE\n                       CLASSIFIED WITH AVAILABLE DATA\n\n# A simple lookup returns all three rows. Correct application\n# evaluates the rules against the patient record and selects\n# one row per group."
+          },
+          {
+            "label": "Map application algorithm",
+            "code": "for each mapGroup of the source concept (ascending):\n    for each row in the group, by mapPriority (ascending):\n        if mapRule is true for this patient:\n            target = row.mapTarget       # may be empty\n            stop evaluating this group\n    if no rule can be evaluated:\n        show the group's mapAdvice to a coder\n\noutput = selected targets, one per group, in group order"
+          }
+        ]
+      },
+      {
+        "title": "Review and test the map",
+        "description": "Review the map at three levels: design (does the map meet its requirements?), content (are the targets right for each source code?), and use (does it work in the system and workflow where it will be applied?). Use the review approach agreed for the map's risk, and check automated or AI-suggested targets with particular care - identifiers that do not match their descriptions, or plausible but imprecise targets, are common. Keep AI-suggested and human-approved maps clearly distinguished. Test end to end with realistic data, including unmapped, multi-target and rule-dependent codes, and confirm that output for statutory or contractual reporting meets its requirements."
+      },
+      {
+        "title": "Maintain the map with each release",
+        "description": "Review the map whenever the source code system, the target code system, or the use case changes. New source codes need new rows; retired source codes need their rows removed - when SNOMED CT is the source, use historical associations to find the replacement concepts; retired target codes need a new target; and non-equivalent maps should be re-evaluated in case a better target now exists. Version every map release, keep a change log, and tell the systems and teams that use the map what is changing before it goes live. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management."
       }
     ],
     "dependencies": [
       {
         "icon": "server",
-        "text": "Terminology service with FHIR $translate operation and ConceptMap support"
+        "text": "Terminology service that can load map reference sets and serve them as FHIR ConceptMaps ($translate) - see the <a href=\"#/playbook/term-service\">Terminology service playbook</a>"
       },
       {
         "icon": "file-import",
-        "text": "Official map for your target system, where one exists (for example, the SNOMED CT to ICD-10 extended map, from RF2 release files)"
+        "text": "Existing maps for your target, where available, such as the SNOMED CT to ICD-10 map from the International Edition release files"
+      },
+      {
+        "icon": "code",
+        "text": "Mapping tool with review workflow and audit trail - Snap2SNOMED (free, for mapping to SNOMED CT) or a commercial tool"
       },
       {
         "icon": "users",
-        "text": "Personnel with clinical, source-system, and target-terminology expertise, not clinical coders alone"
-      },
-      {
-        "icon": "shield-check",
-        "text": "Governance process for map review and update on each SNOMED CT release"
+        "text": "Mappers and reviewers with clinical knowledge and expertise in both code systems"
       },
       {
         "icon": "file-check",
-        "text": "Documented risk assessment and map documentation covering purpose, scope, rules, and QA process"
+        "text": "Map documentation covering purpose, scope, mapping rules, risk assessment and review approach"
+      },
+      {
+        "icon": "shield-check",
+        "text": "Governance process for change requests, versioning and release of the map"
       }
     ],
     "pitfalls": [
-      "Treating a rule-based extended map (such as the SNOMED CT to ICD-10 map) as a simple lookup - these maps have rule groups, priorities, and advice fields that must all be applied to produce the correct target code",
-      "Creating a custom map when the official map already meets the need - custom maps require active maintenance on every SNOMED CT release",
-      "Not validating map output against a defined QA process - technical correctness does not guarantee clinical coding correctness",
-      "Attempting to reverse a unidirectional map - it is not intended for use in the reverse direction, and reversing it can produce nonsensical results because SNOMED CT is typically more granular than the target system",
-      "Ignoring history supplements for retired concepts - historical SNOMED CT concept IDs from older releases may be inactivated and must be resolved to current equivalents before mapping or maintaining a map",
-      "No map maintenance process - the official map is updated on each SNOMED CT release and custom maps must be reviewed against the delta to remain valid",
-      "Treating AI- or automation-assisted map suggestions (for example, from Snap2SNOMED) as reviewed output - AI should be used as an additional mapper, not a replacement for QA; check suggested concepts are genuine and apply risk-based human review",
-      "Assuming a technically well-formed map alone improves clinical utility or analytics - it only reproduces the source system's existing scope until expanded into a proper SNOMED CT value set, and mapped-data reports may not be comparable to reports built on native SNOMED CT data",
-      "Changing a map without telling the systems and teams that use it - downstream reports, billing, and coding workflows can shift silently, and the cause is hard to trace afterwards"
+      "Treating a rule-based map as a simple lookup - every candidate target is returned, and the wrong code is selected or several codes are reported",
+      "Using a map in the reverse direction - non-equivalent links add or lose meaning, and reversing a SNOMED CT to classification map can imply clinical detail that was never recorded",
+      "Building a custom map when a maintained one already exists - the custom map then needs its own upkeep on every release",
+      "Mapping into SNOMED CT without constraining the target scope - automated and human mappers both pick plausible concepts from the wrong hierarchy",
+      "Accepting automated or AI-suggested targets without review - suggested identifiers may not exist or may not match their descriptions",
+      "Expecting mapped data to match native SNOMED CT data - a map reproduces the source's granularity, so reports built on mapped data may not be comparable",
+      "No maintenance process, or changes made without notice - the map drifts out of date, and downstream reports, billing and coding shift without anyone knowing why"
     ],
     "resources": [
-      {
-        "type": "Tool",
-        "title": "Snap2SNOMED - mapping tool",
-        "url": "https://app.snap2snomed.org/"
-      },
-      {
-        "type": "Tool",
-        "title": "SNOMED CT Browser",
-        "url": "https://browser.ihtsdotools.org/"
-      },
       {
         "type": "Guide",
         "title": "Mapping guide",
@@ -1698,13 +1704,28 @@
       },
       {
         "type": "Spec",
-        "title": "ICD-10 map specification",
+        "title": "SNOMED CT to ICD-10 map technical guide",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-to-icd-10-map-specification/"
+      },
+      {
+        "type": "Guide",
+        "title": "Reference set guide - maps to statistical classifications",
+        "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-reference-set-guide/3-requirements-and-use-cases/3.2-use-cases/3.2.3-reporting-and-analytics"
       },
       {
         "type": "Guide",
         "title": "Snap2SNOMED user guide",
         "url": "https://docs.snomed.org/snomed-ct-user-guides/snap2snomed-user-guide/"
+      },
+      {
+        "type": "Tool",
+        "title": "Mapping tools",
+        "url": "https://www.implementation.snomed.org/mapping-tools"
+      },
+      {
+        "type": "Tool",
+        "title": "Snap2SNOMED - mapping tool",
+        "url": "https://app.snap2snomed.org/"
       }
     ],
     "status": "draft"
