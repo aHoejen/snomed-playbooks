@@ -1838,7 +1838,7 @@
         "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/snomed-integrations"
       }
     ],
-    "status": "draft"
+    "status": "published"
   },
   "migration": {
     "title": "Migrating to SNOMED CT",
