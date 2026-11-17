@@ -128,6 +128,16 @@
         "type": "Guide",
         "title": "Mapping guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
+      },
+      {
+        "type": "Demo",
+        "title": "Encounters UI Demo",
+        "url": "https://ihtsdo.github.io/snomed-ui-examples"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED EHR Lab",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
       }
     ],
     "status": "published"
@@ -289,6 +299,21 @@
         "type": "Spec",
         "title": "Expression constraint language specification",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-expression-constraint-language/"
+      },
+      {
+        "type": "Demo",
+        "title": "Allergies",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/allergies"
+      },
+      {
+        "type": "Demo",
+        "title": "Cancer Synoptic Reporting",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/cancer-reporting"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED & FHIR Questionnaires Manager",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/questionnaires"
       }
     ],
     "status": "draft"
@@ -522,6 +547,11 @@
         "type": "Guide",
         "title": "Terminology services guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-terminology-services-guide/"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED EHR Lab",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
       }
     ],
     "status": "published"
@@ -583,7 +613,7 @@
       },
       {
         "title": "Resolve record context alongside the code",
-        "description": "Identify every way the source systems record context for the categories in scope - section headings such as 'Family history', status and verification elements (for example FHIR Condition.clinicalStatus and Condition.verificationStatus), separate coded elements such as 'diagnosis type', and context precoordinated in SNOMED CT concepts below 413350009 |Finding with explicit context|. The same meaning may be recorded differently across systems, or even across users of the same system. Write the query so that it reads both the code and its context, and harmonise the representations when integrating data from several sources. Without this step, family history, suspected and refuted entries are counted as confirmed patient conditions.",
+        "description": "Identify every way the source systems record context for the categories in scope - section headings such as 'Family history', status and verification elements (for example FHIR Condition.clinicalStatus and Condition.verificationStatus), separate coded elements such as 'diagnosis type', and context precoordinated in SNOMED CT concepts below 413350009 |Finding with explicit context|. The same meaning may be recorded differently across systems, or even across users of the same system. Write the query so that it reads both the code and its context, and harmonise the representations when integrating data from several sources. Without this step, family history, suspected and refuted entries are counted as confirmed patient conditions. The <a href=\"https://ihtsdo.github.io/sct-implementation-demonstrator/#/context\" target=\"_blank\" rel=\"noopener\">Context Representation Transformations</a> demonstrator shows how the same context can be represented in SNOMED CT and in FHIR resources.",
         "examples": [
           {
             "label": "Two ways of recording family history",
@@ -671,7 +701,7 @@
       },
       {
         "title": "Include inactive concepts using historical associations",
-        "description": "Clinical records keep the concepts that were active when the data was recorded, so a query run against the current release misses records coded with concepts that have since been inactivated. Rather than running the query against an old release, run it against the most recent release - whose definitions are generally the most accurate - and supplement the results with inactive concepts linked to the result set through historical association reference sets. ECL history supplements do this directly, with three profiles that trade precision against recall. Where the terminology service or data platform does not support history supplements, join to the historical association reference sets in the same way. See the <a href=\"#/playbook/governance\">Governance playbook</a> for managing the impact of each new release.",
+        "description": "Clinical records keep the concepts that were active when the data was recorded, so a query run against the current release misses records coded with concepts that have since been inactivated. Rather than running the query against an old release, run it against the most recent release - whose definitions are generally the most accurate - and supplement the results with inactive concepts linked to the result set through historical association reference sets. ECL history supplements do this directly, with three profiles that trade precision against recall. Where the terminology service or data platform does not support history supplements, join to the historical association reference sets in the same way. See the <a href=\"#/playbook/governance\">Governance playbook</a> for managing the impact of each new release. The <a href=\"https://ihtsdo.github.io/sct-implementation-demonstrator/#/reports\" target=\"_blank\" rel=\"noopener\">SNOMED CT as an Evolving Terminology</a> demonstrator shows how content changes from release to release.",
         "examples": [
           {
             "label": "ECL history supplements",
@@ -766,6 +796,26 @@
         "type": "Guide",
         "title": "Mapping guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-mapping-guide/"
+      },
+      {
+        "type": "Demo",
+        "title": "Analytics with Snolytical",
+        "url": "https://training-snolytical.ihtsdotools.org/"
+      },
+      {
+        "type": "Demo",
+        "title": "Descriptive Analytics",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/descriptive-analytics"
+      },
+      {
+        "type": "Demo",
+        "title": "Context Representation Transformations",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/context"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED CT as an Evolving Terminology",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/reports"
       }
     ],
     "status": "published"
@@ -808,7 +858,7 @@
     "steps": [
       {
         "title": "Map each exchanged data element to its structure and terminology binding",
-        "description": "Create a data mapping document that identifies every SNOMED CT-coded element in the exchange, where it sits in the exchange structure, the value set that constrains it (expressed as an ECL constraint or reference set), and how strictly that binding is enforced. In FHIR, this means the resource and element path (e.g., Condition.code) and the binding strength (required, extensible, preferred); other standards express the same information through their own structures, such as CDA templates or openEHR archetype nodes. If the exchange is governed by a formal, computable implementation guide - such as a FHIR Implementation Guide, whose profiles declare the element paths, value set bindings, and binding strengths, or the equivalent CDA templates or openEHR templates - most of this mapping is already defined and should be reused rather than recreated. What remains is mapping your own system's data to those profiles, and checking that the guide's value sets use SNOMED CT with an appropriate ECL constraint and a declared edition and version. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for guidance on defining ECL-based value sets.",
+        "description": "Create a data mapping document that identifies every SNOMED CT-coded element in the exchange, where it sits in the exchange structure, the value set that constrains it (expressed as an ECL constraint or reference set), and how strictly that binding is enforced. In FHIR, this means the resource and element path (e.g., Condition.code) and the binding strength (required, extensible, preferred); other standards express the same information through their own structures, such as CDA templates or openEHR archetype nodes. If the exchange is governed by a formal, computable implementation guide - such as a FHIR Implementation Guide, whose profiles declare the element paths, value set bindings, and binding strengths, or the equivalent CDA templates or openEHR templates - most of this mapping is already defined and should be reused rather than recreated. What remains is mapping your own system's data to those profiles, and checking that the guide's value sets use SNOMED CT with an appropriate ECL constraint and a declared edition and version. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for guidance on defining ECL-based value sets. The <a href=\"https://ihtsdo.github.io/sct-implementation-demonstrator/#/sandbox\" target=\"_blank\" rel=\"noopener\">Terminology Bindings Sandbox</a> lets you try out bindings interactively.",
         "examples": [
           {
             "label": "FHIR Condition with SNOMED CT coding",
@@ -961,6 +1011,26 @@
         "type": "Spec",
         "title": "SNOMED CT URI standard",
         "url": "https://docs.snomed.org/snomed-ct-specifications/snomed-ct-uri-standard/"
+      },
+      {
+        "type": "Demo",
+        "title": "IPS Terminology Demonstrator",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ips-terminology"
+      },
+      {
+        "type": "Demo",
+        "title": "Terminology Bindings Sandbox",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/sandbox"
+      },
+      {
+        "type": "Demo",
+        "title": "Context Representation Transformations",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/context"
+      },
+      {
+        "type": "Demo",
+        "title": "FHIR Resource Internationalizer",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/fhir-internationalizer"
       }
     ],
     "status": "published"
@@ -1145,6 +1215,21 @@
         "type": "Guide",
         "title": "Simplex user guide",
         "url": "https://docs.snomed.org/snomed-ct-user-guides/simplex-user-guide/"
+      },
+      {
+        "type": "Demo",
+        "title": "ValueSet Utility",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/valueset-translator"
+      },
+      {
+        "type": "Demo",
+        "title": "Terminology Bindings Sandbox",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/sandbox"
+      },
+      {
+        "type": "Demo",
+        "title": "Extensions Search Utility",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/extensions-search"
       }
     ],
     "status": "published"
@@ -1353,6 +1438,11 @@
         "type": "Tool",
         "title": "SNOMED CT Browser",
         "url": "https://browser.ihtsdotools.org/"
+      },
+      {
+        "type": "Demo",
+        "title": "Encounters UI Demo",
+        "url": "https://ihtsdo.github.io/snomed-ui-examples"
       }
     ],
     "status": "draft"
@@ -1551,6 +1641,16 @@
         "type": "Tool",
         "title": "Snowstorm terminology server (open source)",
         "url": "https://github.com/IHTSDO/snowstorm"
+      },
+      {
+        "type": "Demo",
+        "title": "Encounters UI Demo",
+        "url": "https://ihtsdo.github.io/snomed-ui-examples"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED EHR Lab",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/ehr-lab"
       }
     ],
     "status": "draft"
@@ -1640,7 +1740,7 @@
       },
       {
         "title": "Apply rule-based maps correctly",
-        "description": "Maps such as the SNOMED CT to ICD-10 map are not a lookup table. Each source concept can have several map groups, each producing at most one target code. Within a group, rules are evaluated in priority order and the first rule that is true selects the target; rules can test the patient's age, sex or other recorded conditions, and advice explains each choice to a human. Some concepts cannot be classified without information the record does not hold. The map supports semi-automated coding: it is not designed to fully automate ICD-10 coding, so plan for coder review of the output. Systems that cannot evaluate the rules can present the map advice to the user instead.",
+        "description": "Maps such as the SNOMED CT to ICD-10 map are not a lookup table. Each source concept can have several map groups, each producing at most one target code. Within a group, rules are evaluated in priority order and the first rule that is true selects the target; rules can test the patient's age, sex or other recorded conditions, and advice explains each choice to a human. Some concepts cannot be classified without information the record does not hold. The map supports semi-automated coding: it is not designed to fully automate ICD-10 coding, so plan for coder review of the output. Systems that cannot evaluate the rules can present the map advice to the user instead. To see how map groups, rules and advice work in practice, try the <a href=\"https://ihtsdo.github.io/sct-implementation-demonstrator/#/icd-mappings\" target=\"_blank\" rel=\"noopener\">SNOMED Maps Demonstrator</a>, which applies the SNOMED CT to ICD-10 and ICD-11 maps including their complex rules.",
         "examples": [
           {
             "label": "Extended map rows for one concept",
@@ -1726,6 +1826,16 @@
         "type": "Tool",
         "title": "Snap2SNOMED - mapping tool",
         "url": "https://app.snap2snomed.org/"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED Maps Demonstrator",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/icd-mappings"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED Integrations Hub",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/snomed-integrations"
       }
     ],
     "status": "draft"
@@ -1911,6 +2021,16 @@
         "type": "Tool",
         "title": "Snap2SNOMED - mapping tool",
         "url": "https://app.snap2snomed.org/"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED Implementation Roadmap Generator",
+        "url": "https://ihtsdo.github.io/roadmap-generator"
+      },
+      {
+        "type": "Demo",
+        "title": "Implementation Maturity Framework",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/maturity"
       }
     ],
     "status": "draft"
@@ -2053,6 +2173,16 @@
         "type": "Guide",
         "title": "Implementation fact sheets",
         "url": "https://docs.snomed.org/implementation-guides/implementation-fact-sheets/"
+      },
+      {
+        "type": "Demo",
+        "title": "SNOMED CT as an Evolving Terminology",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/reports"
+      },
+      {
+        "type": "Demo",
+        "title": "Implementation Maturity Framework",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/maturity"
       }
     ],
     "status": "draft"
@@ -2268,6 +2398,16 @@
         "type": "Video",
         "title": "Implementation Module: Extensions and Editions (7-part video series)",
         "url": "https://www.youtube.com/playlist?list=PLyEMmgWz-ul0ILLagSJb1Kr73rUTFhUor"
+      },
+      {
+        "type": "Demo",
+        "title": "Module Dependency Reference Set Viewer",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/mdrs-viewer"
+      },
+      {
+        "type": "Demo",
+        "title": "Extensions Search Utility",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/extensions-search"
       }
     ],
     "status": "draft"
@@ -2418,6 +2558,11 @@
         "type": "Guide",
         "title": "Translation management guide",
         "url": "https://docs.snomed.org/snomed-ct-practical-guides/snomed-ct-translation-management-guide/"
+      },
+      {
+        "type": "Demo",
+        "title": "FHIR Resource Internationalizer",
+        "url": "https://ihtsdo.github.io/sct-implementation-demonstrator/#/fhir-internationalizer"
       }
     ],
     "status": "draft"
