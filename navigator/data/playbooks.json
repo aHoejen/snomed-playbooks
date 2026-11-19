@@ -17,15 +17,15 @@
       },
       {
         "question": "Will concept selection be open or constrained by a value set?",
-        "guidance": "An open and high-level constraint (any descendant of Clinical finding) gives maximum flexibility and granularity, but searching across thousands of concepts demands an efficient search mechanism. Relevance ranking, frequency-based ordering, or context-aware suggestions become essential as the constraint gets broader. A manually curated subset is quick to define and easy for clinicians to accept, but it lacks the granularity of a hierarchical (ECL-bounded) constraint and needs more maintenance as SNOMED CT content evolves. A managed subset is often an easy starting point for this reason, widening over time - or giving way to an ECL-bounded constraint. See the Value Sets playbook for how to define and govern it."
+        "guidance": "An open and high-level constraint (any descendant of Clinical finding) gives maximum flexibility and granularity, but searching across thousands of concepts demands an efficient search mechanism. Relevance ranking, frequency-based ordering, or context-aware suggestions become essential as the constraint gets broader. A manually curated subset - a list of concepts your team picks - is quick to define and easy for clinicians to accept, but it lacks the granularity of a hierarchical (ECL-bounded) constraint and has to be updated by hand when SNOMED CT changes. A managed subset - a governed reference set that is versioned and updated with each SNOMED CT release - is often an easy starting point for this reason, widening over time - or giving way to an ECL-bounded constraint. See the Value Sets playbook for how to define and govern it."
       },
       {
         "question": "What level of clinical granularity is required?",
-        "guidance": "The right granularity is rarely a single choice across a workflow: CDS rules and patient-level analytics need the most specific concept the clinician can confidently assert, while population-level reporting can aggregate upward using subsumption (<<) rather than forcing coarser data entry. Capture at the most specific level available and aggregate for reporting, rather than constraining entry to a coarser grain up front. Agree the required depth with clinicians and informaticists before building search and validation logic."
+        "guidance": "The right granularity is rarely a single choice across a workflow: CDS rules and patient-level analytics need the most specific concept the clinician can confidently assert, while population-level reporting can aggregate upward using subsumption (<<) rather than forcing data entry using more general concepts. Capture at the most specific level available and aggregate for reporting, rather than constraining entry to less specific content up front. Agree the required depth with clinicians and informaticists before building search and validation logic."
       },
       {
-        "question": "How will preferred terms be displayed to clinicians?",
-        "guidance": "SNOMED CT fully specified names (FSNs) is not intended for direct data entry and display in the clinical user interface. Preferred terms from the appropriate language reference set should be the default display term for data entry. If your system is multilingual, agree on the language priority order."
+        "question": "What terms will be displayed to clinicians?",
+        "guidance": "SNOMED CT fully specified names (FSNs) are not intended for direct data entry and display in the clinical user interface. Preferred terms from the appropriate language reference set should be the default display term for data entry. If your system is multilingual, agree on the language priority order."
       },
       {
         "question": "What is the architecture of the implementation and how is the problem list integrated into the clinical system?",
@@ -43,11 +43,11 @@
       },
       {
         "title": "Define the problem list value set",
-        "description": "Define the concept scope using an ECL expression (e.g. &lt;&lt;404684003 for all clinical findings, or a narrower constraint) or a curated subset. ECL is preferred - it automatically includes new concepts added in each SNOMED CT release. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for authoring and testing guidance.",
+        "description": "Define the concept scope using an ECL expression (e.g. &lt;&lt;404684003 |Clinical finding (finding)| for all clinical findings, or a narrower constraint) or a curated subset. ECL is preferred - it automatically includes new concepts added in each SNOMED CT release. See the <a href=\"#/playbook/value-sets\">Value set design and management playbook</a> for authoring and testing guidance.",
         "examples": [
           {
             "label": "ECL for clinical findings",
-            "code": "# All clinical findings (broadest scope)\n<<404684003 |Clinical finding (finding)|\n\n# Disorders only (common for problem lists)\n<<64572001 |Disease (disorder)|\n\n# Exclude administrative concepts\n<<404684003 MINUS <<413350009 |Finding with explicit context|"
+            "code": "# All clinical findings (broadest scope)\n<<404684003 |Clinical finding (finding)|\n\n# Disorders only (common for problem lists)\n<<64572001 |Disease (disorder)|\n\n# Exclude administrative concepts\n<<404684003 |Clinical finding (finding)| MINUS <<413350009 |Finding with explicit context|"
           }
         ]
       },
@@ -57,7 +57,7 @@
       },
       {
         "title": "Package the value set for the clinical system",
-        "description": "A raw list of concept IDs is not sufficient - the clinical system needs terms and a structured format. With an integrated terminology service, define a FHIR ValueSet with an ECL compose expression; preferred terms are resolved at runtime. Without one, export the expanded concept list with preferred terms and package as a FHIR ValueSet, RF2 reference set, or CSV. Static representations must be refreshed on each SNOMED CT release. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for packaging options."
+        "description": "A raw list of concept IDs is not sufficient - the clinical system needs terms and a structured format. With an integrated terminology service, define a FHIR ValueSet with an ECL expression in its compose element; preferred terms are resolved at runtime. If no integrated terminology service is available, export the expanded concept list with preferred terms and package as a FHIR ValueSet, RF2 reference set, or CSV. Static representations must be refreshed on each SNOMED CT release. See the <a href=\"#/playbook/value-sets\">Value set playbook</a> for packaging options."
       },
       {
         "title": "Implement clinician-facing search",
@@ -90,7 +90,7 @@
       "Displaying FSNs (fully specified names) instead of preferred terms from a language reference set - FSNs are not for clinical display",
       "Using an open constraint (all of SNOMED CT) without scoping - this produces irrelevant search results and poor data quality",
       "Failing to configure the correct national edition in the terminology service, causing local concepts to be missing",
-      "Skipping release management - inactivated concepts silently remain in patient records after SNOMED CT updates",
+      "Skipping release management - value sets keep offering inactivated concepts for new entry, and queries built on current content silently miss patients whose records use inactivated codes, unless historical associations are applied",
       "Using a static value set extracted from a terminology server without a refresh process - new clinically relevant concepts added in SNOMED CT releases are silently excluded from selection"
     ],
     "resources": [
@@ -1119,23 +1119,23 @@
       "Information Manager",
       "Software provider"
     ],
-    "overview": "A value set is a uniquely identifiable set of valid concept identifiers selected from one or more code systems for use in a specific context. In SNOMED CT, value sets define which concepts are valid for a given data element such as a problem list, a diagnosis field, or a procedure picker.\n\nA value set can be defined in two ways:\n- <strong>Intensionally (recommended)</strong>, using Expression Constraint Language (ECL): an expression that captures the intended concept scope from the SNOMED CT hierarchy. ECL-based definitions are self-maintaining: new concepts that satisfy the constraint are automatically included on each release and can be evaluated at runtime against any SNOMED CT edition by a terminology service.\n- <strong>Extensionally</strong>, as explicit concept lists, where ECL cannot fully capture the intended scope. These require manual review on every SNOMED CT release.\n\nA subset is the same idea under a different name: a set of SNOMED CT concepts selected for a purpose, built by query, by manual selection, or by a combination of both.",
+    "overview": "A value set is a uniquely identifiable set of valid concept identifiers selected from one or more code systems for use in a specific context. When using SNOMED CT, value sets define which concepts are valid for a given data element such as a problem list, a diagnosis field, or a procedure picker.\n\nA value set can be defined in three ways:\n- <strong>Intensionally (recommended)</strong>, using Expression Constraint Language (ECL): an expression that captures the intended concept scope from the SNOMED CT hierarchy. ECL-based definitions improve maintenance: new concepts that satisfy the constraint are included automatically when the ECL is executed against a new release, and a terminology service can evaluate them at runtime against the chosen SNOMED CT edition and version.\n- <strong>Extensionally</strong>, as an explicit list of concepts, where the intended scope is a curated selection that ECL cannot express, or where a fixed list is required. Extensional definitions do not pick up new concepts, so each SNOMED CT release needs a review both to replace inactivated members and to identify new concepts that should be added.\n- <strong>Mix of both</strong>: intensional and extensional approaches can be combined, with an ECL rule plus explicitly included or excluded concepts.\n\nA SNOMED CT subset is a closely related idea: a set of SNOMED CT components (usually concepts) selected for a purpose, built by query, by manual selection, or by a combination of both. Unlike a value set, a subset contains only SNOMED CT content and is shared as an explicit list of members - sometimes as an RF2 reference set, though many implementers use other formats. A value set can span several code systems and can be defined by a rule that is executed when needed, so a subset corresponds to a value set's expansion rather than its definition.",
     "decisions": [
       {
         "question": "What is the clinical purpose and context of this value set?",
-        "guidance": "Before defining any constraints, document exactly what the value set is for (for example a picklist, decision support rule, analytics cohort, or messaging constraint), what must be in or out, and the consequences of including or excluding borderline concepts. Identify where it will be used: the information model element it binds to, the binding strength (required, extensible, preferred, or example), and the people or systems that consume it. This specification is the basis for all subsequent design decisions and is required before governance sign-off."
+        "guidance": "Before defining any constraints, document exactly what the value set is for (for example a picklist, decision support rule, analytics cohort, or messaging constraint), what must be in or out, and the consequences of including or excluding borderline concepts. Identify where it will be used: the information model element it binds to, the binding strength (for example, FHIR’s required, extensible, preferred, or example binding strengths), and the people or systems that consume it. This specification is the basis for all subsequent design decisions and is required before governance sign-off."
       },
       {
         "question": "Should the value set be defined by query (ECL), manual list, or a hybrid?",
-        "guidance": "Query-based (intensional) ECL definitions are strongly preferred when members follow a logical pattern, such as <code>&lt;&lt; 73211009 |Diabetes mellitus|</code>: they are self-maintaining, because re-expansion against a new release picks up new members. A manual (extensional) list is appropriate only when there is no consistent pattern, such as a small, locally prioritised shortlist where clinical judgement over individual concepts is required; it gives precise control but takes more effort and drifts out of date as SNOMED CT changes. A hybrid approach is often practical: generate the core set with a query, then add or remove a few concepts explicitly."
+        "guidance": "Query-based (intensional) ECL definitions are strongly preferred when members follow a logical pattern, such as <code>&lt;&lt; 73211009 |Diabetes mellitus|</code>. They are largely self-maintaining, because executing the ECL against a new release picks up new members, though each release should still be checked for unintended changes caused by remodelling or inactivation. A manual (extensional) list is appropriate when there is no consistent pattern, such as a small, locally prioritised shortlist where clinical judgement over individual concepts is required, or when a fixed list is needed. It gives precise control but takes more effort, and it drifts out of date because new concepts are never added automatically. A hybrid approach is often practical: generate the core set with a query, then add or remove a few concepts explicitly, reviewing those explicit changes on each release."
       },
       {
         "question": "What SNOMED CT hierarchy, attribute constraint, or reference set membership best captures the clinical scope?",
-        "guidance": "Explore the SNOMED CT Browser to find the most specific ancestor concept that covers the intended content. Consider whether attribute refinement (e.g. finding site, causative agent) is needed for precision. Check whether an existing reference set or FHIR ValueSet already covers your need before authoring a new one."
+        "guidance": "Explore the <a href=\"https://browser.ihtsdotools.org/\" target=\"_blank\" rel=\"noopener\">SNOMED CT Browser</a> to find the most specific ancestor concept, or concepts, that cover the intended content, using exclusions where an ancestor brings in unwanted descendants. Consider whether attribute refinement (e.g. finding site, causative agent) is needed for precision, and check the expansion for relevant concepts that are missed because they lack the defining attribute. Reference set membership can also be used as a constraint, either on its own or combined with a hierarchy (e.g. restricting a hierarchy to members of an existing reference set). Finally, check whether an existing reference set or FHIR ValueSet already covers your need before authoring a new one."
       },
       {
         "question": "What does the value set depend on, and what depends on it?",
-        "guidance": "Record the SNOMED CT edition and version it is built against, any other code systems or value sets it draws on, and the terminology services or systems that will expand it. List the downstream consumers (forms, rules, reports, interfaces) that will be affected when it changes, so impact can be assessed on every release."
+        "guidance": "Record the SNOMED CT edition and version it is built against, any reference sets, other code systems or value sets it draws on, whether it is pinned to a specific version or expanded against the latest release, and the terminology services or systems that will expand it. List the downstream consumers (forms, rules, reports, interfaces) and their owners that will be affected when it changes, so impact can be assessed on every SNOMED CT release and whenever the value set or its dependencies change."
       },
       {
         "question": "How will the value set be delivered to and consumed by clinical systems?",
@@ -1157,24 +1157,30 @@
       },
       {
         "title": "Explore the SNOMED CT hierarchy and define the concept scope",
-        "description": "Navigate the SNOMED CT hierarchy using an available browser or authoring tool to identify the most appropriate ancestor concept and any necessary attribute refinements. Review whether existing reference sets or value sets already meet your need before creating a new one. Two definition approaches are available - choose based on whether clinical intent can be fully expressed as an ECL expression.",
+        "description": "Navigate the SNOMED CT hierarchy using an available browser or authoring tool to identify the most appropriate ancestor concept or concepts, any necessary attribute refinements, and any exclusions needed to remove unwanted descendants. Reference set membership can also be used as a constraint. Review whether existing reference sets or value sets already meet your need before creating a new one. Choose a definition approach based on whether clinical intent can be expressed as an ECL expression.",
         "options": [
           {
             "label": "INTENSIONAL DEFINITION",
             "points": [
-              "Write an ECL expression (e.g. &lt;&lt;404684003 for all clinical findings) that captures the intended scope",
-              "The terminology server expands this dynamically on each SNOMED CT release",
-              "New subtypes added in future releases are automatically included",
-              "Preferred approach - requires less maintenance and adapts to release updates"
+              "Write an ECL expression (e.g. &lt;&lt; 73211009 |Diabetes mellitus|) that captures the intended scope",
+              "A terminology server expands it when requested, against the chosen SNOMED CT edition and version",
+              "New subtypes in future releases are included automatically",
+              "Preferred approach: requires less maintenance, but each release should still be checked for unintended changes caused by remodelling or inactivation"
             ]
           },
           {
             "label": "EXTENSIONAL DEFINITION",
             "points": [
-              "Manually select individual concepts where ECL cannot fully capture clinical intent",
-              "Useful when the set cannot be expressed as a hierarchy or attribute pattern",
-              "Requires explicit review and update on each SNOMED CT release",
-              "Use when intensional definition would include clinically inappropriate concepts"
+              "Manually select individual concepts where the scope cannot be expressed as a hierarchy or attribute pattern, such as a locally prioritised shortlist, or where a fixed list is required",
+              "Gives precise control over membership",
+              "New concepts are never added automatically, so each release needs a review to replace inactivated members and identify new concepts to add"
+            ]
+          },
+          {
+            "label": "HYBRID",
+            "points": [
+              "Generate the core set with ECL, then explicitly add or remove a small number of concepts",
+              "Review the explicit additions and removals on each release"
             ]
           }
         ]
@@ -1185,17 +1191,17 @@
         "examples": [
           {
             "label": "ECL expression",
-            "code": "# All clinical findings (broad scope)\n<<404684003 |Clinical finding (finding)|\n\n# Narrowed to disorders only\n<<64572001 |Disease (disorder)|\n\n# Attribute refinement: findings with finding site = heart structure\n<<404684003 |Clinical finding| : 363698007 |Finding site| = <<80891009 |Heart structure|"
+            "code": "# All clinical findings (broad scope)\n<<404684003 |Clinical finding (finding)|\n\n# Descendants and self: diabetes mellitus\n<<73211009 |Diabetes mellitus|\n\n# Narrowed to disorders only\n<<64572001 |Disease (disorder)|\n\n# Attribute refinement: findings with finding site = heart structure\n<<404684003 |Clinical finding| : 363698007 |Finding site| = <<80891009 |Heart structure|\n\n# Exclusion: diabetes mellitus, excluding diabetes in pregnancy\n<<73211009 |Diabetes mellitus| MINUS <<199223000 |Maternal diabetes mellitus during antenatal and/or intrapartum and/or postpartum period|\n\n# Refset membership: restrict a hierarchy to members of a reference set\n<<64572001 |Disease (disorder)| AND ^ [refset id] |[refset name]|"
           },
           {
             "label": "FHIR $expand call",
-            "code": "GET /fhir/ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=ecl/<<404684003&count=10\n\n# With edition and display language\nGET /fhir/ValueSet/$expand\n  ?url=http://snomed.info/sct?fhir_vs=ecl/<<404684003\n  &system-version=http://snomed.info/sct|http://snomed.info/sct/900000000000207008/version/20250301\n  &displayLanguage=en\n  &count=20\n  &offset=0"
+            "code": "GET /fhir/ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=ecl/<<404684003&count=10\n\n# With edition and display language\nGET /fhir/ValueSet/$expand\n  ?url=http://snomed.info/sct?fhir_vs=ecl/<<404684003\n  &system-version=http://snomed.info/sct|http://snomed.info/sct/900000000000207008/version/20261101\n  &displayLanguage=en\n  &count=20\n  &offset=0"
           }
         ]
       },
       {
         "title": "Choose how the value set will be delivered",
-        "description": "Integrating a FHIR terminology service directly into the clinical system is best practice: it enables live ECL expansion, concept search, and preferred term retrieval against the current SNOMED CT release. Where direct integration is not feasible, a separate terminology server can be used to extract and export the concept list. In either case, a raw list of concept IDs is not yet a usable value set. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for deployment and integration guidance."
+        "description": "Integrating a FHIR terminology service directly into the clinical system is best practice: it enables live ECL expansion, concept search, and preferred term retrieval against the chosen SNOMED CT edition and version. Where direct integration is not feasible, a separate terminology server can be used to expand the value set and export it. An exported list must include preferred terms and be packaged in a structured format, because a raw list of concept IDs is not a usable value set, and it must be refreshed on each SNOMED CT release. See the <a href=\"#/playbook/term-service\">Terminology service playbook</a> for deployment and integration guidance."
       },
       {
         "title": "Represent the value set in a form the clinical system can use",
@@ -1206,23 +1212,23 @@
             "points": [
               "Define a named FHIR ValueSet resource with an ECL expression in the compose element",
               "The terminology server resolves preferred terms at runtime from the configured language reference set",
-              "No static export needed - the value set stays current with each SNOMED CT release"
+              "No static export needed - the value set stays current with the chosen SNOMED CT edition and version"
             ],
             "example": {
               "label": "FHIR ValueSet with ECL compose (intensional)",
-              "code": "{\n  \"resourceType\": \"ValueSet\",\n  \"id\": \"problem-list-value-set\",\n  \"url\": \"https://example.org/ValueSet/problem-list-value-set\",\n  \"version\": \"1.0.0\",\n  \"name\": \"ProblemListValueSet\",\n  \"title\": \"Problem List Value Set\",\n  \"status\": \"active\",\n  \"compose\": {\n    \"include\": [\n      {\n        \"system\": \"http://snomed.info/sct\",\n        \"filter\": [\n          {\n            \"property\": \"constraint\",\n            \"op\": \"=\",\n            \"value\": \"<<404684003 |Clinical finding (finding)|\"\n          }\n        ]\n      }\n    ]\n  }\n}"
+              "code": "{\n  \"resourceType\": \"ValueSet\",\n  \"id\": \"problem-list-value-set\",\n  \"url\": \"https://example.org/ValueSet/problem-list-value-set\",\n  \"version\": \"1.0.0\",\n  \"name\": \"ProblemListValueSet\",\n  \"title\": \"Problem List Value Set\",\n  \"status\": \"active\",\n  \"compose\": {\n    \"include\": [\n      {\n        \"system\": \"http://snomed.info/sct\",\n        \"version\": \"http://snomed.info/sct/900000000000207008/version/20261101\",\n        \"filter\": [\n          {\n            \"property\": \"constraint\",\n            \"op\": \"=\",\n            \"value\": \"<<404684003 |Clinical finding (finding)|\"\n          }\n        ]\n      }\n    ]\n  }\n}"
             }
           },
           {
             "label": "No integrated terminology server",
             "points": [
               "Export the expanded concept list from a terminology server, including preferred and acceptable terms for your language",
-              "Package as a FHIR ValueSet with explicit concept entries, a CSV, or an RF2 reference set",
+              "Package as a FHIR ValueSet with explicit concept entries, a CSV, or an RF2 reference set (typically a simple reference set). An RF2 reference set references components by ID and does not contain terms, so the system also needs the corresponding description and language reference set files to obtain them",
               "Must be refreshed on each SNOMED CT release to pick up new or inactivated concepts"
             ],
             "example": {
               "label": "FHIR ValueSet with explicit entries (extensional)",
-              "code": "{\n  \"resourceType\": \"ValueSet\",\n  \"id\": \"hypertension-value-set\",\n  \"url\": \"https://example.org/ValueSet/hypertension-value-set\",\n  \"version\": \"20250301\",\n  \"name\": \"HypertensionValueSet\",\n  \"status\": \"active\",\n  \"compose\": {\n    \"include\": [\n      {\n        \"system\": \"http://snomed.info/sct\",\n        \"concept\": [\n          {\n            \"code\": \"38341003\",\n            \"display\": \"Hypertensive disorder, systemic arterial\"\n          },\n          {\n            \"code\": \"73410007\",\n            \"display\": \"Benign secondary renovascular hypertension\"\n          },\n          {\n            \"code\": \"57684003\",\n            \"display\": \"Parenchymal renal hypertension\"\n          }\n        ]\n      }\n    ]\n  }\n}"
+              "code": "{\n  \"resourceType\": \"ValueSet\",\n  \"id\": \"hypertension-value-set\",\n  \"url\": \"https://example.org/ValueSet/hypertension-value-set\",\n  \"version\": \"1.0.0\",\n  \"name\": \"HypertensionValueSet\",\n  \"status\": \"active\",\n  \"compose\": {\n    \"include\": [\n      {\n        \"system\": \"http://snomed.info/sct\",\n        \"version\": \"http://snomed.info/sct/900000000000207008/version/20261101\",\n        \"concept\": [\n          {\n            \"code\": \"38341003\",\n            \"display\": \"Hypertensive disorder\"\n          },\n          {\n            \"code\": \"73410007\",\n            \"display\": \"Benign secondary renovascular hypertension\"\n          },\n          {\n            \"code\": \"57684003\",\n            \"display\": \"Parenchymal renal hypertension\"\n          }\n        ]\n      }\n    ]\n  }\n}"
             }
           }
         ]
@@ -1233,7 +1239,7 @@
       },
       {
         "title": "Establish governance and release management",
-        "description": "Review the value set on each relevant SNOMED CT release: the International Edition is released monthly, and national extensions follow their own release cycle. Check whether new concepts satisfy the ECL constraint and whether inactivated concepts have been handled. Define who reviews the value set, how inactivated concepts are handled in existing data, and how consumers are notified of changes. Keep each definition and its change history in a versioned store, such as your terminology or authoring tool, or version control alongside implementation code. Choose a review cadence that suits your edition's release schedule, and agree a route for urgent changes between scheduled reviews. Test changes against the systems that use the value set in a staging environment, and notify them before the change goes live. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance."
+        "description": "Review the value set against each relevant SNOMED CT release, or at an agreed cadence that suits your edition’s release schedule: the International Edition is released monthly, and national extensions follow their own release cycles. Compare the new expansion with the previous one to confirm that added and removed concepts are intended, check that concepts referenced in the ECL or listed explicitly are still active, and identify new concepts that should be added to any explicit list. Define who reviews the value set, how records coded with inactivated concepts are handled (for example, by using historical associations in queries), and how consumers are notified of changes. Keep each definition and its change history in a versioned store, such as your terminology or authoring tool, or version control alongside implementation code. Agree a route for urgent changes between scheduled reviews. Test changes against the systems that use the value set in a staging environment, and notify them before the change goes live. See the <a href=\"#/playbook/governance\">Governance playbook</a> for release management process guidance."
       },
       {
         "title": "Document the value set",
@@ -1243,7 +1249,7 @@
     "dependencies": [
       {
         "icon": "server",
-        "text": "Terminology service with ECL expansion ($expand) support"
+        "text": "Terminology service (integrated or standalone) with ECL expansion ($expand) support"
       },
       {
         "icon": "users",
